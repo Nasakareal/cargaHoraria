@@ -1,0 +1,22 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\admin",
+    "\\admin\\autoSalones",
+<<<<<<< HEAD
+    "\\app",
+    "\\app\\controllers",
+    "\\database"
+  ],
+  "SelectedNode": "\\admin\\autoSalones\\index.php",
+=======
+    "\\admin\\profesores",
+    "\\app",
+    "\\app\\controllers",
+    "\\app\\controllers\\profesores",
+    "\\database"
+  ],
+  "SelectedNode": "\\admin\\profesores\\index.php",
+>>>>>>> 09dfda8 (descagada)
+  "PreviewInSolutionExplorer": false
+}
