@@ -1,18 +1,18 @@
 <?php
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
-include('../../app/controllers/grupos/listado_de_grupos.php'); // Incluye el listado de grupos
-include('../../app/controllers/salones/listado_de_salones.php'); // Incluye el listado de salones
+include('../../app/controllers/grupos/listado_de_grupos.php'); 
+include('../../app/controllers/salones/listado_de_salones.php'); 
 
-// Lógica para asignar salones según la capacidad
+/* Lógica para asignar salones según la capacidad */
 function asignarSalones($pdo, $capacidad_grupo, $salones_asignados) {
-    // Asegúrate de que el nombre de la columna es correcto
+    
     $salones_asignados_str = implode(',', array_map('intval', $salones_asignados));
     $sql = "SELECT * FROM classrooms WHERE capacity >= :capacidad_grupo";
 
     if (!empty($salones_asignados)) {
-        // Cambia 'id' por el nombre correcto de la columna
-        $sql .= " AND classroom_id NOT IN ($salones_asignados_str)"; // Asegúrate de que 'classroom_id' es el nombre correcto
+       
+        $sql .= " AND classroom_id NOT IN ($salones_asignados_str)"; 
     }
     
     $sql .= " ORDER BY capacity ASC";
@@ -49,7 +49,7 @@ function asignarSalones($pdo, $capacidad_grupo, $salones_asignados) {
                                     <tr>
                                         <th><center>Numero</center></th>
                                         <th><center>Nombre del Grupo</center></th>
-                                        <th><center>Capacidad</center></th>
+                                        <th><center>Volumen</center></th>
                                         <th><center>Salón Asignado</center></th>
                                         <th><center>Acciones</center></th>
                                     </tr>
@@ -57,17 +57,17 @@ function asignarSalones($pdo, $capacidad_grupo, $salones_asignados) {
                                 <tbody>
                                 <?php
                                 $contador_grupos = 0;
-                                $salones_asignados = []; // Inicializamos el array de salones asignados
+                                $salones_asignados = []; 
                                 foreach ($groups as $group) {
                                     $contador_grupos++;
-                                    $capacidad_grupo = $group['volumen_grupo']; // Usa el volumen del grupo como capacidad
+                                    $capacidad_grupo = $group['volumen_grupo']; 
                                     
                                     $salones_asignados_temp = asignarSalones($pdo, $capacidad_grupo, $salones_asignados);
                                     $salon_asignado = null;
 
                                     if (!empty($salones_asignados_temp)) {
-                                        $salon_asignado = $salones_asignados_temp[0]; // Tomamos el primer salón disponible
-                                        $salones_asignados[] = $salon_asignado['classroom_id']; // Cambia 'id' por 'classroom_id'
+                                        $salon_asignado = $salones_asignados_temp[0]; 
+                                        $salones_asignados[] = $salon_asignado['classroom_id'];
                                     }
                                     
                                     $salon_nombre = $salon_asignado ? $salon_asignado['classroom_name'] : 'No disponible';

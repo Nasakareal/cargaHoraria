@@ -4,10 +4,7 @@ include('../../admin/layout/parte1.php');
 include('../../app/controllers/profesores/listado_de_profesores.php');
 include('../../app/controllers/materias/listado_de_materias.php');
 
-<<<<<<< HEAD
 $sentencia = $pdo->query('SELECT * FROM teachers');
-=======
->>>>>>> 09dfda8 (descagada)
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -60,11 +57,7 @@ $sentencia = $pdo->query('SELECT * FROM teachers');
                                     <tr>
                                         <td style="text-align: center"><?= $contador_teachers; ?></td>
                                         <td><?= $teacher['profesor']; ?></td>
-<<<<<<< HEAD
                                         <td><center><?= $teacher['materia']; ?></center></td>
-=======
-                                        <td><center><?= $teacher['materias']; ?></center></td>  <!-- Cambiado a 'materias' -->
->>>>>>> 09dfda8 (descagada)
                                         <td><center><?= $teacher['horas_semanales']; ?></center></td>
                                         
                                         <td style="text-align: center">

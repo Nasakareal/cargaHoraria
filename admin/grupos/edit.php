@@ -1,12 +1,11 @@
 <?php
-
-$group_id = $_GET['id'];
+$group_id = $_GET['id']; 
 
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
-include('../../app/controllers/grupos/datos_del_grupo.php');
-include('../../app/controllers/programas/listado_de_programas.php');
-include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
+include('../../app/controllers/grupos/datos_del_grupo.php'); // Asegúrate que aquí obtienes los datos del grupo
+include('../../app/controllers/programas/listado_de_programas.php'); // Carga el listado de programas
+include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php'); // Carga el listado de cuatrimestres
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -15,7 +14,7 @@ include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
     <div class="content">
         <div class="container">
             <div class="row">
-                <h1>Editar Grupo: <?= $group_name; ?></h1>
+                <h1>Editar Grupo: <?= htmlspecialchars($group_name); ?></h1>
             </div>
             <div class="row">
                 <div class="col-md-6">
@@ -29,8 +28,8 @@ include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="">Nombre del grupo</label>
-                                            <input type="text" name="group_id" value="<?= $group_id; ?>" hidden>
-                                            <input type="text" class="form-control" name="group_name" value="<?= htmlspecialchars($group_name); ?>">
+                                            <input type="text" name="group_id" value="<?= htmlspecialchars($group_id); ?>" hidden>
+                                            <input type="text" class="form-control" name="group_name" value="<?= htmlspecialchars($group_name); ?>" required>
                                         </div>
                                     </div>
                                 </div>
@@ -38,10 +37,10 @@ include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="">Programa Educativo</label>
-                                            <select name="program_id" class="form-control">
+                                            <select name="program_id" class="form-control" required>
                                                 <?php foreach ($programs as $program): ?>
                                                     <option value="<?= $program['program_id']; ?>" <?= ($program['program_id'] == $selected_program_id) ? 'selected' : ''; ?>>
-                                                        <?= htmlspecialchars($program['program_name']); ?>
+                                                        <?= htmlspecialchars($program['programa']); ?>
                                                     </option>
                                                 <?php endforeach; ?>
                                             </select>
@@ -52,7 +51,7 @@ include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="">Cuatrimestre</label>
-                                            <select name="term_id" class="form-control">
+                                            <select name="term_id" class="form-control" required>
                                                 <?php foreach ($terms as $term): ?>
                                                     <option value="<?= $term['term_id']; ?>" <?= ($term['term_id'] == $selected_term_id) ? 'selected' : ''; ?>>
                                                         <?= htmlspecialchars($term['term_name']); ?>

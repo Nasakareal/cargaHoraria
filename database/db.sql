@@ -86,7 +86,10 @@ CREATE TABLE terms (
 /* Insertar datos de ejemplo en cuatrimestres */
 INSERT INTO terms (term_name, fyh_creacion, estado) VALUES 
 ('PRIMERO', '2024-09-19 20:29:10', '1'),
-('SEGUNDO', '2024-09-19 20:29:10', '1');
+('SEGUNDO', '2024-09-19 20:29:10', '1'),
+('TERCERO', '2024-09-19 20:29:10', '1'),
+('CUARTO', '2024-09-19 20:29:10', '1'),
+('QUINTO', '2024-09-19 20:29:10', '1');
 
 /* Tabla de grupos */
 CREATE TABLE `groups` (
@@ -105,7 +108,19 @@ CREATE TABLE `groups` (
 INSERT INTO `groups` (group_name, program_id, term_id, fyh_creacion, estado) VALUES 
 ('GRUPOA', 1, 1, '2024-09-19 20:29:10', '1'),
 ('GRUPOB', 1, 1, '2024-09-19 20:29:10', '1'),
-('GRUPOC', 2, 2, '2024-09-19 20:29:10', '1');
+('GRUPOC', 2, 2, '2024-09-19 20:29:10', '1'),
+('GRUPOD', 3, 3, '2024-09-19 20:29:10', '1'),
+('GRUPOE', 4, 5, '2024-09-19 20:29:10', '1'),
+('GRUPOF', 5, 4, '2024-09-19 20:29:10', '1'),
+('GRUPOG', 1, 1, '2024-09-19 20:29:10', '1'),
+('GRUPOH', 1, 1, '2024-09-19 20:29:10', '1'),
+('GRUPOI', 2, 2, '2024-09-19 20:29:10', '1'),
+('GRUPOJ', 3, 3, '2024-09-19 20:29:10', '1'),
+('GRUPOK', 1, 1, '2024-09-19 20:29:10', '1'),
+('GRUPOL', 1, 1, '2024-09-19 20:29:10', '1'),
+('GRUPOM', 2, 2, '2024-09-19 20:29:10', '1'),
+('GRUPON', 3, 3, '2024-09-19 20:29:10', '1'),
+('GRUPOO', 4, 5, '2024-09-19 20:29:10', '1');
 
 /* Tabla de profesores */
 CREATE TABLE teachers (
@@ -152,9 +167,21 @@ CREATE TABLE classrooms (
 
 /* Insertar datos de ejemplo */
 INSERT INTO classrooms (classroom_name, capacity, fyh_creacion, fyh_actualizacion, estado) VALUES
-('A1', 2090, NOW(), NOW(), 'activo'),
-('A2', 1097, NOW(), NOW(), 'activo'),
-('A3', 327, NOW(), NOW(), 'activo');
+('A1', 131, NOW(), NOW(), 'activo'),
+('A2', 101, NOW(), NOW(), 'activo'),
+('A3', 11, NOW(), NOW(), 'activo'),
+('A4', 33, NOW(), NOW(), 'activo'),
+('A5', 66, NOW(), NOW(), 'activo'),
+('A6', 78, NOW(), NOW(), 'activo'),
+('A7', 50, NOW(), NOW(), 'activo'),
+('A8', 21, NOW(), NOW(), 'activo'),
+('A9', 48, NOW(), NOW(), 'activo'),
+('A10', 20, NOW(), NOW(), 'activo'),
+('A11', 55, NOW(), NOW(), 'activo'),
+('A12', 100, NOW(), NOW(), 'activo'),
+('A13', 55, NOW(), NOW(), 'activo'),
+('A14', 20, NOW(), NOW(), 'activo'),
+('A15', 30, NOW(), NOW(), 'activo');
 
 
 /* Tabla de estudiantes */

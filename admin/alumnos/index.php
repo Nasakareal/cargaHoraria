@@ -45,7 +45,7 @@ include('../../app/controllers/alumnos/listado_de_alumnos.php');
                                         <th><center>Nombres del Alumno</center></th>
                                         <th><center>Grupo del Alumno</center></th>
                                         <th><center>Cuatrimestre del Alumno</center></th>
-                                        <th><center>Programa del Alumno</center></th>  <!-- Agregar esta columna -->
+                                        <th><center>Programa del Alumno</center></th> 
                                         <th><center>Acciones</center></th>
                                     </tr>
                                 </thead>
@@ -59,7 +59,7 @@ include('../../app/controllers/alumnos/listado_de_alumnos.php');
                                         <td><center><?= $student['alumno']; ?></center></td>
                                         <td><center><?= $student['grupo']; ?></center></td>
                                         <td><center><?= $student['cuatrimestre']; ?></center></td>
-                                        <td><center><?= $student['programa']; ?></center></td>  <!-- Mostrar el programa -->
+                                        <td><center><?= $student['programa']; ?></center></td>  
                                         <td style="text-align: center">
                                             <div class="btn-group" role="group" aria-label="Basic example">
                                                 <a href="show.php?id=<?= $student['student_id']; ?>" type="button" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>
@@ -74,7 +74,7 @@ include('../../app/controllers/alumnos/listado_de_alumnos.php');
                                                         event.preventDefault();
                                                         Swal.fire({
                                                             title: 'Eliminar Alumno',
-                                                            text: '�Desea eliminar este Alumno?',
+                                                            text: 'Desea eliminar este Alumno?',
                                                             icon: 'question',
                                                             showDenyButton: true,
                                                             confirmButtonText: 'Eliminar',
@@ -119,7 +119,7 @@ include('../../layout/mensajes.php');
         $("#example1").DataTable({
             "pageLength": 5,
             "language": {
-                "emptyTable": "No hay informaci�n",
+                "emptyTable": "No hay informacion",
                 "info": "Mostrando _START_ a _END_ de _TOTAL_ Alumnos",
                 "infoEmpty": "Mostrando 0 a 0 de 0 Alumnos",
                 "infoFiltered": "(Filtrado de _MAX_ total Alumnos)",

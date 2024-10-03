@@ -63,12 +63,12 @@ $is_specialization = $materia['is_specialization'];
 
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="">¿Es especialización?</label>
+                                            <label for="">es especializacion?</label>
                                             <select name="is_specialization" class="form-control" required>
                                                 <option value="0" <?php if (!$is_specialization)
                                                     echo 'selected'; ?>>No</option>
                                                 <option value="1" <?php if ($is_specialization)
-                                                    echo 'selected'; ?>>Sí</option>
+                                                    echo 'selected'; ?>>Si</option>
                                             </select>
                                         </div>
                                     </div>

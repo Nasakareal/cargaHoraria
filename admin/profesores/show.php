@@ -1,22 +1,15 @@
 <?php
 
 /* Filtra y valida el teacher_id */
-
 $teacher_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$teacher_id) {
     echo "ID de profesor inválido.";
     exit;
 }
 
-<<<<<<< HEAD
-include ('../../app/config.php');
-include ('../../admin/layout/parte1.php');
-include ('../../app/controllers/profesores/datos_del_profesor.php');
-=======
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/profesores/datos_del_profesor.php');
->>>>>>> 09dfda8 (descagada)
 
 ?>
 
@@ -26,11 +19,7 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
     <div class="content">
         <div class="container">
             <div class="row">
-<<<<<<< HEAD
-                <h1>Profesor: <?=$nombres;?></h1> 
-=======
-                <h1>Profesor: <?= $nombres; ?></h1> 
->>>>>>> 09dfda8 (descagada)
+                <h1>Profesor: <?= htmlspecialchars($nombres); ?></h1> 
             </div>
             <div class="row">
                 <div class="col-md-12">
@@ -43,38 +32,31 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Nombres del profesor</label>
-<<<<<<< HEAD
-                                        <p><?=$nombres;?></p>
-=======
-                                        <p><?= $nombres; ?></p>
->>>>>>> 09dfda8 (descagada)
+                                        <p><?= htmlspecialchars($nombres); ?></p>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-<<<<<<< HEAD
-                                        <label for="">Materia</label>
-                                        <p><?=$materias;?></p> 
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="">Horas Semanales</label>
-                                        <p><?=$horas_semanales;?></p> 
-=======
                                         <label for="">Materias</label>
                                         <p>
                                             <?php
                                             if (!empty($materias)) {
+                                                echo "<ul>";
                                                 foreach ($materias as $materia) {
-                                                    echo $materia['subject_name'] . " (" . $materia['weekly_hours'] . " horas semanales)<br>";
+                                                    echo "<li>" . htmlspecialchars($materia['subject_name'] ?? 'Materia no especificada') . " (" . htmlspecialchars($materia['weekly_hours'] ?? 0) . " horas semanales)</li>";
                                                 }
+                                                echo "</ul>";
                                             } else {
                                                 echo "No tiene materias asignadas.";
                                             }
                                             ?>
                                         </p>
->>>>>>> 09dfda8 (descagada)
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">Horas Semanales</label>
+                                        <p><?= ($weekly_hours ?? 0); ?></p> 
                                     </div>
                                 </div>
                             </div>
@@ -83,11 +65,7 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-<<<<<<< HEAD
-                                        <a href="<?=APP_URL;?>/admin/profesores" class="btn btn-secondary">Volver</a>
-=======
                                         <a href="<?= APP_URL; ?>/admin/profesores" class="btn btn-secondary">Volver</a>
->>>>>>> 09dfda8 (descagada)
                                     </div>
                                 </div>
                             </div>
@@ -102,13 +80,7 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
 </div>
 <!-- /.content-wrapper -->
 
-<<<<<<< HEAD
-<?php 
-include ('../../admin/layout/parte2.php');
-include ('../../layout/mensajes.php');
-=======
 <?php
 include('../../admin/layout/parte2.php');
 include('../../layout/mensajes.php');
->>>>>>> 09dfda8 (descagada)
 ?>

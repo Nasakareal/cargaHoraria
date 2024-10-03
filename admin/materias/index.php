@@ -1,7 +1,7 @@
 <?php
-include ('../../app/config.php');
-include ('../../admin/layout/parte1.php');
-include ('../../app/controllers/materias/listado_de_materias.php');
+include('../../app/config.php');
+include('../../admin/layout/parte1.php');
+include('../../app/controllers/materias/listado_de_materias.php');
 
 $sentencia = $pdo->query('SELECT * FROM subjects');
 ?>
@@ -37,7 +37,7 @@ $sentencia = $pdo->query('SELECT * FROM subjects');
                         <div class="card-body">
                             <?php if (isset($_SESSION['mensaje'])): ?>
                                 <div class="alert alert-<?= $_SESSION['icono'] == 'success' ? 'success' : 'danger'; ?>">
-                                    <?= $_SESSION['mensaje']; ?>
+                                    <i class="<?= $_SESSION['icono'] == 'success' ? 'bi bi-check-circle' : 'bi bi-exclamation-triangle'; ?>"></i> <?= $_SESSION['mensaje']; ?>
                                 </div>
                                 <?php unset($_SESSION['mensaje']); ?>
                             <?php endif; ?>
@@ -67,32 +67,32 @@ $sentencia = $pdo->query('SELECT * FROM subjects');
                                                 <div class="btn-group" role="group" aria-label="Basic example">
                                                     <a href="show.php?id=<?= $subject_id; ?>" type="button" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>
                                                     <a href="edit.php?id=<?= $subject_id; ?>" type="button" class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></a>
-                                                    <form action="<?=APP_URL;?>/app/controllers/materias/delete.php" onclick="preguntar<?=$subject_id;?>(event)" method="post" id="miFormulario<?=$subject_id;?>">
-                                                    <input type="text" name="subject_id" value="<?=$subject_id;?>" hidden>
-                                                    <button type="submit" class="btn btn-danger btn-sm" style="border-radius: 0px 5px 5px 0px"><i class="bi bi-trash"></i></button>
-                                                </form>
+                                                    <form action="<?= APP_URL; ?>/app/controllers/materias/delete.php" onclick="preguntar<?= $subject_id; ?>(event)" method="post" id="miFormulario<?= $subject_id; ?>">
+                                                        <input type="hidden" name="subject_id" value="<?= $subject_id; ?>">
+                                                        <button type="submit" class="btn btn-danger btn-sm" style="border-radius: 0px 5px 5px 0px"><i class="bi bi-trash"></i></button>
+                                                    </form>
 
-                                                <script>
-                                                    function preguntar<?=$subject_id;?>(event){
-                                                        event.preventDefault();
-                                                        Swal.fire({
-                                                            title: 'Eliminar Materia',
-                                                            text: '¿Desea eliminar esta Materia?',
-                                                            icon: 'question',
-                                                            showDenyButton: true,
-                                                            confirmButtonText: 'Eliminar',
-                                                            confirmButtonColor: '#a5161d',
-                                                            denyButtonColor: '#007bff',
-                                                            denyButtonText: 'Cancelar',
-                                                        }).then((result) => {
-                                                            if (result.isConfirmed) { 
-                                                                var form = $('#miFormulario<?=$subject_id;?>');
-                                                                form.submit();
-                                                            }
-                                                        });
-                                                        return false;
-                                                    }
-                                                </script>
+                                                    <script>
+                                                        function preguntar<?= $subject_id; ?>(event){
+                                                            event.preventDefault();
+                                                            Swal.fire({
+                                                                title: 'Eliminar Materia',
+                                                                text: '¿Desea eliminar esta Materia?',
+                                                                icon: 'question',
+                                                                showDenyButton: true,
+                                                                confirmButtonText: 'Eliminar',
+                                                                confirmButtonColor: '#a5161d',
+                                                                denyButtonColor: '#007bff',
+                                                                denyButtonText: 'Cancelar',
+                                                            }).then((result) => {
+                                                                if (result.isConfirmed) { 
+                                                                    var form = $('#miFormulario<?= $subject_id; ?>');
+                                                                    form.submit();
+                                                                }
+                                                            });
+                                                            return false;
+                                                        }
+                                                    </script>
                                                 </div>
                                             </td>
                                         </tr>
@@ -113,8 +113,8 @@ $sentencia = $pdo->query('SELECT * FROM subjects');
 <!-- /.content-wrapper -->
 
 <?php
-include ('../../admin/layout/parte2.php');
-include ('../../layout/mensajes.php');
+include('../../admin/layout/parte2.php');
+include('../../layout/mensajes.php');
 ?>
 
 <script>
@@ -125,7 +125,7 @@ include ('../../layout/mensajes.php');
                 "emptyTable": "No hay información",
                 "info": "Mostrando _START_ a _END_ de _TOTAL_ Usuarios",
                 "infoEmpty": "Mostrando 0 a 0 de 0 Usuarios",
-                "infoFiltered": "(Filtrado de _Max_ total Usuarios)",
+                "infoFiltered": "(Filtrado de _MAX_ total Usuarios)",
                 "thousands": ",",
                 "lengthMenu": "Mostrar _MENU_ Usuarios",
                 "loadingRecord": "Cargando...",

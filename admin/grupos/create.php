@@ -2,7 +2,7 @@
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/programas/listado_de_programas.php');
-// include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
+include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php'); // Asegúrate de que este archivo esté bien configurado
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -20,7 +20,7 @@ include('../../app/controllers/programas/listado_de_programas.php');
                             <h3 class="card-title">Llene los datos</h3>
                         </div>
                         <div class="card-body">
-                            <form action="<?= APP_URL; ?>/app/controllers/grupos/create.php" method="post"> <!-- Cambiado aqu� -->
+                            <form action="<?= APP_URL; ?>/app/controllers/grupos/create.php" method="post">
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group">
@@ -44,21 +44,14 @@ include('../../app/controllers/programas/listado_de_programas.php');
                                             <label for="">Cuatrimestre</label>
                                             <select name="cuatrimestre_id" class="form-control" required>
                                                 <option value="">Seleccione un cuatrimestre</option>
-                                                <?php foreach ($cuatrimestres as $cuatrimestre): ?>
-                                                    <option value="<?= $cuatrimestre['id']; ?>"><?= $cuatrimestre['nombre']; ?></option>
+                                                <?php foreach ($terms as $term): // Asegúrate de que la variable sea $terms ?>
+                                                    <option value="<?= $term['term_id']; ?>"><?= $term['term_name']; ?></option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="">Volumen del grupo</label>
-                                            <input type="number" name="volumen_grupo" class="form-control" required>
-                                        </div>
-                                    </div>
-                                </div>
+                                <!-- Elimina la sección de volumen del grupo -->
                                 <hr>
                                 <div class="row">
                                     <div class="col-md-12">
