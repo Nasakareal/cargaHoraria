@@ -2,7 +2,7 @@
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/programas/listado_de_programas.php');
-include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php'); // Asegúrate de que este archivo esté bien configurado
+include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php'); 
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -44,14 +44,14 @@ include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php'); // 
                                             <label for="">Cuatrimestre</label>
                                             <select name="cuatrimestre_id" class="form-control" required>
                                                 <option value="">Seleccione un cuatrimestre</option>
-                                                <?php foreach ($terms as $term): // Asegúrate de que la variable sea $terms ?>
+                                                <?php foreach ($terms as $term):  ?>
                                                     <option value="<?= $term['term_id']; ?>"><?= $term['term_name']; ?></option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Elimina la sección de volumen del grupo -->
+                                
                                 <hr>
                                 <div class="row">
                                     <div class="col-md-12">

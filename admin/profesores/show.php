@@ -1,9 +1,10 @@
-<?php
+ï»¿<?php
 
 /* Filtra y valida el teacher_id */
+
 $teacher_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$teacher_id) {
-    echo "ID de profesor inválido.";
+    echo "ID de profesor invï¿½lido.";
     exit;
 }
 
@@ -19,7 +20,7 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
     <div class="content">
         <div class="container">
             <div class="row">
-                <h1>Profesor: <?= htmlspecialchars($nombres); ?></h1> 
+                <h1>Profesor: <?= $nombres; ?></h1> <!-- Muestra el nombre del profesor -->
             </div>
             <div class="row">
                 <div class="col-md-12">
@@ -32,31 +33,19 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Nombres del profesor</label>
-                                        <p><?= htmlspecialchars($nombres); ?></p>
+                                        <p><?= $nombres; ?></p>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="">Materias</label>
-                                        <p>
-                                            <?php
-                                            if (!empty($materias)) {
-                                                echo "<ul>";
-                                                foreach ($materias as $materia) {
-                                                    echo "<li>" . htmlspecialchars($materia['subject_name'] ?? 'Materia no especificada') . " (" . htmlspecialchars($materia['weekly_hours'] ?? 0) . " horas semanales)</li>";
-                                                }
-                                                echo "</ul>";
-                                            } else {
-                                                echo "No tiene materias asignadas.";
-                                            }
-                                            ?>
-                                        </p>
+                                        <label for="">Materia</label>
+                                        <p><?= $materias; ?></p> <!-- Materias del profesor -->
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Horas Semanales</label>
-                                        <p><?= ($weekly_hours ?? 0); ?></p> 
+                                        <p><?= $horas_semanales; ?></p> <!-- Horas semanales del profesor -->
                                     </div>
                                 </div>
                             </div>

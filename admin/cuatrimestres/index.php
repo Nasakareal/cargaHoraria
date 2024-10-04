@@ -69,8 +69,8 @@ include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
                                                     function preguntar<?= $term_id; ?>(event){
                                                         event.preventDefault();
                                                         Swal.fire({
-                                                            title: 'Eliminar Grupo',
-                                                            text: '¿Desea eliminar este Grupo?',
+                                                            title: 'Eliminar Cuatrimestre',
+                                                            text: 'Desea eliminar este Cuatrimestre?',
                                                             icon: 'question',
                                                             showDenyButton: true,
                                                             confirmButtonText: 'Eliminar',
