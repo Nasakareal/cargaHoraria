@@ -1,10 +1,9 @@
 <?php
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
-include('../../app/controllers/salones/listado_de_salones.php');
+include('../../app/controllers/salones/listado_de_salones.php'); // Asegúrate de estar incluyendo este archivo correctamente
 
-$sentencia = $pdo->query('SELECT * FROM classrooms');
-$classrooms = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+// No es necesario ejecutar otra consulta aquí, ya que `$classrooms` ya fue definido en el archivo listado_de_salones.php
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -43,7 +42,9 @@ $classrooms = $sentencia->fetchAll(PDO::FETCH_ASSOC);
                                     <tr>
                                         <th><center>Numero</center></th>
                                         <th><center>Nombre del Salón</center></th>
-                                        <th><center>Capacidad del Salón</center></th>
+                                        <th><center>Capacidad</center></th>
+                                        <th><center>Edificio</center></th>
+                                        <th><center>Planta</center></th>
                                         <th><center>Acciones</center></th>
                                     </tr>
                                 </thead>
@@ -55,8 +56,11 @@ $classrooms = $sentencia->fetchAll(PDO::FETCH_ASSOC);
                                     $contador_classrooms++; ?>
                                     <tr>
                                         <td style="text-align: center"><?= $contador_classrooms; ?></td>
-                                        <td><center><?= $classroom['classroom_name']; ?></center></td>
-                                        <td style="text-align: center"><?= $classroom['capacity']; ?></td>
+                                        <!-- Usar nombre_salon correctamente -->
+                                        <td><center><?= $classroom['nombre_salon']; ?></center></td>
+                                        <td style="text-align: center"><?= $classroom['capacidad']; ?></td>
+                                        <td style="text-align: center"><?= $classroom['edificio']; ?></td>
+                                        <td style="text-align: center"><?= $classroom['planta']; ?></td>
                                         <td style="text-align: center">
                                             <div class="btn-group" role="group" aria-label="Basic example">
                                                 <a href="show.php?id=<?= $classroom_id; ?>" type="button" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>

@@ -1,11 +1,21 @@
 <?php
-$group_id = $_GET['id']; 
+$group_id = $_GET['id'];
 
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
-include('../../app/controllers/grupos/datos_del_grupo.php'); // Asegúrate que aquí obtienes los datos del grupo
-include('../../app/controllers/programas/listado_de_programas.php'); // Carga el listado de programas
-include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php'); // Carga el listado de cuatrimestres
+include('../../app/controllers/grupos/datos_del_grupo.php');
+include('../../app/controllers/programas/listado_de_programas.php');
+
+$group_name = isset($group_name) ? $group_name : "Grupo no encontrado";
+$program_id = isset($program_id) ? $program_id : null;
+$period = isset($period) ? $period : "Periodo no encontrado";
+$year = isset($year) ? $year : "Año no encontrado";
+$volumen_grupo = isset($volumen_grupo) ? $volumen_grupo : "N/A";
+
+$sql_periods = "SELECT DISTINCT period FROM `groups` WHERE estado = '1'";
+$query_periods = $pdo->prepare($sql_periods);
+$query_periods->execute();
+$periods = $query_periods->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -38,9 +48,10 @@ include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php'); // 
                                         <div class="form-group">
                                             <label for="">Programa Educativo</label>
                                             <select name="program_id" class="form-control" required>
+                                                <option value="">Seleccione un programa</option>
                                                 <?php foreach ($programs as $program): ?>
-                                                    <option value="<?= $program['program_id']; ?>" <?= ($program['program_id'] == $selected_program_id) ? 'selected' : ''; ?>>
-                                                        <?= htmlspecialchars($program['programa']); ?>
+                                                    <option value="<?= $program['program_id']; ?>" <?= ($program['program_id'] == $program_id) ? 'selected' : ''; ?>>
+                                                        <?= htmlspecialchars($program['programa'], ENT_QUOTES, 'UTF-8'); ?>
                                                     </option>
                                                 <?php endforeach; ?>
                                             </select>
@@ -50,14 +61,31 @@ include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php'); // 
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label for="">Cuatrimestre</label>
-                                            <select name="term_id" class="form-control" required>
-                                                <?php foreach ($terms as $term): ?>
-                                                    <option value="<?= $term['term_id']; ?>" <?= ($term['term_id'] == $selected_term_id) ? 'selected' : ''; ?>>
-                                                        <?= htmlspecialchars($term['term_name']); ?>
+                                            <label for="">Periodo</label>
+                                            <select name="period" class="form-control" required>
+                                                <option value="">Seleccione un periodo</option>
+                                                <?php foreach ($periods as $p): ?>
+                                                    <option value="<?= htmlspecialchars($p['period'], ENT_QUOTES, 'UTF-8'); ?>" <?= ($p['period'] == $period) ? 'selected' : ''; ?>>
+                                                        <?= htmlspecialchars($p['period'], ENT_QUOTES, 'UTF-8'); ?>
                                                     </option>
                                                 <?php endforeach; ?>
                                             </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="">Año</label>
+                                            <input type="number" class="form-control" name="year" value="<?= htmlspecialchars($year); ?>" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="">Volumen del grupo</label>
+                                            <input type="number" class="form-control" name="volume" value="<?= htmlspecialchars($volumen_grupo); ?>" required>
                                         </div>
                                     </div>
                                 </div>

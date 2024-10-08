@@ -109,7 +109,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Brand Logo -->
     <a href="<?=APP_URL;?>/admin" class="brand-link" style="background-color: #008080">
       <img src="https://ut-morelia.edu.mx/wp-content/uploads/2022/05/Logo-UTM-Claro.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8; width: 50px; height: 50px; object-fit: contain;">
-      <span class="brand-text font-weight-light">Sistema Escolar</span>
+      <span class="brand-text font-weight-light">Carga Horaria</span>
     </a>
 
     <!-- Sidebar -->

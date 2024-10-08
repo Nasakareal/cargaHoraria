@@ -1,8 +1,15 @@
 {
   "ExpandedNodes": [
     "",
+    "\\admin",
+    "\\admin\\grupos",
+    "\\admin\\salones",
+    "\\app",
+    "\\app\\controllers",
+    "\\app\\controllers\\grupos",
+    "\\app\\controllers\\salones",
     "\\database"
   ],
-  "SelectedNode": "\\database\\db.sql",
+  "SelectedNode": "\\admin\\salones\\index.php",
   "PreviewInSolutionExplorer": false
 }

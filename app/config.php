@@ -4,11 +4,11 @@ define ('USUARIO','root');
 define ('PASSWORD','');
 define ('BD','sistemaGestionEscolar');
 
-define ('APP_NAME','Sistema De Gestion Escolar');
+define ('APP_NAME','Sistema De Carga Horaria');
 define ('APP_URL','http://localhost/sistemaGestionEscolar');
 define ('KEY_API_MAPS','');
 
-$servidor = "mysql:dbname=".BD.";host=".SERVIDOR;
+$servidor = "mysql:dbname=" . BD . ";host=" . SERVIDOR . ";charset=utf8mb4";
 
 try{
     $pdo = new PDO($servidor, USUARIO, PASSWORD, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));

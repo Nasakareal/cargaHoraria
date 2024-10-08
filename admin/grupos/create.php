@@ -2,7 +2,12 @@
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/programas/listado_de_programas.php');
-include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php'); 
+include('../../app/controllers/grupos/listado_de_grupos.php');
+
+
+$query = $pdo->prepare("SELECT DISTINCT period FROM `groups` ORDER BY period");
+$query->execute();
+$periods = $query->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -34,20 +39,32 @@ include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
                                             <select name="programa_id" class="form-control" required>
                                                 <option value="">Seleccione un programa</option>
                                                 <?php foreach ($programs as $program): ?>
-                                                    <option value="<?= $program['program_id']; ?>"><?= $program['programa']; ?></option>
+                                                    <option value="<?= $program['program_id']; ?>"><?= htmlspecialchars($program['programa'], ENT_QUOTES, 'UTF-8'); ?></option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="">Cuatrimestre</label>
-                                            <select name="cuatrimestre_id" class="form-control" required>
-                                                <option value="">Seleccione un cuatrimestre</option>
-                                                <?php foreach ($terms as $term):  ?>
-                                                    <option value="<?= $term['term_id']; ?>"><?= $term['term_name']; ?></option>
+                                            <label for="">Periodo</label>
+                                            <select name="period" class="form-control" required>
+                                                <option value="">Seleccione un periodo</option>
+                                                <?php foreach ($periods as $period): ?>
+                                                    <option value="<?= htmlspecialchars($period['period'], ENT_QUOTES, 'UTF-8'); ?>"><?= htmlspecialchars($period['period'], ENT_QUOTES, 'UTF-8'); ?></option>
                                                 <?php endforeach; ?>
                                             </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="">A&ntilde;o</label>
+                                            <input type="number" name="year" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="">Volumen del grupo</label>
+                                            <input type="number" name="volume" class="form-control" required>
                                         </div>
                                     </div>
                                 </div>

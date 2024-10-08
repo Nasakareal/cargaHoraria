@@ -5,24 +5,35 @@ include('../../../app/config.php');
 $group_id = $_POST['group_id']; // ID del grupo a actualizar
 $grupo = $_POST['group_name']; // Nombre del grupo
 $programa_id = $_POST['program_id']; // ID del programa
-$cuatrimestre_id = $_POST['term_id']; // ID del cuatrimestre
-$volumen_grupo = $_POST['volumen_grupo'] ?? null; // Permitir que este campo sea opcional
+$periodo = $_POST['period']; // Periodo
+$year = $_POST['year']; // Año
+$volumen_grupo = $_POST['volume'] ?? null; // Permitir que este campo sea opcional
 
 $grupo = mb_strtoupper($grupo, 'UTF-8'); // Asegúrate de que el campo esté en mayúsculas
 
-if ($grupo == "" || $programa_id == "" || $cuatrimestre_id == "") {
+if ($grupo == "" || $programa_id == "" || $periodo == "" || $year == "") {
     session_start();
-    $_SESSION['mensaje'] = "Los campos Nombre del grupo, Programa y Cuatrimestre son obligatorios.";
+    $_SESSION['mensaje'] = "Los campos Nombre del grupo, Programa, Periodo y Año son obligatorios.";
     $_SESSION['icono'] = "error";
     header('Location:' . APP_URL . "/admin/grupos/edit.php?id=" . $group_id);
     exit;
 }
 
 // Preparamos la consulta
-$sentencia = $pdo->prepare("UPDATE `groups` SET group_name = :grupo, program_id = :programa_id, term_id = :cuatrimestre_id, fyh_actualizacion = NOW() WHERE group_id = :group_id");
+$sentencia = $pdo->prepare("UPDATE `groups` 
+                            SET group_name = :grupo, 
+                                program_id = :programa_id, 
+                                period = :periodo, 
+                                year = :year, 
+                                volume = :volume, 
+                                fyh_actualizacion = NOW() 
+                            WHERE group_id = :group_id");
+
 $sentencia->bindParam(':grupo', $grupo);
 $sentencia->bindParam(':programa_id', $programa_id);
-$sentencia->bindParam(':cuatrimestre_id', $cuatrimestre_id);
+$sentencia->bindParam(':periodo', $periodo);
+$sentencia->bindParam(':year', $year);
+$sentencia->bindParam(':volume', $volumen_grupo);
 $sentencia->bindParam(':group_id', $group_id);
 
 try {

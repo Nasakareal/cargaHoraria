@@ -4,13 +4,13 @@ include ('../../../app/config.php');
 
 $group_id = $_POST['group_id'];
 
-// Verificar si el grupo está asociado a algún estudiante
+/* Verificar si el grupo está asociado a algún estudiante */
 $sql_asociaciones = "SELECT * FROM students WHERE estado = '1' AND group_id = :group_id"; 
 $query_asociaciones = $pdo->prepare($sql_asociaciones);
 $query_asociaciones->bindParam(':group_id', $group_id);
 $query_asociaciones->execute();
 $asociaciones = $query_asociaciones->fetchAll(PDO::FETCH_ASSOC);
-$contador = count($asociaciones); // Cuenta las asociaciones
+$contador = count($asociaciones); 
 
 if ($contador > 0) {
     session_start();

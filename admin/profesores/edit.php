@@ -1,9 +1,9 @@
-﻿<?php
+<?php
 include('../../app/config.php');
 
 $teacher_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$teacher_id) {
-    echo "ID de usuario inv�lido.";
+    echo "ID de usuario inválido.";
     exit;
 }
 
@@ -11,7 +11,12 @@ include('../../admin/layout/parte1.php');
 include('../../app/controllers/profesores/datos_del_profesor.php');
 include('../../app/controllers/materias/listado_de_materias.php');
 
-$materia_id = isset($materia_id) ? $materia_id : '';
+// Obtener las materias que el profesor ya imparte
+$query = $pdo->prepare("SELECT subject_id, weekly_hours FROM teacher_subjects WHERE teacher_id = :teacher_id");
+$query->execute(['teacher_id' => $teacher_id]);
+$materias_asignadas = $query->fetchAll(PDO::FETCH_ASSOC);
+
+$materias_ids_asignadas = array_column($materias_asignadas, 'subject_id');
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -20,7 +25,7 @@ $materia_id = isset($materia_id) ? $materia_id : '';
     <div class="content">
         <div class="container">
             <div class="row">
-                <h1>Modificar profesor: <?= $nombres; ?></h1>
+                <h1>Modificar profesor: <?= htmlspecialchars($nombres); ?></h1>
             </div>
             <div class="row">
                 <div class="col-md-12">
@@ -30,28 +35,27 @@ $materia_id = isset($materia_id) ? $materia_id : '';
                         </div>
                         <div class="card-body">
                             <form action="<?= APP_URL; ?>/app/controllers/profesores/update.php" method="post">
-                                <!-- A�adir campo oculto para el ID del profesor -->
-                                <input type="hidden" name="teacher_id" value="<?= $teacher_id; ?>">
+                                <!-- Añadir campo oculto para el ID del profesor -->
+                                <input type="hidden" name="teacher_id" value="<?= htmlspecialchars($teacher_id); ?>">
 
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="">Nombres del profesor</label>
-                                            <input type="text" name="nombres" value="<?= $nombres; ?>" class="form-control" required>
+                                            <input type="text" name="nombres" value="<?= htmlspecialchars($nombres); ?>" class="form-control" required>
                                         </div>
                                     </div>
 
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="">Materia a impartir</label>
-                                            <select name="materia_id" class="form-control" required>
-                                                <option value="">Selecciona una materia</option>
+                                            <label for="">Materias a impartir</label>
+                                            <select name="materia_ids[]" class="form-control" multiple required>
                                                 <?php
                                                 /* Mostrar las materias disponibles */
                                                 if (!empty($subjects)) {
                                                     foreach ($subjects as $subject) { ?>
-                                                        <option value="<?= $subject['subject_id']; ?>" <?php if ($materia_id == $subject['subject_id']) { ?> selected="selected" <?php } ?>>
-                                                            <?= $subject['subject_name']; ?>
+                                                        <option value="<?= htmlspecialchars($subject['subject_id']); ?>" <?php if (in_array($subject['subject_id'], $materias_ids_asignadas)) { ?> selected="selected" <?php } ?>>
+                                                            <?= htmlspecialchars($subject['subject_name']); ?>
                                                         </option>
                                                     <?php }
                                                 } else {
@@ -65,7 +69,7 @@ $materia_id = isset($materia_id) ? $materia_id : '';
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="">Horas Semanales</label>
-                                            <input type="number" name="horas_semanales" value="<?= $horas_semanales; ?>" class="form-control" required>
+                                            <input type="number" name="horas_semanales" class="form-control" required>
                                         </div>
                                     </div>
                                 </div>

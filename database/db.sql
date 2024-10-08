@@ -96,31 +96,34 @@ CREATE TABLE `groups` (
     group_id INT AUTO_INCREMENT PRIMARY KEY,
     group_name VARCHAR(255) NOT NULL,
     program_id INT,
-    term_id INT,
+    period VARCHAR(255),
+    year INT,
+    volume INT,
     fyh_creacion DATETIME NULL,
     fyh_actualizacion DATETIME NULL,
     estado VARCHAR(11),
-    FOREIGN KEY (program_id) REFERENCES programs(program_id),
-    FOREIGN KEY (term_id) REFERENCES terms(term_id)
+    
+    FOREIGN KEY (program_id) REFERENCES programs(program_id)
 ) ENGINE=InnoDB;
 
 /* Insertar datos de ejemplo en grupos */
-INSERT INTO `groups` (group_name, program_id, term_id, fyh_creacion, estado) VALUES 
-('GRUPOA', 1, 1, '2024-09-19 20:29:10', '1'),
-('GRUPOB', 1, 1, '2024-09-19 20:29:10', '1'),
-('GRUPOC', 2, 2, '2024-09-19 20:29:10', '1'),
-('GRUPOD', 3, 3, '2024-09-19 20:29:10', '1'),
-('GRUPOE', 4, 5, '2024-09-19 20:29:10', '1'),
-('GRUPOF', 5, 4, '2024-09-19 20:29:10', '1'),
-('GRUPOG', 1, 1, '2024-09-19 20:29:10', '1'),
-('GRUPOH', 1, 1, '2024-09-19 20:29:10', '1'),
-('GRUPOI', 2, 2, '2024-09-19 20:29:10', '1'),
-('GRUPOJ', 3, 3, '2024-09-19 20:29:10', '1'),
-('GRUPOK', 1, 1, '2024-09-19 20:29:10', '1'),
-('GRUPOL', 1, 1, '2024-09-19 20:29:10', '1'),
-('GRUPOM', 2, 2, '2024-09-19 20:29:10', '1'),
-('GRUPON', 3, 3, '2024-09-19 20:29:10', '1'),
-('GRUPOO', 4, 5, '2024-09-19 20:29:10', '1');
+INSERT INTO `groups` (group_name, program_id, period, year, volume, fyh_creacion, estado) VALUES 
+('GRUPOA', 1, '1° Periodo', 2024, 30, '2024-09-19 20:29:10', '1'),
+('GRUPOB', 1, '1° Periodo', 2024, 25, '2024-09-19 20:29:10', '1'),
+('GRUPOC', 2, '2° Periodo', 2024, 20, '2024-09-19 20:29:10', '1'),
+('GRUPOD', 3, '3° Periodo', 2024, 15, '2024-09-19 20:29:10', '1'),
+('GRUPOE', 4, '5° Periodo', 2024, 10, '2024-09-19 20:29:10', '1'),
+('GRUPOF', 5, '4° Periodo', 2024, 5, '2024-09-19 20:29:10', '1'),
+('GRUPOG', 1, '1° Periodo', 2024, 35, '2024-09-19 20:29:10', '1'),
+('GRUPOH', 1, '1° Periodo', 2024, 40, '2024-09-19 20:29:10', '1'),
+('GRUPOI', 2, '2° Periodo', 2024, 40, '2024-09-19 20:29:10', '1'),
+('GRUPOJ', 3, '3° Periodo', 2024, 40, '2024-09-19 20:29:10', '1'),
+('GRUPOK', 1, '1° Periodo', 2024, 40, '2024-09-19 20:29:10', '1'),
+('GRUPOL', 1, '1° Periodo', 2024, 40, '2024-09-19 20:29:10', '1'),
+('GRUPOM', 2, '2° Periodo', 2024, 40, '2024-09-19 20:29:10', '1'),
+('GRUPON', 3, '3° Periodo', 2024, 40, '2024-09-19 20:29:10', '1'),
+('GRUPOO', 4, '5° Periodo', 2024, 40, '2024-09-19 20:29:10', '1');
+
 
 /* Tabla de profesores */
 CREATE TABLE teachers (
@@ -159,29 +162,79 @@ CREATE TABLE teacher_subjects (
 CREATE TABLE classrooms (
     classroom_id INT AUTO_INCREMENT PRIMARY KEY,
     classroom_name VARCHAR(50) NOT NULL,
-    capacity INT NOT NULL, /* Capacidad del salón */
+    capacity INT NOT NULL,
+    building VARCHAR(100) NOT NULL, /* Campo para el edificio */
+    floor ENUM('ALTA', 'BAJA') NOT NULL, /* Planta que solo puede ser ALTA o BAJA */
     fyh_creacion DATETIME NULL,
     fyh_actualizacion DATETIME NULL,
     estado VARCHAR(11)
 ) ENGINE=InnoDB;
 
 /* Insertar datos de ejemplo */
-INSERT INTO classrooms (classroom_name, capacity, fyh_creacion, fyh_actualizacion, estado) VALUES
-('A1', 131, NOW(), NOW(), 'activo'),
-('A2', 101, NOW(), NOW(), 'activo'),
-('A3', 11, NOW(), NOW(), 'activo'),
-('A4', 33, NOW(), NOW(), 'activo'),
-('A5', 66, NOW(), NOW(), 'activo'),
-('A6', 78, NOW(), NOW(), 'activo'),
-('A7', 50, NOW(), NOW(), 'activo'),
-('A8', 21, NOW(), NOW(), 'activo'),
-('A9', 48, NOW(), NOW(), 'activo'),
-('A10', 20, NOW(), NOW(), 'activo'),
-('A11', 55, NOW(), NOW(), 'activo'),
-('A12', 100, NOW(), NOW(), 'activo'),
-('A13', 55, NOW(), NOW(), 'activo'),
-('A14', 20, NOW(), NOW(), 'activo'),
-('A15', 30, NOW(), NOW(), 'activo');
+INSERT INTO classrooms (classroom_name, capacity, building, floor, fyh_creacion, fyh_actualizacion, estado) VALUES
+('1', 38, 'EDIFICIO A', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('2', 38, 'EDIFICIO A', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('3', 38, 'EDIFICIO A', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('4', 38, 'EDIFICIO A', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('5', 38, 'EDIFICIO A', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('6', 38, 'EDIFICIO A', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('7', 38, 'EDIFICIO A', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('8', 38, 'EDIFICIO A', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('9', 38, 'EDIFICIO A', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('10', 38, 'EDIFICIO A', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('11', 38, 'EDIFICIO A', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('12', 38, 'EDIFICIO A', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('13', 38, 'EDIFICIO A', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('14', 38, 'EDIFICIO A', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('15', 30, 'EDIFICIO A', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('16', 30, 'EDIFICIO A', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('17', 30, 'EDIFICIO A', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('M', 38, 'EDIFICIO A', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('1', 30, 'EDIFICIO B', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('2', 30, 'EDIFICIO B', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('3', 30, 'EDIFICIO B', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('4', 30, 'EDIFICIO B', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('5', 30, 'EDIFICIO B', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('6', 30, 'EDIFICIO B', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('7', 30, 'EDIFICIO B', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('8', 30, 'EDIFICIO B', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('9', 30, 'EDIFICIO B', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('10', 30, 'EDIFICIO B', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('11', 30, 'EDIFICIO B', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('12', 30, 'EDIFICIO B', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('13', 30, 'EDIFICIO B', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('14', 30, 'EDIFICIO B', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('15', 30, 'EDIFICIO B', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('16', 25, 'EDIFICIO B', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('1', 25, 'EDIFICIO C', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('2', 25, 'EDIFICIO C', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('3', 25, 'EDIFICIO C', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('4', 25, 'EDIFICIO C', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('5', 30, 'EDIFICIO C', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('6', 30, 'EDIFICIO C', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('7', 20, 'EDIFICIO C', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('8', 20, 'EDIFICIO C', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('1', 30, 'EDIFICIO D', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('2', 30, 'EDIFICIO D', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('3', 40, 'EDIFICIO D', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('4', 40, 'EDIFICIO D', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('5', 40, 'EDIFICIO D', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('6', 40, 'EDIFICIO D', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('7', 40, 'EDIFICIO D', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('8', 40, 'EDIFICIO D', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('9', 40, 'EDIFICIO D', 'BAJA', NOW(), NOW(), 'ACTIVO'),
+('10', 40, 'EDIFICIO D', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('11', 40, 'EDIFICIO D', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('12', 40, 'EDIFICIO D', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('13', 40, 'EDIFICIO D', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('14', 40, 'EDIFICIO D', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('15', 40, 'EDIFICIO D', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('16', 40, 'EDIFICIO D', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('1', 30, 'EDIFICIO E', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('2', 30, 'EDIFICIO E', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('3', 30, 'EDIFICIO E', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('16', 40, 'P1', 'ALTA', NOW(), NOW(), 'ACTIVO'),
+('17', 40, 'P1', 'ALTA', NOW(), NOW(), 'ACTIVO');
 
 
 /* Tabla de estudiantes */

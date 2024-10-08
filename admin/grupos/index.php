@@ -6,8 +6,6 @@ include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/programas/listado_de_programas.php');
 include('../../app/controllers/grupos/listado_de_grupos.php');
-include('../../app/controllers/alumnos/listado_de_alumnos.php');
-include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
 
 ?>
 
@@ -45,60 +43,66 @@ include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
                             <table id="example1" class="table table-striped table-bordered table-hover table-sm">
                                 <thead>
                                     <tr>
-                                        <th><center>Numero</center></th>
-                                        <th><center>Nombre del Grupo</center></th>
-                                        <th><center>Nombre del Programa Educativo</center></th>
-                                        <th><center>Cuatrimestre</center></th>
-                                        <th><center>Volumen del grupo</center></th>
-                                        <th><center>Acciones</center></th>
+                                        <th class="text-center">N&uacute;mero</th>
+                                        <th class="text-center">Nombre del Grupo</th>
+                                        <th class="text-center">Nombre del Programa Educativo</th>
+                                        <th class="text-center">Periodo</th>
+                                        <th class="text-center">A&ntilde;o</th>
+                                        <th class="text-center">Volumen del grupo</th>
+                                        <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 <?php
-                                $contador_groups = 0;
-                                foreach ($groups as $group) {
-                                    $group_id = $group['group_id'];
-                                    $contador_groups++; ?>
-                                    <tr>
-                                        <td style="text-align: center"><?= $contador_groups; ?></td>
-                                        <td><?= $group['grupo']; ?></td>
-                                        <td><?= $group['programa']; ?></td>
-                                        <td><?= $group['cuatrimestre']; ?></td>
-                                        <td style="text-align: center"><?= $group['volumen_grupo']; ?></td>
-                                        <td style="text-align: center">
-                                            <div class="btn-group" role="group" aria-label="Basic example">
-                                                <a href="show.php?id=<?= $group_id; ?>" type="button" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>
-                                                <a href="edit.php?id=<?= $group_id; ?>" type="button" class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></a>
-                                                <form action="<?= APP_URL; ?>/app/controllers/grupos/delete.php" onclick="preguntar<?= $group_id; ?>(event)" method="post" id="miFormulario<?= $group_id; ?>">
-                                                    <input type="text" name="group_id" value="<?= $group_id; ?>" hidden>
-                                                    <button type="submit" class="btn btn-danger btn-sm" style="border-radius: 0px 5px 5px 0px"><i class="bi bi-trash"></i></button>
-                                                </form>
+                                if (isset($groups)) {
+                                    $contador_groups = 0;
+                                    foreach ($groups as $group) {
+                                        $group_id = $group['group_id'];
+                                        $contador_groups++; ?>
+                                        <tr>
+                                            <td style="text-align: center"><?= $contador_groups; ?></td>
+                                            <td class="text-center"><?= $group['group_name']; ?></td>
+                                            <td class="text-center"><?= $group['programa']; ?></td>
+                                            <td class="text-center"><?= $group['period']; ?></td>
+                                            <td class="text-center"><?= $group['year']; ?></td>
+                                            <td style="text-align: center"><?= $group['volume']; ?></td>
+                                            <td style="text-align: center">
+                                                <div class="btn-group" role="group" aria-label="Basic example">
+                                                    <a href="show.php?id=<?= $group_id; ?>" type="button" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>
+                                                    <a href="edit.php?id=<?= $group_id; ?>" type="button" class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></a>
+                                                    <form action="<?= APP_URL; ?>/app/controllers/grupos/delete.php" onclick="preguntar<?= $group_id; ?>(event)" method="post" id="miFormulario<?= $group_id; ?>">
+                                                        <input type="text" name="group_id" value="<?= $group_id; ?>" hidden>
+                                                        <button type="submit" class="btn btn-danger btn-sm" style="border-radius: 0px 5px 5px 0px"><i class="bi bi-trash"></i></button>
+                                                    </form>
 
-                                                <script>
-                                                    function preguntar<?= $group_id; ?>(event){
-                                                        event.preventDefault();
-                                                        Swal.fire({
-                                                            title: 'Eliminar Grupo',
-                                                            text: '¿Desea eliminar este Grupo?',
-                                                            icon: 'question',
-                                                            showDenyButton: true,
-                                                            confirmButtonText: 'Eliminar',
-                                                            confirmButtonColor: '#a5161d',
-                                                            denyButtonColor: '#007bff',
-                                                            denyButtonText: 'Cancelar',
-                                                        }).then((result) => {
-                                                            if (result.isConfirmed) { 
-                                                                var form = $('#miFormulario<?= $group_id; ?>');
-                                                                form.submit();
-                                                            }
-                                                        });
-                                                        return false;
-                                                    }
-                                                </script>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <?php
+                                                    <script>
+                                                        function preguntar<?= $group_id; ?>(event){
+                                                            event.preventDefault();
+                                                            Swal.fire({
+                                                                title: 'Eliminar Grupo',
+                                                                text: 'Desea eliminar este Grupo?',
+                                                                icon: 'question',
+                                                                showDenyButton: true,
+                                                                confirmButtonText: 'Eliminar',
+                                                                confirmButtonColor: '#a5161d',
+                                                                denyButtonColor: '#007bff',
+                                                                denyButtonText: 'Cancelar',
+                                                            }).then((result) => {
+                                                                if (result.isConfirmed) { 
+                                                                    var form = $('#miFormulario<?= $group_id; ?>');
+                                                                    form.submit();
+                                                                }
+                                                            });
+                                                            return false;
+                                                        }
+                                                    </script>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <?php
+                                    }
+                                } else {
+                                    echo "<tr><td colspan='7' style='text-align:center'>No se encontraron grupos.</td></tr>";
                                 }
                                 ?>
                                 </tbody>
@@ -127,7 +131,7 @@ include('../../layout/mensajes.php');
                 "emptyTable": "No hay información",
                 "info": "Mostrando _START_ a _END_ de _TOTAL_ Grupos",
                 "infoEmpty": "Mostrando 0 a 0 de 0 Grupos",
-                "infoFiltered": "(Filtrado de _Max_ total Grupos)",
+                "infoFiltered": "(Filtrado de _MAX_ total Grupos)",
                 "lengthMenu": "Mostrar _MENU_ Grupos",
                 "loadingRecord": "Cargando...",
                 "processing": "Procesando...",

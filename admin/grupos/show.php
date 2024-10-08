@@ -1,31 +1,85 @@
 <?php
 
-$student_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-if (!$student_id) {
-    echo "ID de alumno inválido.";
+$group_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+if (!$group_id) {
+    header('Location: ' . APP_URL . '/admin/grupos');
     exit;
 }
 
-$sql_student = "
-    SELECT s.student_id, s.alumno, g.group_name, p.program_name, g.term_id
-    FROM students s
-    LEFT JOIN groups g ON s.group_id = g.group_id
-    LEFT JOIN programs p ON g.program_id = p.program_id
-    WHERE s.student_id = :student_id AND s.estado = '1'
-";
+include('../../app/config.php');
+include('../../admin/layout/parte1.php');
+include('../../app/controllers/grupos/datos_del_grupo.php');
 
-$query_student = $pdo->prepare($sql_student);
-$query_student->bindParam(':student_id', $student_id, PDO::PARAM_INT);
-$query_student->execute();
+?>
 
-$student_data = $query_student->fetch(PDO::FETCH_ASSOC);
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <br>
+    <div class="content">
+        <div class="container">
+            <div class="row">
+                <h1>Datos del Grupo</h1> 
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-outline card-info">
+                        <div class="card-header">
+                            <h3 class="card-title">Datos del Grupo</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">Nombre del grupo</label>
+                                        <p><?= htmlspecialchars($group_name); ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">Programa educativo</label>
+                                        <p><?= htmlspecialchars($program_name); ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">Periodo</label>
+                                        <p><?= htmlspecialchars($period); ?></p> 
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">A&ntilde;o</label>
+                                        <p><?= htmlspecialchars($year); ?></p> 
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">Volumen</label>
+                                        <p><?= htmlspecialchars($volumen_grupo); ?></p> 
+                                    </div>
+                                </div>
+                            </div>
 
-if ($student_data) {
-    $alumno = $student_data['alumno'];
-    $group_name = $student_data['group_name'] ?? "Grupo no encontrado";
-    $program_name = $student_data['program_name'] ?? "Programa no encontrado";
-    $selected_term_id = $student_data['term_id'] ?? "Termino no encontrado";
-} else {
-    echo "Alumno no encontrado.";
-    exit;
-}
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <a href="<?= APP_URL; ?>/admin/grupos" class="btn btn-secondary">Volver</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+
+<?php
+include('../../admin/layout/parte2.php');
+include('../../layout/mensajes.php');
+?>
