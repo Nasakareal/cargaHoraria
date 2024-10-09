@@ -28,7 +28,7 @@ include('../../app/controllers/grupos/listado_de_grupos.php');
                                     <i class="bi bi-plus-square"></i> Agregar nuevo Grupo
                                 </a>
 
-                                <!-- Añadir grupos desde archivo -->
+                                <!-- AÃ±adir grupos desde archivo -->
                                 <form action="<?= APP_URL; ?>/app/controllers/grupos/upload.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center">
                                     <div class="form-group me-2">
                                         <label for="file" class="d-none">Selecciona un archivo CSV:</label>
@@ -49,6 +49,7 @@ include('../../app/controllers/grupos/listado_de_grupos.php');
                                         <th class="text-center">Periodo</th>
                                         <th class="text-center">A&ntilde;o</th>
                                         <th class="text-center">Volumen del grupo</th>
+                                        <th class="text-center">Turno</th>  <!-- Nueva columna para el turno -->
                                         <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
@@ -66,6 +67,7 @@ include('../../app/controllers/grupos/listado_de_grupos.php');
                                             <td class="text-center"><?= $group['period']; ?></td>
                                             <td class="text-center"><?= $group['year']; ?></td>
                                             <td style="text-align: center"><?= $group['volume']; ?></td>
+                                            <td class="text-center"><?= $group['turno']; ?></td>  <!-- Mostrar el turno aquÃ­ -->
                                             <td style="text-align: center">
                                                 <div class="btn-group" role="group" aria-label="Basic example">
                                                     <a href="show.php?id=<?= $group_id; ?>" type="button" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>
@@ -80,7 +82,7 @@ include('../../app/controllers/grupos/listado_de_grupos.php');
                                                             event.preventDefault();
                                                             Swal.fire({
                                                                 title: 'Eliminar Grupo',
-                                                                text: 'Desea eliminar este Grupo?',
+                                                                text: 'Â¿Desea eliminar este Grupo?',
                                                                 icon: 'question',
                                                                 showDenyButton: true,
                                                                 confirmButtonText: 'Eliminar',
@@ -102,7 +104,7 @@ include('../../app/controllers/grupos/listado_de_grupos.php');
                                         <?php
                                     }
                                 } else {
-                                    echo "<tr><td colspan='7' style='text-align:center'>No se encontraron grupos.</td></tr>";
+                                    echo "<tr><td colspan='8' style='text-align:center'>No se encontraron grupos.</td></tr>";
                                 }
                                 ?>
                                 </tbody>
@@ -128,7 +130,7 @@ include('../../layout/mensajes.php');
         $("#example1").DataTable({
             "pageLength": 5,
             "language": {
-                "emptyTable": "No hay información",
+                "emptyTable": "No hay informaciÃ³n",
                 "info": "Mostrando _START_ a _END_ de _TOTAL_ Grupos",
                 "infoEmpty": "Mostrando 0 a 0 de 0 Grupos",
                 "infoFiltered": "(Filtrado de _MAX_ total Grupos)",
@@ -139,7 +141,7 @@ include('../../layout/mensajes.php');
                 "zeroRecords": "Sin resultados encontrados",
                 "paginate": {
                     "first": "Primero",
-                    "last": "Último",
+                    "last": "Ãšltimo",
                     "next": "Siguiente",
                     "previous": "Anterior"
                 }

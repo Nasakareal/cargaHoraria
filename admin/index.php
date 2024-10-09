@@ -8,7 +8,6 @@ include('../app/controllers/materias/listado_de_materias.php');
 include('../app/controllers/programas/listado_de_programas.php');
 include('../app/controllers/grupos/listado_de_grupos.php');
 include('../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
-include('../app/controllers/alumnos/listado_de_alumnos.php');
 ?>
 
   <!-- Content Wrapper. Contains page content -->
@@ -169,26 +168,7 @@ include('../app/controllers/alumnos/listado_de_alumnos.php');
             </div>
           </div>
 
-            <div class="col-lg-3 col-6">
-            <div class="small-box bg-info">
-              <div class="inner">
-                <?php
-                $contador_students = 0;
-                foreach ($students as $student) {
-                    $contador_students++;
-                }
-                ?>
-                <h3><?= $contador_students; ?></h3>
-                <p>Alumnos registrados</p>
-              </div>
-              <div class="icon">
-                <i class="fas"><i class="bi bi-person-lines-fill"></i></i>
-              </div>
-              <a href="<?= APP_URL; ?>/admin/alumnos" class="small-box-footer">
-                Más información <i class="fas fa-arrow-circle-right"></i>
-              </a>
-            </div>
-          </div>
+            
 
           
 

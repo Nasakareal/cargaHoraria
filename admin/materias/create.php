@@ -38,6 +38,14 @@ include('../../admin/layout/parte1.php');
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
+                                            <label for="">Horas semanales</label>
+                                            <input type="number" name="weekly_hours" class="form-control" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
                                             <label for="">¿Es especialización?</label>
                                             <input type="checkbox" name="is_specialization" value="1"> Sí
                                         </div>

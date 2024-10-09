@@ -5,12 +5,14 @@ include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/grupos/datos_del_grupo.php');
 include('../../app/controllers/programas/listado_de_programas.php');
+include('../../app/controllers/turnos/listado_de_turnos.php'); // Asegúrate de incluir la lista de turnos
 
 $group_name = isset($group_name) ? $group_name : "Grupo no encontrado";
 $program_id = isset($program_id) ? $program_id : null;
 $period = isset($period) ? $period : "Periodo no encontrado";
 $year = isset($year) ? $year : "Año no encontrado";
 $volumen_grupo = isset($volumen_grupo) ? $volumen_grupo : "N/A";
+$turn_id = isset($turn_id) ? $turn_id : null; // Agregado para el turno
 
 $sql_periods = "SELECT DISTINCT period FROM `groups` WHERE estado = '1'";
 $query_periods = $pdo->prepare($sql_periods);
@@ -86,6 +88,21 @@ $periods = $query_periods->fetchAll(PDO::FETCH_ASSOC);
                                         <div class="form-group">
                                             <label for="">Volumen del grupo</label>
                                             <input type="number" class="form-control" name="volume" value="<?= htmlspecialchars($volumen_grupo); ?>" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="">Turno</label>
+                                            <select name="turn_id" class="form-control" required>
+                                                <option value="">Seleccione un turno</option>
+                                                <?php foreach ($turns as $turn): ?> <!-- Asegúrate de usar $turns -->
+                                                    <option value="<?= $turn['shift_id']; ?>" <?= ($turn['shift_id'] == $turn_id) ? 'selected' : ''; ?>>
+                                                        <?= htmlspecialchars($turn['shift_name'], ENT_QUOTES, 'UTF-8'); ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>

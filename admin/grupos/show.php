@@ -58,6 +58,12 @@ include('../../app/controllers/grupos/datos_del_grupo.php');
                                         <p><?= htmlspecialchars($volumen_grupo); ?></p> 
                                     </div>
                                 </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">Turno</label> <!-- Nueva etiqueta para el turno -->
+                                        <p><?= htmlspecialchars($turno); ?></p> <!-- Mostrar el turno aquí -->
+                                    </div>
+                                </div>
                             </div>
 
                             <hr>

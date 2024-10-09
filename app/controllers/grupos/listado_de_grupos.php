@@ -5,14 +5,15 @@ $sql = "SELECT
             p.program_name AS programa, 
             g.period, 
             g.year, 
-            g.volume 
+            g.volume,
+            s.shift_name AS turno  -- Agregar el nombre del turno
         FROM 
             `groups` g 
         LEFT JOIN 
-            programs p ON g.program_id = p.program_id";
+            programs p ON g.program_id = p.program_id
+        LEFT JOIN 
+            shifts s ON g.turn_id = s.shift_id";  // Cambiar shift_id por turn_id
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute();
 $groups = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-?>

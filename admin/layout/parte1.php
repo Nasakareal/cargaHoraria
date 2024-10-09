@@ -235,6 +235,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </a>
               </li>
             </ul>
+
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?=APP_URL;?>/admin/relacion_materia_cuatrimestre_programa" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Listado relacionado de Materias, Programas, y cuatrimestre</p>
+                </a>
+              </li>
+            </ul>
+
           </li>
 
             <li class="nav-item">
@@ -253,6 +263,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </a>
               </li>
             </ul>
+
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?= APP_URL; ?>/admin/grupos_materias" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Listado de Grupos y Materias</p>
+                </a>
+              </li>
+            </ul>
+
           </li>
             
             <li class="nav-item">
@@ -273,23 +293,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </ul>
           </li>
 
-            <li class="nav-item">
-            <a href="#" class="nav-link" style= "background-color: #3688f4">
-              <i class="nav-icon fas"><i class="bi bi-person-lines-fill"></i></i>
-              <p>
-                Alumnos
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="<?= APP_URL; ?>/admin/alumnos" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Listado de Alumnos</p>
-                </a>
-              </li>
-            </ul>
-          </li>
+            
 
           <li class="nav-item">
             <a href="#" class="nav-link" style= "background-color: #3688f4">
@@ -307,21 +311,33 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </a>
               </li>
             </ul>
+
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?= APP_URL; ?>/admin/autoSalones" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Autoasignación de salones</p>
+                </a>
+              </li>
+            </ul>
+
           </li>
+
+          
 
           <li class="nav-item">
             <a href="#" class="nav-link" style= "background-color: #3688f4">
-              <i class="nav-icon fas"><i class="bi bi-border-all"></i></i>
+              <i class="nav-icon fas"><i class="bi bi-calendar-range"></i></i>
               <p>
-                Autoasignación de Salones
+                Horarios Grupos
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="<?= APP_URL; ?>/admin/autoSalones" class="nav-link">
+                <a href="<?= APP_URL; ?>/admin/horarios_grupos" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Listado de Salones</p>
+                  <p>Horarios de Grupos</p>
                 </a>
               </li>
             </ul>
