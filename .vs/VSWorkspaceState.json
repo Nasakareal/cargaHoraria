@@ -1,8 +1,16 @@
 {
   "ExpandedNodes": [
     "",
-    "\\database"
+    "\\admin",
+    "\\admin\\layout",
+    "\\admin\\profesores",
+    "\\app",
+    "\\app\\controllers",
+    "\\app\\controllers\\materias",
+    "\\app\\controllers\\profesores",
+    "\\app\\controllers\\programas",
+    "\\app\\controllers\\relacion_profesor_materias"
   ],
-  "SelectedNode": "\\database\\db.sql",
+  "SelectedNode": "\\admin\\profesores\\edit.php",
   "PreviewInSolutionExplorer": false
 }

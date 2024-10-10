@@ -62,6 +62,7 @@ CREATE TABLE programs (
     estado VARCHAR(11)
 ) ENGINE=InnoDB;
 
+
 /* Insertar datos de ejemplo en programas */
 INSERT INTO programs (program_name, fyh_creacion, estado) VALUES 
 ('ASESOR FINANCIERO', '2024-09-19 20:29:10', '1'),
@@ -86,6 +87,7 @@ CREATE TABLE terms (
     fyh_actualizacion DATETIME NULL,
     estado VARCHAR(11)
 ) ENGINE=InnoDB;
+
 
 /* Insertar datos de ejemplo en cuatrimestres */
 INSERT INTO terms (term_name, fyh_creacion, estado) VALUES 
@@ -153,16 +155,15 @@ INSERT INTO `groups` (group_name, program_id, period, year, volume, turn_id, fyh
 CREATE TABLE teachers (
     teacher_id INT AUTO_INCREMENT PRIMARY KEY,
     teacher_name VARCHAR(100) NOT NULL,
-    total_weekly_hours INT DEFAULT 0, /* Horas totales asignadas al profesor */
     fyh_creacion DATETIME NULL,
     fyh_actualizacion DATETIME NULL,
     estado VARCHAR(11)
 ) ENGINE=InnoDB;
 
 /* Insertar datos de ejemplo en profesores */
-INSERT INTO teachers (teacher_name, total_weekly_hours, fyh_creacion, estado) VALUES 
-('PROF. JUAN PÉREZ', 0, NOW(), '1'),
-('PROF. MARÍA LÓPEZ', 0, NOW(), '1');
+INSERT INTO teachers (teacher_name, fyh_creacion, estado) VALUES 
+('PROF. JUAN PÉREZ', NOW(), '1'),
+('PROF. MARÍA LÓPEZ', NOW(), '1');
 
 
 /* Tabla de materias */
@@ -183,9 +184,9 @@ CREATE TABLE subjects (
 
 /* Insertar datos de ejemplo en materias */
 INSERT INTO subjects (subject_name, is_specialization, hours_consecutive, weekly_hours, program_id, term_id, fyh_creacion, estado) VALUES 
-('Matemáticas', 0, 3, 5, 1, 1, NOW(), '1'),
-('Física', 0, 3, 4, 1, 1, NOW(), '1'),
-('Programación', 1, 2, 6, 2, 2, NOW(), '1');
+('MATEMÁTICAS', 0, 3, 5, 1, 1, NOW(), '1'),
+('FÍSICA', 0, 3, 4, 1, 1, NOW(), '1'),
+('PROGRAMACIÓN', 1, 2, 6, 2, 2, NOW(), '1');
 
 
 /* Tabla de relación profesores y materias */
@@ -193,14 +194,12 @@ CREATE TABLE teacher_subjects (
     teacher_subject_id INT AUTO_INCREMENT PRIMARY KEY,
     teacher_id INT,
     subject_id INT,
-    weekly_hours INT NOT NULL, /* Nueva columna para horas semanales */
     fyh_creacion DATETIME NULL,
     fyh_actualizacion DATETIME NULL,
     estado VARCHAR(11),
     FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES subjects(subject_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
-
 
 /* Relación entre profesores y materias */
 INSERT INTO teacher_subjects (teacher_id, subject_id, fyh_creacion, estado) VALUES 
@@ -333,4 +332,19 @@ CREATE TABLE program_term_subjects (
     FOREIGN KEY (program_id) REFERENCES programs(program_id),
     FOREIGN KEY (term_id) REFERENCES terms(term_id),
     FOREIGN KEY (subject_id) REFERENCES subjects(subject_id)
+) ENGINE=InnoDB;
+
+
+/* Tabla relación de profesor, programa y cuatrimestre */
+CREATE TABLE teacher_program_term (
+    teacher_program_term_id INT AUTO_INCREMENT PRIMARY KEY,
+    teacher_id INT,
+    program_id INT,
+    term_id INT,
+    fyh_creacion DATETIME NULL,
+    fyh_actualizacion DATETIME NULL,
+    estado VARCHAR(11),
+    CONSTRAINT fk_teacher_program FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id),
+    CONSTRAINT fk_program_term FOREIGN KEY (program_id) REFERENCES programs(program_id),
+    CONSTRAINT fk_term_program FOREIGN KEY (term_id) REFERENCES terms(term_id)
 ) ENGINE=InnoDB;

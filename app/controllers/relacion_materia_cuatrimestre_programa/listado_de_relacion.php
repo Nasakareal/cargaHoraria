@@ -14,7 +14,7 @@ $sql = "SELECT
         JOIN 
             subjects s ON pts.subject_id = s.subject_id
         GROUP BY 
-            p.program_name, t.term_name";
+            pts.program_term_subject_id, p.program_name, t.term_name";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute();

@@ -2,7 +2,6 @@
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/profesores/listado_de_profesores.php');
-
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -43,6 +42,8 @@ include('../../app/controllers/profesores/listado_de_profesores.php');
                                         <th><center>Nombres del profesor</center></th>
                                         <th><center>Materias</center></th>
                                         <th><center>Horas Semanales</center></th>
+                                        <th><center>Programas</center></th>
+                                        <th><center>Cuatrimestres</center></th>
                                         <th><center>Acciones</center></th>
                                     </tr>
                                 </thead>
@@ -57,6 +58,8 @@ include('../../app/controllers/profesores/listado_de_profesores.php');
                                         <td><?= $teacher['profesor']; ?></td>
                                         <td><center><?= $teacher['materias']; ?></center></td>
                                         <td><center><?= $teacher['horas_semanales']; ?></center></td>
+                                        <td><center><?= $teacher['programas']; ?></center></td>
+                                        <td><center><?= $teacher['cuatrimestres']; ?></center></td>
                                         
                                         <td style="text-align: center">
                                             <div class="btn-group" role="group" aria-label="Basic example">
@@ -118,10 +121,10 @@ include('../../layout/mensajes.php');
             "pageLength": 5,
             "language": {
                 "emptyTable": "No hay información",
-                "info": "Mostrando _START_ a _END_ de _TOTAL_ Usuarios",
-                "infoEmpty": "Mostrando 0 a 0 de 0 Usuarios",
-                "infoFiltered": "(Filtrado de _Max_ total Usuarios)",
-                "lengthMenu": "Mostrar _MENU_ Usuarios",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ Profesores",
+                "infoEmpty": "Mostrando 0 a 0 de 0 Profesores",
+                "infoFiltered": "(Filtrado de _Max_ total Profesores)",
+                "lengthMenu": "Mostrar _MENU_ Profesores",
                 "loadingRecord": "Cargando...",
                 "processing": "Procesando...",
                 "search": "Buscador:",

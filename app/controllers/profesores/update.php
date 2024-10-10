@@ -4,9 +4,7 @@ include('../../../app/config.php');
 
 $teacher_id = $_POST['teacher_id'];
 $nombres = $_POST['nombres'];
-$materia_ids = $_POST['materia_ids']; 
-$horas_semanales = $_POST['horas_semanales'];
-
+$materia_ids = $_POST['materias_asignadas']; // IDs de las materias
 $fechaHora = date('Y-m-d H:i:s');
 
 try {
@@ -30,12 +28,11 @@ try {
 
     /* Insertar nuevas materias */
     foreach ($materia_ids as $materia_id) {
-        $sentencia_insertar = $pdo->prepare("INSERT INTO teacher_subjects (teacher_id, subject_id, weekly_hours, fyh_creacion, fyh_actualizacion)
-            VALUES (:teacher_id, :subject_id, :weekly_hours, :fyh_creacion, :fyh_actualizacion)");
+        $sentencia_insertar = $pdo->prepare("INSERT INTO teacher_subjects (teacher_id, subject_id, fyh_creacion, fyh_actualizacion)
+            VALUES (:teacher_id, :subject_id, :fyh_creacion, :fyh_actualizacion)");
 
         $sentencia_insertar->bindParam(':teacher_id', $teacher_id);
         $sentencia_insertar->bindParam(':subject_id', $materia_id);
-        $sentencia_insertar->bindParam(':weekly_hours', $horas_semanales); 
         $sentencia_insertar->bindParam(':fyh_creacion', $fechaHora);
         $sentencia_insertar->bindParam(':fyh_actualizacion', $fechaHora);
         $sentencia_insertar->execute();

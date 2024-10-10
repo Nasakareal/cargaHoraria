@@ -1,10 +1,8 @@
-﻿<?php
-
-/* Filtra y valida el teacher_id */
+<?php
 
 $teacher_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$teacher_id) {
-    echo "ID de profesor inv�lido.";
+    echo "ID de profesor inválido.";
     exit;
 }
 
@@ -20,7 +18,7 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
     <div class="content">
         <div class="container">
             <div class="row">
-                <h1>Profesor: <?= $nombres; ?></h1> <!-- Muestra el nombre del profesor -->
+                <h1>Profesor: <?= $nombres; ?></h1> 
             </div>
             <div class="row">
                 <div class="col-md-12">
@@ -39,13 +37,25 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Materia</label>
-                                        <p><?= $materias; ?></p> <!-- Materias del profesor -->
+                                        <p><?= $materias; ?></p> 
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Horas Semanales</label>
-                                        <p><?= $horas_semanales; ?></p> <!-- Horas semanales del profesor -->
+                                        <p><?= $horas_semanales; ?></p> 
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">Programa</label>
+                                        <p><?= $programa; ?></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">Cuatrimestre</label>
+                                        <p><?= $cuatrimestre; ?></p>
                                     </div>
                                 </div>
                             </div>

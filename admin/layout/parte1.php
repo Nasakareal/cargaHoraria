@@ -167,24 +167,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
           <li class="nav-item">
             <a href="#" class="nav-link" style= "background-color: #3688f4">
-              <i class="nav-icon fas"><i class="bi bi-gear"></i></i>
-              <p>
-                Configuraciones
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="<?=APP_URL;?>/admin/configuraciones" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Configurar</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-
-          <li class="nav-item">
-            <a href="#" class="nav-link" style= "background-color: #3688f4">
               <i class="nav-icon fas"><i class="bi bi-person-workspace"></i></i>
               <p>
                 Profesores
@@ -338,6 +320,25 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <a href="<?= APP_URL; ?>/admin/horarios_grupos" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Horarios de Grupos</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+
+            <li class="nav-item">
+            <a href="#" class="nav-link" style= "background-color: #3688f4">
+              <i class="nav-icon fas"><i class="bi bi-gear"></i></i>
+              <p>
+                Configuraciones
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?= APP_URL; ?>/admin/configuraciones" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Configurar</p>
                 </a>
               </li>
             </ul>
