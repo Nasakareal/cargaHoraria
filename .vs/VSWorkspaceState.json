@@ -2,15 +2,16 @@
   "ExpandedNodes": [
     "",
     "\\admin",
-    "\\admin\\layout",
-    "\\admin\\profesores",
+    "\\admin\\configuraciones",
+    "\\admin\\configuraciones\\institucion",
     "\\app",
     "\\app\\controllers",
-    "\\app\\controllers\\materias",
-    "\\app\\controllers\\profesores",
-    "\\app\\controllers\\programas",
-    "\\app\\controllers\\relacion_profesor_materias"
+    "\\app\\controllers\\configuraciones",
+    "\\app\\controllers\\configuraciones\\institucion",
+    "\\app\\controllers\\usuarios",
+    "\\public",
+    "\\public\\images"
   ],
-  "SelectedNode": "\\admin\\profesores\\edit.php",
+  "SelectedNode": "\\admin\\configuraciones\\institucion\\edit.php",
   "PreviewInSolutionExplorer": false
 }

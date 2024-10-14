@@ -42,7 +42,7 @@ $programs = $sentencia->fetchAll(PDO::FETCH_ASSOC);
                             <table id="example1" class="table table-striped table-bordered table-hover table-sm">
                                 <thead>
                                     <tr>
-                                        <th><center>Numero</center></th>
+                                        <th><center>N&uacute;mero</center></th>
                                         <th><center>Nombre del programa</center></th>
                                         <th><center>Acciones</center></th>
                                     </tr>
