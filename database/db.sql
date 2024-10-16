@@ -9,11 +9,11 @@ CREATE TABLE roles (
 
 /* Insertar roles */
 INSERT INTO roles (nombre_rol, fyh_creacion, estado) VALUES 
-('ADMINISTRADOR', '2024-09-19 19:10:20', '1'),
-('SUB-DIRECTOR ACADEMICO', '2024-09-19 19:10:20', '1'),
-('ADMINISTRATIVO', '2024-09-19 19:10:20', '1'),
-('SOPORTE', '2024-09-19 19:10:20', '1'),
-('OBSERVADOR', '2024-09-19 19:10:20', '1');
+('ADMINISTRADOR', NOW(), '1'),
+('SUB-DIRECTOR ACADEMICO', NOW(), '1'),
+('ADMINISTRATIVO', NOW(), '1'),
+('SOPORTE', NOW(), '1'),
+('OBSERVADOR', NOW(), '1');
 
 
 /* Tabla de usuarios */
@@ -31,7 +31,7 @@ CREATE TABLE usuarios (
 
 /* Insertar usuarios */
 INSERT INTO usuarios (nombres, rol_id, email, password, fyh_creacion, estado) 
-VALUES ('Mario Bautista', 1, 'admin@admin.com', 'ansq98', '2024-09-19 20:29:10', '1');
+VALUES ('Mario Bautista', 1, 'admin@admin.com', 'ansq98', NOW(), '1');
 
 
 /* Tabla de configuración de instituciones */
@@ -65,18 +65,18 @@ CREATE TABLE programs (
 
 /* Insertar datos de ejemplo en programas */
 INSERT INTO programs (program_name, fyh_creacion, estado) VALUES 
-('ASESOR FINANCIERO', '2024-09-19 20:29:10', '1'),
-('PROCESOS ALIMENTARIOS', '2024-09-19 20:29:10', '1'),
-('DISEÑO TEXTIL Y MODA', '2024-09-19 20:29:10', '1'),
-('ENERGÍAS RENOVABLES', '2024-09-19 20:29:10', '1'),
-('MANTENIMIENTO INDUSTRIAL', '2024-09-19 20:29:10', '1'),
-('MECATRÓNICA', '2024-09-19 20:29:10', '1'),
-('TECNOLOGÍAS DE LA INFORMACIÓN', '2024-09-19 20:29:10', '1'),
-('BIOTECNOLOGÍA', '2024-09-19 20:29:10', '1'),
-('GASTRONOMÍA', '2024-09-19 20:29:10', '1'),
-('LICENCIATURA DE ENFERMERÍA', '2024-09-19 20:29:10', '1'),
-('SISTEMAS AUTOMOTRICES', '2024-09-19 20:29:10', '1'),
-('LICENCIATURA EN ECONOMÍA SOCIAL SOLIDARIA', '2024-09-19 20:29:10', '1');
+('ASESOR FINANCIERO', NOW(), '1'),
+('PROCESOS ALIMENTARIOS', NOW(), '1'),
+('DISEÑO TEXTIL Y MODA', NOW(), '1'),
+('ENERGÍAS RENOVABLES', NOW(), '1'),
+('MANTENIMIENTO INDUSTRIAL', NOW(), '1'),
+('MECATRÓNICA', NOW(), '1'),
+('TECNOLOGÍAS DE LA INFORMACIÓN', NOW(), '1'),
+('BIOTECNOLOGÍA', NOW(), '1'),
+('GASTRONOMÍA', NOW(), '1'),
+('LICENCIATURA DE ENFERMERÍA', NOW(), '1'),
+('SISTEMAS AUTOMOTRICES', NOW(), '1'),
+('LICENCIATURA EN ECONOMÍA SOCIAL SOLIDARIA', NOW(), '1');
 
 
 /* Tabla de cuatrimestres */
@@ -91,11 +91,18 @@ CREATE TABLE terms (
 
 /* Insertar datos de ejemplo en cuatrimestres */
 INSERT INTO terms (term_name, fyh_creacion, estado) VALUES 
-('PRIMERO', '2024-09-19 20:29:10', '1'),
-('SEGUNDO', '2024-09-19 20:29:10', '1'),
-('TERCERO', '2024-09-19 20:29:10', '1'),
-('CUARTO', '2024-09-19 20:29:10', '1'),
-('QUINTO', '2024-09-19 20:29:10', '1');
+('PRIMERO', NOW(), '1'),
+('SEGUNDO', NOW(), '1'),
+('TERCERO', NOW(), '1'),
+('CUARTO', NOW(), '1'),
+('QUINTO', NOW(), '1'),
+('SEXTO', NOW(), '1'),
+('SEPTIMO', NOW(), '1'),
+('OCTAVO', NOW(), '1'),
+('NOVENO', NOW(), '1'),
+('DECIMO', NOW(), '1'),
+('ONCEAVO', NOW(), '1'),
+('DOCEAVO', NOW(), '1');
 
 
 /* Tabla de turnos */
@@ -134,21 +141,11 @@ CREATE TABLE `groups` (
 
 /* Insertar datos de ejemplo en grupos */
 INSERT INTO `groups` (group_name, program_id, period, year, volume, turn_id, fyh_creacion, estado) VALUES 
-('GRUPOA', 1, '1° Periodo', 2024, 30, 1, NOW(), '1'),
-('GRUPOB', 1, '1° Periodo', 2024, 25, 1, NOW(), '1'),
-('GRUPOC', 2, '2° Periodo', 2024, 20, 2, NOW(), '1'),
-('GRUPOD', 1, '3° Periodo', 2024, 15, 3, NOW(), '1'),
-('GRUPOE', 2, '5° Periodo', 2024, 10, 1, NOW(), '1'),
-('GRUPOF', 1, '4° Periodo', 2024, 5, 2, NOW(), '1'),
-('GRUPOG', 1, '1° Periodo', 2024, 35, 3, NOW(), '1'),
-('GRUPOH', 1, '1° Periodo', 2024, 40, 1, NOW(), '1'),
-('GRUPOI', 2, '2° Periodo', 2024, 40, 2, NOW(), '1'),
-('GRUPOJ', 3, '3° Periodo', 2024, 40, 1, NOW(), '1'),
-('GRUPOK', 1, '1° Periodo', 2024, 40, 3, NOW(), '1'),
-('GRUPOL', 1, '1° Periodo', 2024, 40, 1, NOW(), '1'),
-('GRUPOM', 2, '2° Periodo', 2024, 40, 2, NOW(), '1'),
-('GRUPON', 3, '3° Periodo', 2024, 40, 1, NOW(), '1'),
-('GRUPOO', 4, '5° Periodo', 2024, 40, 2, NOW(), '1');
+('GRUPOA', 3, '1° PERIODO', 2024, 30, 1, NOW(), '1'),
+('GRUPOB', 3, '4° PERIODO', 2024, 25, 2, NOW(), '1'),
+('GRUPOC', 3, '2° PERIODO', 2024, 20, 3, NOW(), '1'),
+('GRUPOD', 1, '3° PERIODO', 2024, 15, 3, NOW(), '1'),
+('GRUPOE', 2, '5° PERIODO', 2024, 10, 1, NOW(), '1');
 
 
 /* Tabla de profesores */
@@ -166,6 +163,21 @@ INSERT INTO teachers (teacher_name, fyh_creacion, estado) VALUES
 ('PROF. MARÍA LÓPEZ', NOW(), '1');
 
 
+/* Tabla de Laboratorios */
+CREATE TABLE labs (
+    lab_id INT AUTO_INCREMENT PRIMARY KEY,
+    lab_name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+    fyh_creacion DATETIME NULL,
+    fyh_actualizacion DATETIME NULL
+) ENGINE=InnoDB;
+
+
+INSERT INTO labs (lab_name, description, fyh_creacion) VALUES 
+('Laboratorio de Teñido y Estampado', 'Laboratorio para la práctica de teñido y estampado', NOW()),
+('Laboratorio de Corte y Confección', 'Laboratorio para aprender corte y confección', NOW());
+
+
 /* Tabla de materias */
 CREATE TABLE subjects (
     subject_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -173,20 +185,39 @@ CREATE TABLE subjects (
     is_specialization BOOLEAN DEFAULT 0, /* 0 = No, 1 = Sí */
     hours_consecutive INT, /* Horas que puede impartir consecutivas */
     weekly_hours INT NOT NULL, /* Horas semanales de la materia */
+    class_hours INT DEFAULT 0, /* Horas en aula */
+    lab_hours INT DEFAULT 0, /* Horas en laboratorio */
+    lab_id INT, /* Llave foránea para el laboratorio */
     program_id INT,
     term_id INT,
     fyh_creacion DATETIME NULL,
     fyh_actualizacion DATETIME NULL,
     estado VARCHAR(11),
     CONSTRAINT fk_program FOREIGN KEY (program_id) REFERENCES programs(program_id),
-    CONSTRAINT fk_term FOREIGN KEY (term_id) REFERENCES terms(term_id)
+    CONSTRAINT fk_term FOREIGN KEY (term_id) REFERENCES terms(term_id),
+    CONSTRAINT fk_lab FOREIGN KEY (lab_id) REFERENCES labs(lab_id) /* Relación con la tabla de laboratorios */
 ) ENGINE=InnoDB;
 
-/* Insertar datos de ejemplo en materias */
-INSERT INTO subjects (subject_name, is_specialization, hours_consecutive, weekly_hours, program_id, term_id, fyh_creacion, estado) VALUES 
-('MATEMÁTICAS', 0, 3, 5, 1, 1, NOW(), '1'),
-('FÍSICA', 0, 3, 4, 1, 1, NOW(), '1'),
-('PROGRAMACIÓN', 1, 2, 6, 2, 2, NOW(), '1');
+
+INSERT INTO subjects (subject_name, is_specialization, hours_consecutive, weekly_hours, class_hours, lab_hours, lab_id, program_id, term_id, fyh_creacion, estado) VALUES 
+('TEXTILES I', 0, 4, 4, 0, 4, 1, 3, 1, NOW(), '1'),
+('PRINCIPIOS DE PATRONAJE Y CONFECCIÓN', 0, 6, 6, 0, 6, 2, 3, 1, NOW(), '1'),
+('PRINCIPIOS DE DISEÑO DE MODA', 0, 4, 4, 4, 0, NULL, 3, 1, NOW(), '1'),
+('INGLÉS I', 0, 5, 5, 5, 0, NULL, 3, 1, NOW(), '1'),
+('FUNDAMENTOS MATEMÁTICOS', 0, 7, 7, 7, 0, NULL, 3, 1, NOW(), '1'),
+('DESARROLLO HUMANO Y VALORES', 0, 5, 5, 5, 0, NULL, 3, 1, NOW(), '1'),
+('COMUNICACIÓN Y HABILIDADES DIGITALES', 0, 7, 7, 7, 0, NULL, 3, 1, NOW(), '1'),
+('PATRONAJE INDUSTRIAL', 0, 4, 4, 0, 4, 1, 3, 2, NOW(), '1'),
+('INGLÉS II', 0, 6, 6, 0, 6, 2, 3, 2, NOW(), '1'),
+('ILUSTRACIÓN DE MODA', 0, 4, 4, 4, 0, NULL, 3, 2, NOW(), '1'),
+('HISTORIA Y SOCIOLOGÍA DE LA MODA', 0, 5, 5, 5, 0, NULL, 3, 2, NOW(), '1'),
+('HABILIDADES SOCIEMOCIONALES Y MANEJO DE CONFLICTOS', 0, 7, 7, 7, 0, NULL, 3, 2, NOW(), '1'),
+('FÍSICA', 0, 5, 5, 5, 0, NULL, 3, 2, NOW(), '1'),
+('CONFECCIÓN INDUSTRIAL', 0, 7, 7, 7, 0, NULL, 3, 2, NOW(), '1'),
+
+('MATEMÁTICAS', 0, 3, 5, 5, 0, NULL, 1, 1, NOW(), '1'),
+('FÍSICA', 0, 3, 4, 4, 0, NULL, 1, 1, NOW(), '1'),
+('PROGRAMACIÓN', 1, 2, 6, 0, 6, 1, 2, 2, NOW(), '1');
 
 
 /* Tabla de relación profesores y materias */
@@ -310,6 +341,10 @@ INSERT INTO schedules (teacher_subject_id, classroom_id, schedule_day, start_tim
 (NULL, 2, 'LUNES', '12:00:00', '20:00:00', 1, NOW(), '1'),
 (NULL, 1, 'MARTES', '07:00:00', '15:00:00', 1, NOW(), '1'),
 (NULL, 2, 'MARTES', '12:00:00', '20:00:00', 1, NOW(), '1'),
+(NULL, 1, 'MIERCOLES', '07:00:00', '15:00:00', 1, NOW(), '1'),
+(NULL, 2, 'MIERCOLES', '12:00:00', '20:00:00', 1, NOW(), '1'),
+(NULL, 1, 'JUEVES', '07:00:00', '15:00:00', 1, NOW(), '1'),
+(NULL, 2, 'JUEVES', '12:00:00', '20:00:00', 1, NOW(), '1'),
 (NULL, 3, 'SABADO', '7:00:00', '18:00:00', 2, NOW(), '1');
 
 
@@ -334,6 +369,26 @@ CREATE TABLE program_term_subjects (
     FOREIGN KEY (subject_id) REFERENCES subjects(subject_id)
 ) ENGINE=InnoDB;
 
+INSERT INTO program_term_subjects (program_id, term_id, subject_id)
+VALUES
+(3, 1, 1),  /* TEXTILES I */
+(3, 1, 2),  /* PRINCIPIOS DE PATRONAJE Y CONFECCIÓN */
+(3, 1, 3),  /* PRINCIPIOS DE DISEÑO DE MODA */
+(3, 1, 4),  /* INGLÉS I */
+(3, 1, 5),  /* FUNDAMENTOS MATEMÁTICOS */
+(3, 1, 6),  /* DESARROLLO HUMANO Y VALORES */
+(3, 1, 7),  /* COMUNICACIÓN Y HABILIDADES DIGITALES */
+(3, 2, 8),  /* PATRONAJE INDUSTRIAL */
+(3, 2, 9),  /* INGLÉS II */
+(3, 2, 10), /* ILUSTRACIÓN DE MODA */
+(3, 2, 11), /* HISTORIA Y SOCIOLOGÍA DE LA MODA */
+(3, 2, 12), /* HABILIDADES SOCIEMOCIONALES Y MANEJO DE CONFLICTOS */
+(3, 2, 13), /* FÍSICA */
+(3, 2, 14), /* CONFECCIÓN INDUSTRIAL */
+(1, 1, 15), /* MATEMÁTICAS */
+(1, 1, 16), /* FÍSICA */
+(2, 2, 17); /* PROGRAMACIÓN */
+
 
 /* Tabla relación de profesor, programa y cuatrimestre */
 CREATE TABLE teacher_program_term (
@@ -348,3 +403,49 @@ CREATE TABLE teacher_program_term (
     CONSTRAINT fk_program_term FOREIGN KEY (program_id) REFERENCES programs(program_id),
     CONSTRAINT fk_term_program FOREIGN KEY (term_id) REFERENCES terms(term_id)
 ) ENGINE=InnoDB;
+
+
+/* Tabla de asignación de horarios por materia */
+CREATE TABLE schedule_assignments (
+    assignment_id INT AUTO_INCREMENT PRIMARY KEY,
+    schedule_id INT,
+    subject_id INT,
+    teacher_id INT,
+    group_id INT,
+    classroom_id INT,
+    start_time TIME,
+    end_time TIME,
+    schedule_day ENUM('Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'),
+    estado VARCHAR(11),
+    fyh_creacion DATETIME,
+    fyh_actualizacion DATETIME,
+    FOREIGN KEY (schedule_id) REFERENCES schedules(schedule_id),
+    FOREIGN KEY (subject_id) REFERENCES subjects(subject_id),
+    FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id),
+    FOREIGN KEY (group_id) REFERENCES `groups`(group_id),
+    FOREIGN KEY (classroom_id) REFERENCES classrooms(classroom_id)
+) ENGINE=InnoDB;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

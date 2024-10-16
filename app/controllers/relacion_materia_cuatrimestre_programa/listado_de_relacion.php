@@ -1,7 +1,6 @@
 <?php
 
 $sql = "SELECT 
-            pts.program_term_subject_id,
             p.program_name,
             t.term_name,
             GROUP_CONCAT(s.subject_name SEPARATOR ', ') AS subjects
@@ -14,7 +13,7 @@ $sql = "SELECT
         JOIN 
             subjects s ON pts.subject_id = s.subject_id
         GROUP BY 
-            pts.program_term_subject_id, p.program_name, t.term_name";
+            p.program_name, t.term_name"; // Agrupar solo por programa y cuatrimestre
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute();

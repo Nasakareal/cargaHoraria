@@ -22,11 +22,6 @@ include('../../app/controllers/relacion_materia_cuatrimestre_programa/listado_de
                         <div class="card-header">
                             <h3 class="card-title">Materias asignadas a Programas y Cuatrimestres</h3>
                             <br>
-                            <div class="card-tools d-flex">
-                                <a href="create.php" class="btn btn-primary me-2">
-                                    <i class="bi bi-plus-square"></i> Agregar nueva Relación
-                                </a>
-                            </div>
                         </div>
 
                         <div class="card-body">
@@ -37,7 +32,6 @@ include('../../app/controllers/relacion_materia_cuatrimestre_programa/listado_de
                                         <th class="text-center">Programa Educativo</th>
                                         <th class="text-center">Cuatrimestre</th>
                                         <th class="text-center">Materias</th>
-                                        <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -51,21 +45,11 @@ include('../../app/controllers/relacion_materia_cuatrimestre_programa/listado_de
                                             <td class="text-center"><?= $relation['program_name']; ?></td>
                                             <td class="text-center"><?= $relation['term_name']; ?></td>
                                             <td class="text-center"><?= $relation['subjects']; ?></td>
-                                            <td style="text-align: center">
-                                                <div class="btn-group" role="group" aria-label="Basic example">
-                                                    <a href="show.php?id=<?= $relation['program_term_subject_id']; ?>" type="button" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>
-                                                    <a href="edit.php?id=<?= $relation['program_term_subject_id']; ?>" type="button" class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></a>
-                                                    <form action="<?= APP_URL; ?>/app/controllers/group_subjects/delete.php" method="post" id="miFormulario<?= $relation['program_term_subject_id']; ?>">
-                                                        <input type="hidden" name="program_term_subject_id" value="<?= $relation['program_term_subject_id']; ?>">
-                                                        <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
-                                                    </form>
-                                                </div>
-                                            </td>
                                         </tr>
                                         <?php
                                     }
                                 } else {
-                                    echo "<tr><td colspan='5' style='text-align:center'>No se encontraron relaciones.</td></tr>";
+                                    echo "<tr><td colspan='4' style='text-align:center'>No se encontraron relaciones.</td></tr>";
                                 }
                                 ?>
                                 </tbody>
@@ -107,12 +91,36 @@ include('../../layout/mensajes.php');
                     "previous": "Anterior"
                 }
             },
-            "responsive": true,
-            "lengthChange": true,
+            "responsive": true, 
+            "lengthChange": true, 
             "autoWidth": false,
-            buttons: [
-                
-            ],
+            buttons: [{
+                extend: 'collection',
+                text: 'Opciones',
+                orientation: 'landscape',
+                buttons: [{
+                    text: 'Copiar',
+                    extend: 'copy',
+                }, {
+                    extend: 'pdf',
+                    title: 'Relación de Materias'
+                }, {
+                    extend: 'csv',
+                    title: 'Relación de Materias'
+                }, {
+                    extend: 'excel',
+                    title: 'Relación de Materias'
+                }, {
+                    text: 'Imprimir',
+                    extend: 'print',
+                    title: 'Relación de Materias'
+                }]
+            },
+            {
+                extend: 'colvis',
+                text: 'Visor de columnas',
+                collectionLayout: 'fixed three-column'
+            }],
         }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
     });
 </script>

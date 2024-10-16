@@ -2,16 +2,15 @@
   "ExpandedNodes": [
     "",
     "\\admin",
-    "\\admin\\configuraciones",
-    "\\admin\\configuraciones\\institucion",
+    "\\admin\\autoSalones",
+    "\\admin\\horarios_grupos",
+    "\\admin\\roles",
+    "\\admin\\salones",
     "\\app",
     "\\app\\controllers",
-    "\\app\\controllers\\configuraciones",
-    "\\app\\controllers\\configuraciones\\institucion",
-    "\\app\\controllers\\usuarios",
-    "\\public",
-    "\\public\\images"
+    "\\app\\controllers\\autoSalones",
+    "\\app\\controllers\\horarios_grupos"
   ],
-  "SelectedNode": "\\admin\\configuraciones\\institucion\\edit.php",
+  "SelectedNode": "\\admin\\horarios_grupos\\index.php",
   "PreviewInSolutionExplorer": false
 }

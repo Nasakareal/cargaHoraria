@@ -1,9 +1,9 @@
 <?php
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
-include('../../app/controllers/salones/listado_de_salones.php'); // Asegúrate de estar incluyendo este archivo correctamente
+include('../../app/controllers/salones/listado_de_salones.php'); 
 
-// No es necesario ejecutar otra consulta aquí, ya que `$classrooms` ya fue definido en el archivo listado_de_salones.php
+
 ?>
 
 <!-- Content Wrapper. Contains page content -->
