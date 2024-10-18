@@ -4,6 +4,7 @@ $sql_teachers = "
     SELECT 
         t.teacher_id,
         t.teacher_name AS profesor,
+        t.es_local,  -- Nueva columna que indica si es local o foráneo
         GROUP_CONCAT(s.subject_name SEPARATOR ', ') AS materias,
         SUM(s.weekly_hours) AS horas_semanales,
         GROUP_CONCAT(DISTINCT p.program_name SEPARATOR ', ') AS programas,

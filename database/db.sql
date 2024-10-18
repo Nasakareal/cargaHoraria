@@ -154,13 +154,14 @@ CREATE TABLE teachers (
     teacher_name VARCHAR(100) NOT NULL,
     fyh_creacion DATETIME NULL,
     fyh_actualizacion DATETIME NULL,
-    estado VARCHAR(11)
+    estado VARCHAR(11),
+    es_local BOOLEAN DEFAULT 1  /* ('local', 'foraneo') */
 ) ENGINE=InnoDB;
 
 /* Insertar datos de ejemplo en profesores */
-INSERT INTO teachers (teacher_name, fyh_creacion, estado) VALUES 
-('PROF. JUAN PÉREZ', NOW(), '1'),
-('PROF. MARÍA LÓPEZ', NOW(), '1');
+INSERT INTO teachers (teacher_name, fyh_creacion, estado, es_local) VALUES 
+('PROF. JUAN PÉREZ', NOW(), '1', 1),   /* Profesor local */
+('PROF. MARÍA LÓPEZ', NOW(), '1', 0);  /* Profesor foráneo */
 
 
 /* Tabla de Laboratorios */
@@ -425,27 +426,5 @@ CREATE TABLE schedule_assignments (
     FOREIGN KEY (group_id) REFERENCES `groups`(group_id),
     FOREIGN KEY (classroom_id) REFERENCES classrooms(classroom_id)
 ) ENGINE=InnoDB;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

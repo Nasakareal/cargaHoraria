@@ -1,7 +1,7 @@
 <?php
 $sql_programs = "SELECT 
                     p.program_id,
-                    p.program_name AS programa,
+                    p.program_name,  -- No alias para evitar el error 'undefined'
                     p.fyh_creacion AS fecha_creacion,
                     p.fyh_actualizacion AS fecha_actualizacion,
                     p.estado

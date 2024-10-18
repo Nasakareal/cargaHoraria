@@ -28,30 +28,47 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
                         </div>
                         <div class="card-body">
                             <div class="row">
+                                <!-- Nombres del profesor -->
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Nombres del profesor</label>
                                         <p><?= $nombres; ?></p>
                                     </div>
                                 </div>
+
+                                <!-- Local o Foráneo -->
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">Local/Foráneo</label>
+                                        <p><?= $es_local; ?></p>  <!-- Nueva columna -->
+                                    </div>
+                                </div>
+
+                                <!-- Materia -->
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Materia</label>
                                         <p><?= $materias; ?></p> 
                                     </div>
                                 </div>
+
+                                <!-- Horas Semanales -->
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Horas Semanales</label>
                                         <p><?= $horas_semanales; ?></p> 
                                     </div>
                                 </div>
+
+                                <!-- Programa -->
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Programa</label>
                                         <p><?= $programa; ?></p>
                                     </div>
                                 </div>
+
+                                <!-- Cuatrimestre -->
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Cuatrimestre</label>

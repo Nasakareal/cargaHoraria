@@ -40,6 +40,7 @@ include('../../app/controllers/profesores/listado_de_profesores.php');
                                     <tr>
                                         <th><center>Número</center></th>
                                         <th><center>Nombres del profesor</center></th>
+                                        <th><center>Local/Foráneo</center></th>
                                         <th><center>Materias</center></th>
                                         <th><center>Horas Semanales</center></th>
                                         <th><center>Programas</center></th>
@@ -56,6 +57,9 @@ include('../../app/controllers/profesores/listado_de_profesores.php');
                                     <tr>
                                         <td style="text-align: center"><?= $contador_teachers; ?></td>
                                         <td><?= $teacher['profesor']; ?></td>
+                                        <td><center>
+                                            <?= $teacher['es_local'] == 1 ? 'Local' : 'Foráneo'; ?> 
+                                        </center></td>
                                         <td><center><?= $teacher['materias']; ?></center></td>
                                         <td><center><?= $teacher['horas_semanales']; ?></center></td>
                                         <td><center><?= $teacher['programas']; ?></center></td>
@@ -123,9 +127,9 @@ include('../../layout/mensajes.php');
                 "emptyTable": "No hay información",
                 "info": "Mostrando _START_ a _END_ de _TOTAL_ Profesores",
                 "infoEmpty": "Mostrando 0 a 0 de 0 Profesores",
-                "infoFiltered": "(Filtrado de _Max_ total Profesores)",
+                "infoFiltered": "(Filtrado de _MAX_ total Profesores)",
                 "lengthMenu": "Mostrar _MENU_ Profesores",
-                "loadingRecord": "Cargando...",
+                "loadingRecords": "Cargando...",
                 "processing": "Procesando...",
                 "search": "Buscador:",
                 "zeroRecords": "Sin resultados encontrados",

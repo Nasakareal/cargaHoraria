@@ -8,7 +8,7 @@ include('../../app/controllers/horarios_grupos/logica.php');
     <div class="content">
         <div class="container">
             <div class="row">
-                <h1>Listado de Grupos y Asignación de Horarios</h1>
+                <h1>Listado de Grupos</h1>
             </div>
             <div class="row">
                 <div class="col-md-12">
@@ -22,7 +22,7 @@ include('../../app/controllers/horarios_grupos/logica.php');
                                     <tr>
                                         <th class="text-center">Número</th>
                                         <th class="text-center">Nombre del Grupo</th>
-                                        <th class="text-center">Horarios Asignados</th>
+                                        <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -34,7 +34,12 @@ include('../../app/controllers/horarios_grupos/logica.php');
                                     <tr>
                                         <td style="text-align: center"><?= $contador_grupos; ?></td>
                                         <td class="text-center"><?= htmlspecialchars($group['group_name']); ?></td>
-                                        <td style="text-align: center"><?= $asignaciones[$group['group_name']] ?? 'No hay horarios asignados'; ?></td>
+                                        <td class="text-center">
+                                            <!-- Botón Ver que redirige a show.php con el ID del grupo -->
+                                            <a href="show.php?id=<?= $group['group_id']; ?>" class="btn btn-info btn-sm">
+                                                <i class="bi bi-eye"></i> Ver
+                                            </a>
+                                        </td>
                                     </tr>
                                     <?php
                                 }
