@@ -3,37 +3,41 @@ include('../../../app/config.php');
 
 session_start();
 
-$group_name = trim($_POST['grupo']);
-$program_id = $_POST['programa_id'];
-$period = $_POST['period'];
-$year = $_POST['year'];
-$volume = $_POST['volume'];
-$fechaHora = date('Y-m-d H:i:s');
-$estado_de_registro = '1'; // Cambiado a '1' para indicar activo
 
-/* Verificar que los campos no estén vacíos */
-if (empty($group_name) || empty($program_id) || empty($period) || empty($year) || empty($volume)) {
+$group_name = isset($_POST['grupo']) ? trim($_POST['grupo']) : null;
+$programa_id = isset($_POST['programa_id']) ? trim($_POST['programa_id']) : null;
+$term_id = isset($_POST['term_id']) ? trim($_POST['term_id']) : null;
+$year = isset($_POST['year']) ? trim($_POST['year']) : null;
+$volume = isset($_POST['volume']) ? trim($_POST['volume']) : null;
+$turn_id = isset($_POST['turn_id']) ? trim($_POST['turn_id']) : null;
+$fechaHora = date('Y-m-d H:i:s');
+$estado_de_registro = '1';
+
+
+if (empty($group_name) || empty($programa_id) || empty($term_id) || empty($year) || empty($volume) || empty($turn_id)) {
     $_SESSION['mensaje'] = "Todos los campos son obligatorios.";
     $_SESSION['icono'] = "error";
     header('Location:' . APP_URL . "/admin/grupos/create.php");
     exit();
 }
 
-/* Preparar la consulta SQL */
+
 $sentencia = $pdo->prepare("INSERT INTO `groups`
-    (group_name, program_id, period, year, volume, fyh_creacion, estado)
-VALUES  (:group_name, :program_id, :period, :year, :volume, :fyh_creacion, :estado)");
+    (group_name, program_id, term_id, year, volume, turn_id, fyh_creacion, estado)
+VALUES  (:group_name, :programa_id, :term_id, :year, :volume, :turn_id, :fyh_creacion, :estado)");
+
 
 $sentencia->bindParam(':group_name', $group_name);
-$sentencia->bindParam(':program_id', $program_id);
-$sentencia->bindParam(':period', $period);
+$sentencia->bindParam(':programa_id', $programa_id);
+$sentencia->bindParam(':term_id', $term_id);
 $sentencia->bindParam(':year', $year);
 $sentencia->bindParam(':volume', $volume);
+$sentencia->bindParam(':turn_id', $turn_id);
 $sentencia->bindParam(':fyh_creacion', $fechaHora);
 $sentencia->bindParam(':estado', $estado_de_registro);
 
 try {
-    /* Ejecutar la consulta */
+    
     if ($sentencia->execute()) {
         $_SESSION['mensaje'] = "Se ha registrado el nuevo grupo.";
         $_SESSION['icono'] = "success";
@@ -48,3 +52,4 @@ try {
     $_SESSION['icono'] = "error";
     header('Location:' . APP_URL . "/admin/grupos/create.php");
 }
+?>

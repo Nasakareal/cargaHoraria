@@ -129,41 +129,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-          <li class="nav-item">
-            <a href="#" class="nav-link" style= "background-color: #3688f4">
-              <i class="nav-icon fas"><i class="bi bi-bookmarks"></i></i>
-              <p>
-                Roles
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="<?=APP_URL;?>/admin/roles" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Listado de Roles</p>
-                </a>
-              </li>
-            </ul>
-          </li>
-
-          <li class="nav-item">
-            <a href="#" class="nav-link" style= "background-color: #3688f4">
-              <i class="nav-icon fas"><i class="bi bi-people-fill"></i></i>
-              <p>
-                Usuarios
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="<?=APP_URL;?>/admin/usuarios" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Listado de Usuarios</p>
-                </a>
-              </li>
-            </ul>
-          </li>
+          
 
           <li class="nav-item">
             <a href="#" class="nav-link" style= "background-color: #3688f4">
@@ -348,10 +314,27 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <li class="nav-item">
                 <a href="<?= APP_URL; ?>/admin/configuraciones" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Configurar</p>
+                  <p>Listado de Configuraciones</p>
                 </a>
               </li>
             </ul>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?= APP_URL; ?>/admin/roles" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Listado de Roles</p>
+                </a>
+              </li>
+            </ul>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?= APP_URL; ?>/admin/usuarios" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Listado de Usuarios</p>
+                </a>
+              </li>
+            </ul>
+
           </li>
 
           <li class="nav-item">

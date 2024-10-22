@@ -15,4 +15,3 @@ $terms = $query_terms->fetchAll(PDO::FETCH_ASSOC);
 if (empty($terms)) {
     $terms = [];
 }
-?>

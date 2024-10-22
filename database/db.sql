@@ -1,67 +1,99 @@
-/* Tabla de roles */
+/* 
+ Tabla que almacena los diferentes roles de usuario dentro del sistema.
+ Cada rol tiene un nombre único y se registran fechas de creación y actualización.
+ */
+
+ /* Tabla de roles */
 CREATE TABLE roles (
-    id_rol INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    nombre_rol VARCHAR(255) NOT NULL UNIQUE,
-    fyh_creacion DATETIME NULL,
-    fyh_actualizacion DATETIME NULL,
-    estado VARCHAR(11)
+    id_rol INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, /* ID único para cada rol */
+    nombre_rol VARCHAR(255) NOT NULL UNIQUE, /* Nombre único del rol */
+    fyh_creacion DATETIME NULL, /* Fecha y hora de creación del rol */
+    fyh_actualizacion DATETIME NULL, /* Fecha y hora de la última actualización del rol */
+    estado VARCHAR(11) /* Estado del rol, por ejemplo 'ACTIVO' o 'INACTIVO' */
 ) ENGINE=InnoDB;
+
+/*
+ Inserta los roles básicos que estarán disponibles en el sistema.
+ Cada rol se asocia a un estado y la fecha de creación es la actual.
+ */
 
 /* Insertar roles */
 INSERT INTO roles (nombre_rol, fyh_creacion, estado) VALUES 
-('ADMINISTRADOR', NOW(), '1'),
-('SUB-DIRECTOR ACADEMICO', NOW(), '1'),
-('ADMINISTRATIVO', NOW(), '1'),
-('SOPORTE', NOW(), '1'),
-('OBSERVADOR', NOW(), '1');
+('ADMINISTRADOR', NOW(), '1'), /* Rol de administrador del sistema */
+('SUB-DIRECTOR ACADEMICO', NOW(), '1'), /* Rol de sub-director académico */
+('ADMINISTRATIVO', NOW(), '1'), /* Rol de personal administrativo */
+('SOPORTE', NOW(), '1'), /* Rol para el equipo de soporte técnico */
+('OBSERVADOR', NOW(), '1'); /* Rol de observador, con acceso limitado */
 
+/*
+ Tabla que almacena información de los usuarios del sistema.
+ Cada usuario tiene un rol asignado a través de una clave foránea que referencia la tabla de roles.
+ */
 
 /* Tabla de usuarios */
 CREATE TABLE usuarios (
-    id_usuario INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    nombres VARCHAR(255) NOT NULL,
-    rol_id INT(11) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password TEXT NOT NULL,
-    fyh_creacion DATETIME NULL,
-    fyh_actualizacion DATETIME NULL,
-    estado VARCHAR(11),
-    FOREIGN KEY (rol_id) REFERENCES roles(id_rol) ON DELETE NO ACTION ON UPDATE CASCADE
+    id_usuario INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, /* ID único del usuario */
+    nombres VARCHAR(255) NOT NULL, /* Nombre completo del usuario */
+    rol_id INT(11) NOT NULL, /* ID del rol que tiene el usuario, referenciado desde la tabla roles */
+    email VARCHAR(255) NOT NULL UNIQUE, /* Correo electrónico único del usuario */
+    password TEXT NOT NULL, /* Contraseña encriptada del usuario */
+    fyh_creacion DATETIME NULL, /* Fecha y hora de creación del usuario */
+    fyh_actualizacion DATETIME NULL, /* Fecha y hora de la última actualización de los datos del usuario */
+    estado VARCHAR(11), /* Estado del usuario, por ejemplo 'ACTIVO' o 'INACTIVO' */
+    FOREIGN KEY (rol_id) REFERENCES roles(id_rol) ON DELETE NO ACTION ON UPDATE CASCADE /* Relación con la tabla roles */
 ) ENGINE=InnoDB;
+
+/*
+ Inserta un usuario administrador en el sistema con el rol de 'ADMINISTRADOR'.
+ */
 
 /* Insertar usuarios */
 INSERT INTO usuarios (nombres, rol_id, email, password, fyh_creacion, estado) 
 VALUES ('Mario Bautista', 1, 'admin@admin.com', 'ansq98', NOW(), '1');
 
+/*
+ Tabla que almacena la configuración de las instituciones registradas en el sistema.
+ Incluye información como nombre, dirección, teléfono, y logotipo de la institución.
+ */
 
 /* Tabla de configuración de instituciones */
 CREATE TABLE configuracion_instituciones (
-    id_config_institucion INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    nombre_institucion VARCHAR(255) NOT NULL,
-    logo VARCHAR(255) NULL,
-    direccion VARCHAR(255) NOT NULL,
-    telefono VARCHAR(100) NULL,
-    celular VARCHAR(100) NULL,
-    correo VARCHAR(100) NULL,
-    fyh_creacion DATETIME NULL,
-    fyh_actualizacion DATETIME NULL,
-    estado VARCHAR(11)
+    id_config_institucion INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, /* ID único de la configuración */
+    nombre_institucion VARCHAR(255) NOT NULL, /* Nombre de la institución */
+    logo VARCHAR(255) NULL,/* URL del logotipo de la institución */
+    direccion VARCHAR(255) NOT NULL, /* Dirección física de la institución */
+    telefono VARCHAR(100) NULL, /* Número de teléfono de contacto */
+    celular VARCHAR(100) NULL, /* Número de teléfono móvil de contacto */
+    correo VARCHAR(100) NULL, /* Correo electrónico de contacto */
+    fyh_creacion DATETIME NULL, /* Fecha y hora de creación de la configuración */
+    fyh_actualizacion DATETIME NULL, /* Fecha y hora de la última actualización de la configuración */
+    estado VARCHAR(11) /* Estado de la institución, por ejemplo 'ACTIVO' o 'INACTIVO' */
 ) ENGINE=InnoDB;
+
+/*
+ Inserta los datos de ejemplo para la institución registrada en el sistema.
+ */
 
 /* Insertar datos de la institución */
 INSERT INTO configuracion_instituciones (nombre_institucion, logo, direccion, telefono, celular, correo, fyh_creacion, estado) 
 VALUES ('Universidad Tecnológica de Morelia', 'https://ut-morelia.edu.mx/wp-content/uploads/2022/05/Logo-UTM-Claro.png', 'Av. Vicepresidente Pino Suarez No. 750, Col. Ciudad Industrial, C.P. 58200, Morelia, Michoacán', '4431135900', '524431135900', 'informacion@ut-morelia.edu.mx', '2023-12-28 20:29:10', '1');
 
+/*
+ Tabla que almacena los programas académicos ofrecidos por la institución.
+ */
 
 /* Tabla de programas */
 CREATE TABLE programs (
-    program_id INT AUTO_INCREMENT PRIMARY KEY,
-    program_name VARCHAR(255) NOT NULL,
-    fyh_creacion DATETIME NULL,
-    fyh_actualizacion DATETIME NULL,
-    estado VARCHAR(11)
+    program_id INT AUTO_INCREMENT PRIMARY KEY, /* ID único del programa */
+    program_name VARCHAR(255) NOT NULL, /* Nombre del programa */
+    fyh_creacion DATETIME NULL, /* Fecha y hora de creación del programa */
+    fyh_actualizacion DATETIME NULL, /* Fecha y hora de la última actualización del programa */
+    estado VARCHAR(11)/* Estado del programa, por ejemplo 'ACTIVO' o 'INACTIVO' */
 ) ENGINE=InnoDB;
 
+/*
+ Inserta los programas académicos disponibles en la institución.
+ */
 
 /* Insertar datos de ejemplo en programas */
 INSERT INTO programs (program_name, fyh_creacion, estado) VALUES 
@@ -78,6 +110,9 @@ INSERT INTO programs (program_name, fyh_creacion, estado) VALUES
 ('SISTEMAS AUTOMOTRICES', NOW(), '1'),
 ('LICENCIATURA EN ECONOMÍA SOCIAL SOLIDARIA', NOW(), '1');
 
+/*
+ Tabla que almacena los cuatrimestres dentro de los programas académicos.
+ */
 
 /* Tabla de cuatrimestres */
 CREATE TABLE terms (
@@ -88,6 +123,9 @@ CREATE TABLE terms (
     estado VARCHAR(11)
 ) ENGINE=InnoDB;
 
+/*
+ Inserta los cuatrimestres disponibles.
+ */
 
 /* Insertar datos de ejemplo en cuatrimestres */
 INSERT INTO terms (term_name, fyh_creacion, estado) VALUES 
@@ -104,6 +142,9 @@ INSERT INTO terms (term_name, fyh_creacion, estado) VALUES
 ('ONCEAVO', NOW(), '1'),
 ('DOCEAVO', NOW(), '1');
 
+/*
+ Tabla que almacena los turnos disponibles para los grupos.
+ */
 
 /* Tabla de turnos */
 CREATE TABLE shifts (
@@ -115,6 +156,10 @@ CREATE TABLE shifts (
     estado VARCHAR(11)
 ) ENGINE=InnoDB;
 
+/*
+ Inserta los turnos disponibles para los grupos.
+ */
+
 /* Insertar turnos */
 INSERT INTO shifts (shift_name, schedule_details, fyh_creacion, estado) 
 VALUES 
@@ -122,30 +167,39 @@ VALUES
 ('VESPERTINO', 'LUNES A VIERNES de 12:00 A 20:00', NOW(), '1'),
 ('MIXTO', 'VIERNES DE 16:00 A 20:00 Y SÁBADO DE 7:00 A 18:00', NOW(), '1');
 
+/*
+ Tabla que almacena los grupos que pertenecen a un programa y tienen asignado un turno.
+ */
 
 /* Tabla de grupos */
 CREATE TABLE `groups` (
-    group_id INT AUTO_INCREMENT PRIMARY KEY,
-    group_name VARCHAR(255) NOT NULL,
-    program_id INT,
-    period VARCHAR(255),
-    year INT,
-    volume INT,
-    turn_id INT,
-    fyh_creacion DATETIME NULL,
-    fyh_actualizacion DATETIME NULL,
-    estado VARCHAR(11),
-    FOREIGN KEY (program_id) REFERENCES programs(program_id),
-    FOREIGN KEY (turn_id) REFERENCES shifts(shift_id)
+    group_id INT AUTO_INCREMENT PRIMARY KEY, /* ID único del grupo */
+    group_name VARCHAR(255) NOT NULL, /* Nombre del grupo */
+    program_id INT, /* ID del programa al que pertenece el grupo */
+    term_id INT, /* ID del cuatrimestre en el que está el grupo */
+    year INT, /* Año en el que está activo el grupo */
+    volume INT, /* Número de estudiantes en el grupo */
+    turn_id INT, /* ID del turno al que pertenece el grupo */
+    fyh_creacion DATETIME NULL, /* Fecha y hora de creación del grupo */
+    fyh_actualizacion DATETIME NULL, /* Fecha y hora de la última actualización del grupo */
+    estado VARCHAR(11), /* Estado del grupo, por ejemplo 'ACTIVO' o 'INACTIVO' */
+    FOREIGN KEY (program_id) REFERENCES programs(program_id), /* Relación con la tabla de programas */
+    FOREIGN KEY (term_id) REFERENCES terms(term_id), /* Relación con la tabla de cuatrimestres */
+    FOREIGN KEY (turn_id) REFERENCES shifts(shift_id) /* Relación con la tabla de turnos */
 ) ENGINE=InnoDB;
 
+
+/*
+ Inserta grupos de ejemplo, con el programa, periodo, año, volumen y turno correspondiente.
+ */
+
 /* Insertar datos de ejemplo en grupos */
-INSERT INTO `groups` (group_name, program_id, period, year, volume, turn_id, fyh_creacion, estado) VALUES 
-('GRUPOA', 3, '1° PERIODO', 2024, 30, 1, NOW(), '1'),
-('GRUPOB', 3, '4° PERIODO', 2024, 25, 2, NOW(), '1'),
-('GRUPOC', 3, '2° PERIODO', 2024, 20, 3, NOW(), '1'),
-('GRUPOD', 1, '3° PERIODO', 2024, 15, 3, NOW(), '1'),
-('GRUPOE', 2, '5° PERIODO', 2024, 10, 1, NOW(), '1');
+INSERT INTO `groups` (group_name, program_id, term_id, year, volume, turn_id, fyh_creacion, estado) VALUES 
+('GRUPOA', 3, 1, 2024, 30, 1, NOW(), '1'),
+('GRUPOB', 3, 4, 2024, 25, 2, NOW(), '1'),
+('GRUPOC', 3, 2, 2024, 20, 3, NOW(), '1'),
+('GRUPOD', 1, 3, 2024, 15, 3, NOW(), '1'),
+('GRUPOE', 2, 5, 2024, 10, 1, NOW(), '1');
 
 
 /* Tabla de profesores */
@@ -406,7 +460,7 @@ CREATE TABLE teacher_program_term (
 ) ENGINE=InnoDB;
 
 
-/* Tabla de asignación de horarios por materia */
+/* Tabla de asignación de horarios por materia con ON DELETE CASCADE */
 CREATE TABLE schedule_assignments (
     assignment_id INT AUTO_INCREMENT PRIMARY KEY,
     schedule_id INT,
@@ -423,8 +477,9 @@ CREATE TABLE schedule_assignments (
     FOREIGN KEY (schedule_id) REFERENCES schedules(schedule_id),
     FOREIGN KEY (subject_id) REFERENCES subjects(subject_id),
     FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id),
-    FOREIGN KEY (group_id) REFERENCES `groups`(group_id),
+    FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE,
     FOREIGN KEY (classroom_id) REFERENCES classrooms(classroom_id)
 ) ENGINE=InnoDB;
+
 
 

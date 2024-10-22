@@ -1,6 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\admin",
+    "\\login"
   ],
+  "SelectedNode": "\\login\\controller_login.php",
   "PreviewInSolutionExplorer": false
 }

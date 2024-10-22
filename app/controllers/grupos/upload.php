@@ -11,15 +11,16 @@ if (isset($_FILES['file'])) {
 
     if (($handle = fopen($file, 'r')) !== FALSE) {
         while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
-            echo "Datos le�dos: " . implode(", ", $data) . "<br>";
+            echo "Datos leídos: " . implode(", ", $data) . "<br>";
 
             $group_name = $data[0];
             $program_name = $data[1];
-            $period = $data[2];  
-            $year = $data[3];   
-            $volume = $data[4];  
+            $term_name = $data[2];  // Cuatrimestre
+            $year = $data[3];
+            $volume = $data[4];
+            $turn_name = $data[5];  // Turno
 
-            
+            // Buscar el ID del programa educativo
             $stmt_program = $pdo->prepare('SELECT program_id FROM programs WHERE program_name = :program_name');
             $stmt_program->bindParam(':program_name', $program_name);
             $stmt_program->execute();
@@ -30,13 +31,40 @@ if (isset($_FILES['file'])) {
             }
             $program_id = $program['program_id'];
 
-            
-            $sentencia = $pdo->prepare('INSERT INTO `groups` (group_name, program_id, period, year, volume, fyh_creacion, estado) VALUES (:group_name, :program_id, :period, :year, :volume, NOW(), "1")');
+            // Buscar el ID del cuatrimestre
+            $stmt_term = $pdo->prepare('SELECT term_id FROM terms WHERE term_name = :term_name');
+            $stmt_term->bindParam(':term_name', $term_name);
+            $stmt_term->execute();
+            $term = $stmt_term->fetch(PDO::FETCH_ASSOC);
+            if (!$term) {
+                echo "Error: Cuatrimestre no encontrado para el nombre: " . $term_name . "<br>";
+                continue;
+            }
+            $term_id = $term['term_id'];
+
+            // Buscar el ID del turno
+            $stmt_turn = $pdo->prepare('SELECT shift_id FROM shifts WHERE shift_name = :turn_name');
+            $stmt_turn->bindParam(':turn_name', $turn_name);
+            $stmt_turn->execute();
+            $turn = $stmt_turn->fetch(PDO::FETCH_ASSOC);
+            if (!$turn) {
+                echo "Error: Turno no encontrado para el nombre: " . $turn_name . "<br>";
+                continue;
+            }
+            $turn_id = $turn['shift_id'];
+
+            // Preparar la consulta SQL para insertar el grupo
+            $sentencia = $pdo->prepare('INSERT INTO `groups` 
+                (group_name, program_id, term_id, year, volume, turn_id, fyh_creacion, estado) 
+                VALUES (:group_name, :program_id, :term_id, :year, :volume, :turn_id, NOW(), "1")');
+
+            // Vincular los parámetros
             $sentencia->bindParam(':group_name', $group_name);
             $sentencia->bindParam(':program_id', $program_id);
-            $sentencia->bindParam(':period', $period); 
-            $sentencia->bindParam(':year', $year); 
-            $sentencia->bindParam(':volume', $volume); 
+            $sentencia->bindParam(':term_id', $term_id);  // Cuatrimestre
+            $sentencia->bindParam(':year', $year);
+            $sentencia->bindParam(':volume', $volume);
+            $sentencia->bindParam(':turn_id', $turn_id);  // Turno
 
             try {
                 $sentencia->execute();
@@ -48,7 +76,7 @@ if (isset($_FILES['file'])) {
         fclose($handle);
 
         session_start();
-        $_SESSION['mensaje'] = "Grupos registrados con exito.";
+        $_SESSION['mensaje'] = "Grupos registrados con éxito.";
         $_SESSION['icono'] = "success";
         header('Location:' . APP_URL . "/admin/grupos");
         die();
@@ -56,6 +84,5 @@ if (isset($_FILES['file'])) {
         echo "No se pudo abrir el archivo.";
     }
 } else {
-    echo "No se ha seleccionado ning�n archivo.";
+    echo "No se ha seleccionado ningún archivo.";
 }
-?>

@@ -18,7 +18,7 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
     <div class="content">
         <div class="container">
             <div class="row">
-                <h1>Profesor: <?= $nombres; ?></h1> 
+                <h1>Profesor: <?= $nombres ?? 'Desconocido'; ?></h1> 
             </div>
             <div class="row">
                 <div class="col-md-12">
@@ -32,7 +32,7 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Nombres del profesor</label>
-                                        <p><?= $nombres; ?></p>
+                                        <p><?= $nombres ?? 'Desconocido'; ?></p>
                                     </div>
                                 </div>
 
@@ -40,7 +40,7 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Local/Foráneo</label>
-                                        <p><?= $es_local; ?></p>  <!-- Nueva columna -->
+                                        <p><?= $es_local ?? 'Desconocido'; ?></p>
                                     </div>
                                 </div>
 
@@ -48,7 +48,7 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Materia</label>
-                                        <p><?= $materias; ?></p> 
+                                        <p><?= $materias ?? 'No asignado'; ?></p> 
                                     </div>
                                 </div>
 
@@ -56,7 +56,7 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Horas Semanales</label>
-                                        <p><?= $horas_semanales; ?></p> 
+                                        <p><?= $horas_semanales ?? 'No disponible'; ?></p> 
                                     </div>
                                 </div>
 
@@ -64,7 +64,7 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Programa</label>
-                                        <p><?= $programa; ?></p>
+                                        <p><?= $programa ?? 'No asignado'; ?></p>
                                     </div>
                                 </div>
 
@@ -72,7 +72,7 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Cuatrimestre</label>
-                                        <p><?= $cuatrimestre; ?></p>
+                                        <p><?= $cuatrimestre ?? 'No asignado'; ?></p>
                                     </div>
                                 </div>
                             </div>

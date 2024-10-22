@@ -1,6 +1,6 @@
 <?php
-include ('../../app/config.php');
-include ('../../admin/layout/parte1.php');
+include('../../app/config.php');
+include('../../admin/layout/parte1.php');
 ?>
 
   <!-- Content Wrapper. Contains page content -->
@@ -23,6 +23,28 @@ include ('../../admin/layout/parte1.php');
                     </div>
                 </div>
 
+                
+                <div class="col-md-4 col-sm-6 col-12">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-info"><i class="bi bi-bookmarks"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text"><b>Roles</b></span>
+                            <a href="<?= APP_URL; ?>/admin/roles" class="btn btn-primary btn-sm">Acceder</a>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="col-md-4 col-sm-6 col-12">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-info"><i class="bi bi-people-fill"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text"><b>Usuarios</b></span>
+                            <a href="<?= APP_URL; ?>/admin/usuarios" class="btn btn-primary btn-sm">Acceder</a>
+                        </div>
+                    </div>
+                </div>
+
         </div>
         <!-- /.row -->
       </div><!-- /.container-fluid -->
@@ -31,9 +53,7 @@ include ('../../admin/layout/parte1.php');
   </div>
   <!-- /.content-wrapper -->
 
-<?php 
-  
-include ('../../admin/layout/parte2.php');
-include ('../../layout/mensajes.php');
-  
+<?php
+include('../../admin/layout/parte2.php');
+include('../../layout/mensajes.php');
 ?>

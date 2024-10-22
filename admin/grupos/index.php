@@ -5,7 +5,8 @@ header('Content-Type: text/html; charset=utf-8');
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/programas/listado_de_programas.php');
-include('../../app/controllers/grupos/listado_de_grupos.php');
+include('../../app/controllers/grupos/listado_de_grupos.php');  // Controlador de grupos
+include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');  // Controlador de cuatrimestres
 
 ?>
 
@@ -46,16 +47,16 @@ include('../../app/controllers/grupos/listado_de_grupos.php');
                                         <th class="text-center">N&uacute;mero</th>
                                         <th class="text-center">Nombre del Grupo</th>
                                         <th class="text-center">Nombre del Programa Educativo</th>
-                                        <th class="text-center">Periodo</th>
+                                        <th class="text-center">Cuatrimestre</th>
                                         <th class="text-center">A&ntilde;o</th>
                                         <th class="text-center">Volumen del grupo</th>
-                                        <th class="text-center">Turno</th>  <!-- Nueva columna para el turno -->
+                                        <th class="text-center">Turno</th>
                                         <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 <?php
-                                if (isset($groups)) {
+                                if (!empty($groups)) {
                                     $contador_groups = 0;
                                     foreach ($groups as $group) {
                                         $group_id = $group['group_id'];
@@ -63,11 +64,11 @@ include('../../app/controllers/grupos/listado_de_grupos.php');
                                         <tr>
                                             <td style="text-align: center"><?= $contador_groups; ?></td>
                                             <td class="text-center"><?= $group['group_name']; ?></td>
-                                            <td class="text-center"><?= $group['programa']; ?></td>
-                                            <td class="text-center"><?= $group['period']; ?></td>
+                                            <td class="text-center"><?= $group['program_name']; ?></td> <!-- Mostrar program_name directamente -->
+                                            <td class="text-center"><?= $group['term_name']; ?></td> <!-- Mostrar term_name directamente -->
                                             <td class="text-center"><?= $group['year']; ?></td>
                                             <td style="text-align: center"><?= $group['volume']; ?></td>
-                                            <td class="text-center"><?= $group['turno']; ?></td>  <!-- Mostrar el turno aquí -->
+                                            <td class="text-center"><?= $group['shift_name']; ?></td>  <!-- Mostrar shift_name directamente -->
                                             <td style="text-align: center">
                                                 <div class="btn-group" role="group" aria-label="Basic example">
                                                     <a href="show.php?id=<?= $group_id; ?>" type="button" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>
@@ -113,12 +114,9 @@ include('../../app/controllers/grupos/listado_de_grupos.php');
                     </div>
                 </div>
             </div>
-            <!-- /.row -->
-        </div><!-- /.container-fluid -->
+        </div>
     </div>
-    <!-- /.content -->
 </div>
-<!-- /.content-wrapper -->
 
 <?php
 include('../../admin/layout/parte2.php');
