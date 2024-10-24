@@ -1,5 +1,9 @@
 <?php
-$group_id = $_GET['id'];
+$group_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+if (!$group_id) {
+    header('Location: ' . APP_URL . '/admin/grupos');
+    exit;
+}
 
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
@@ -7,14 +11,16 @@ include('../../app/controllers/grupos/datos_del_grupo.php');
 include('../../app/controllers/programas/listado_de_programas.php');
 include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
 include('../../app/controllers/turnos/listado_de_turnos.php');
+include('../../app/controllers/niveles/listado_de_niveles.php');  // Incluimos listado de niveles educativos
 
-
+// Definir variables con valores por defecto para evitar advertencias
 $group_name = isset($group_name) ? $group_name : "Grupo no encontrado";
 $program_id = isset($program_id) ? $program_id : null;
 $term_id = isset($term_id) ? $term_id : null;
 $year = isset($year) ? $year : "Año no encontrado";
 $volumen_grupo = isset($volumen_grupo) ? $volumen_grupo : "N/A";
 $turn_id = isset($turn_id) ? $turn_id : null;
+$nivel_id = isset($nivel_id) ? $nivel_id : null;  // Para el nivel educativo
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -79,17 +85,7 @@ $turn_id = isset($turn_id) ? $turn_id : null;
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- Campo para el año -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="">Año</label>
-                                            <input type="number" class="form-control" name="year" value="<?= htmlspecialchars($year); ?>" required>
-                                        </div>
-                                    </div>
-                                </div>
-
+                                                               
                                 <!-- Campo para el volumen del grupo -->
                                 <div class="row">
                                     <div class="col-md-12">
@@ -110,6 +106,23 @@ $turn_id = isset($turn_id) ? $turn_id : null;
                                                 <?php foreach ($turns as $turn): ?>
                                                     <option value="<?= $turn['shift_id']; ?>" <?= ($turn['shift_id'] == $turn_id) ? 'selected' : ''; ?>>
                                                         <?= htmlspecialchars($turn['shift_name'], ENT_QUOTES, 'UTF-8'); ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Campo para el nivel educativo -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="">Nivel Educativo</label>
+                                            <select name="nivel_id" class="form-control" required>
+                                                <option value="">Seleccione un nivel educativo</option>
+                                                <?php foreach ($levels as $level): ?>
+                                                    <option value="<?= $level['level_id']; ?>" <?= ($level['level_id'] == $nivel_id) ? 'selected' : ''; ?>>
+                                                        <?= htmlspecialchars($level['level_name'], ENT_QUOTES, 'UTF-8'); ?>
                                                     </option>
                                                 <?php endforeach; ?>
                                             </select>

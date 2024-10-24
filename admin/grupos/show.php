@@ -43,15 +43,10 @@ include('../../app/controllers/grupos/datos_del_grupo.php');
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Periodo</label>
-                                        <p><?= htmlspecialchars($period); ?></p> 
+                                        <p><?= htmlspecialchars($term_name); ?></p>  
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="">A&ntilde;o</label>
-                                        <p><?= htmlspecialchars($year); ?></p> 
-                                    </div>
-                                </div>
+                                
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Volumen</label>
@@ -60,8 +55,14 @@ include('../../app/controllers/grupos/datos_del_grupo.php');
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="">Turno</label> <!-- Nueva etiqueta para el turno -->
-                                        <p><?= htmlspecialchars($turno); ?></p> <!-- Mostrar el turno aquí -->
+                                        <label for="">Turno</label>
+                                        <p><?= htmlspecialchars($turno); ?></p> 
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">Nivel educativo</label> 
+                                        <p><?= htmlspecialchars($nivel_educativo); ?></p> 
                                     </div>
                                 </div>
                             </div>

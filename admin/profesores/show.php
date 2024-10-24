@@ -36,18 +36,10 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
                                     </div>
                                 </div>
 
-                                <!-- Local o Foráneo -->
+                                <!-- Materias -->
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="">Local/Foráneo</label>
-                                        <p><?= $es_local ?? 'Desconocido'; ?></p>
-                                    </div>
-                                </div>
-
-                                <!-- Materia -->
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="">Materia</label>
+                                        <label for="">Materias</label>
                                         <p><?= $materias ?? 'No asignado'; ?></p> 
                                     </div>
                                 </div>
@@ -60,10 +52,10 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
                                     </div>
                                 </div>
 
-                                <!-- Programa -->
+                                <!-- Programa de Adscripción -->
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="">Programa</label>
+                                        <label for="">Programa de Adscripción</label>
                                         <p><?= $programa ?? 'No asignado'; ?></p>
                                     </div>
                                 </div>

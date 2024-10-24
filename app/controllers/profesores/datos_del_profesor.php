@@ -1,9 +1,9 @@
 <?php
 
+/* Consulta para obtener los datos del profesor, incluyendo el nombre, programa y cuatrimestre */
 $sql_teacher = "
     SELECT 
         t.teacher_name AS nombres, 
-        t.es_local,  
         p.program_name AS programa,
         c.term_name AS cuatrimestre
     FROM 
@@ -22,19 +22,19 @@ $query_teacher->bindParam(':teacher_id', $teacher_id);
 $query_teacher->execute();
 $teacher = $query_teacher->fetch(PDO::FETCH_ASSOC);
 
-
+/* Si el profesor existe, asignamos las variables para el formulario */
 if ($teacher) {
     $nombres = $teacher['nombres'];
-    $es_local = $teacher['es_local'] == 1 ? 'Local' : 'Foráneo';
     $programa = $teacher['programa'] ?? 'No asignado';
     $cuatrimestre = $teacher['cuatrimestre'] ?? 'No asignado';
 }
 
-
+/* Consulta para obtener las materias ya asignadas al profesor, incluyendo las horas semanales */
 $sql_materias_asignadas = "
     SELECT 
         s.subject_name, 
-        s.weekly_hours
+        IFNULL(s.weekly_hours, 0) AS weekly_hours,  /* Si weekly_hours no tiene valor, asignamos 0 */
+        s.subject_id
     FROM 
         teacher_subjects ts 
     INNER JOIN 
@@ -47,13 +47,15 @@ $query_materias_asignadas->bindParam(':teacher_id', $teacher_id, PDO::PARAM_INT)
 $query_materias_asignadas->execute();
 $materias_asignadas = $query_materias_asignadas->fetchAll(PDO::FETCH_ASSOC);
 
-
+/* Inicializamos variables para mostrar las materias y el total de horas semanales */
 $materias = [];
 $horas_semanales = 0;
 
 foreach ($materias_asignadas as $materia) {
+    /* Verificamos que las horas semanales existan, si no, serán 0 */
+    $materia['weekly_hours'] = isset($materia['weekly_hours']) ? $materia['weekly_hours'] : 0;
     $materias[] = $materia['subject_name'];
-    $horas_semanales += $materia['weekly_hours']; 
+    $horas_semanales += $materia['weekly_hours'];
 }
 
 $materias = !empty($materias) ? implode(', ', $materias) : 'No asignado';

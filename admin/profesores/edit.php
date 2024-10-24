@@ -43,17 +43,6 @@ include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.ph
                                         </div>
                                     </div>
 
-                                    <!-- Local o Foráneo -->
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="">Local o Foráneo</label>
-                                            <select name="es_local" class="form-control" required>
-                                                <option value="1" <?= $es_local == 'Local' ? 'selected' : ''; ?>>Local</option>
-                                                <option value="0" <?= $es_local == 'Foráneo' ? 'selected' : ''; ?>>Foráneo</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
                                     <!-- Programa -->
                                     <div class="col-md-4">
                                         <div class="form-group">
@@ -85,7 +74,7 @@ include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.ph
                                     </div>
                                 </div>
 
-                                <!-- Materias disponibles (se cargarán dinámicamente con AJAX) -->
+                                <!-- Materias disponibles -->
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label for="">Materias disponibles</label>
@@ -99,7 +88,7 @@ include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.ph
                                         <label for="">Materias asignadas</label>
                                         <select id="materias_asignadas" name="materias_asignadas[]" class="form-control" multiple>
                                             <?php foreach ($materias_asignadas as $materia_asignada): ?>
-                                                <option value="<?= $materia_asignada['subject_id']; ?>">
+                                                <option value="<?= $materia_asignada['subject_id']; ?>" data-hours="<?= isset($materia_asignada['weekly_hours']) ? $materia_asignada['weekly_hours'] : 0; ?>">
                                                     <?= htmlspecialchars($materia_asignada['subject_name']); ?>
                                                 </option>
                                             <?php endforeach; ?>
@@ -112,6 +101,13 @@ include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.ph
                                     <div class="col-md-12 text-center">
                                         <button type="button" id="add_subject" class="btn btn-primary"> > </button>
                                         <button type="button" id="remove_subject" class="btn btn-primary"> < </button>
+                                    </div>
+                                </div>
+
+                                <!-- Contador de horas -->
+                                <div class="row">
+                                    <div class="col-md-12 text-center">
+                                        <h4>Horas semanales totales: <span id="total_hours">0</span></h4>
                                     </div>
                                 </div>
 
@@ -140,14 +136,14 @@ include('../../layout/mensajes.php');
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
-        // Evento al cambiar el programa o cuatrimestre
+        /* Evento al cambiar el programa o cuatrimestre */
         $('#programa_id, #cuatrimestre_id').change(function() {
             var programa_id = $('#programa_id').val();
             var cuatrimestre_id = $('#cuatrimestre_id').val();
             var teacher_id = <?= $teacher_id; ?>;
 
             if (programa_id && cuatrimestre_id) {
-                // Solicitud AJAX para obtener las materias
+                /* Solicitud AJAX para obtener las materias */
                 $.ajax({
                     url: '../../app/controllers/relacion_profesor_materias/obtener_materias.php',
                     type: 'POST',
@@ -157,21 +153,27 @@ include('../../layout/mensajes.php');
                         teacher_id: teacher_id
                     },
                     success: function(response) {
-                        // Cargar las materias en el select
+                        
                         $('#materias_disponibles').html(response);
+                        
+                        updateTotalHours();
                     }
                 });
             }
         });
 
-        // Scripts para mover materias entre listas
+        /* Scripts para mover materias entre listas y actualizar el contador */
         document.getElementById('add_subject').addEventListener('click', function() {
             const available = document.getElementById('materias_disponibles');
             const assigned = document.getElementById('materias_asignadas');
 
             Array.from(available.selectedOptions).forEach(option => {
+                console.log('Añadiendo materia:', option.text, 'Horas:', option.getAttribute('data-hours')); 
                 assigned.appendChild(option);
             });
+
+            /* Actualizar las horas después de mover materias */
+            updateTotalHours();
         });
 
         document.getElementById('remove_subject').addEventListener('click', function() {
@@ -179,8 +181,29 @@ include('../../layout/mensajes.php');
             const available = document.getElementById('materias_disponibles');
 
             Array.from(assigned.selectedOptions).forEach(option => {
+                console.log('Quitando materia:', option.text, 'Horas:', option.getAttribute('data-hours')); // Verificar si las horas están presentes
                 available.appendChild(option);
             });
+
+            /* Actualizar las horas después de mover materias */
+            updateTotalHours();
         });
+
+        /* Función para actualizar el contador de horas */
+        function updateTotalHours() {
+            let totalHours = 0;
+            const assigned = document.getElementById('materias_asignadas');
+
+            Array.from(assigned.options).forEach(option => {
+                const hours = parseInt(option.getAttribute('data-hours')) || 0;
+                console.log('Suma de horas:', hours);  /* Verificar si las horas están siendo leídas correctamente */
+                totalHours += hours;
+            });
+
+            document.getElementById('total_hours').innerText = totalHours;
+        }
+
+        /* Actualizar horas iniciales cuando cargamos la página */
+        updateTotalHours();
     });
 </script>

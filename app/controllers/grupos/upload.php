@@ -9,75 +9,133 @@ if (isset($_FILES['file'])) {
         die();
     }
 
+    $errores = [];  /* Array para acumular los errores */
+
     if (($handle = fopen($file, 'r')) !== FALSE) {
+        $row = 0;  /* Contador para las filas */
         while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
-            echo "Datos leídos: " . implode(", ", $data) . "<br>";
+            $row++;
 
-            $group_name = $data[0];
-            $program_name = $data[1];
-            $term_name = $data[2];  // Cuatrimestre
-            $year = $data[3];
-            $volume = $data[4];
-            $turn_name = $data[5];  // Turno
+            /* Omitir las primeras 3 filas */
+            if ($row <= 3) {
+                continue;
+            }
 
-            // Buscar el ID del programa educativo
+            /* Ignorar las primeras 2 columnas, procesar desde la tercera */
+            $abreviatura = trim($data[2]);    /* Columna 3: abreviatura */
+            $program_name = trim(mb_strtoupper($data[3]));   /* Columna 4: carrera (programa educativo) en mayúsculas */
+            $nivel_educativo = trim($data[4]);  /* Columna 5: nivel educativo */
+            $term_number = intval(trim($data[5]));  /* Columna 6: cuatrimestre (número) */
+            $group_suffix = trim($data[6]);   /* Columna 7: nombre del grupo (sufijo) */
+            $turn_name = trim($data[7]);      /* Columna 8: turno */
+            $volume = trim($data[8]);         /* Columna 9: volumen de alumnos */
+
+            /* Concatenar la abreviatura con el nombre del grupo */
+            $group_name = mb_strtoupper($abreviatura . '-' . $group_suffix, 'UTF-8');
+
+            /* Buscar o insertar el programa educativo */
             $stmt_program = $pdo->prepare('SELECT program_id FROM programs WHERE program_name = :program_name');
             $stmt_program->bindParam(':program_name', $program_name);
             $stmt_program->execute();
             $program = $stmt_program->fetch(PDO::FETCH_ASSOC);
+
             if (!$program) {
-                echo "Error: Programa no encontrado para el nombre: " . $program_name . "<br>";
+                /* Si no existe el programa, insertarlo */
+                $insert_program = $pdo->prepare('INSERT INTO programs (program_name) VALUES (:program_name)');
+                $insert_program->bindParam(':program_name', $program_name);
+                if ($insert_program->execute()) {
+                    $program_id = $pdo->lastInsertId();  /* Obtener el ID del nuevo programa */
+                } else {
+                    $errores[] = "Error: No se pudo insertar el programa: " . $program_name;
+                    continue;
+                }
+            } else {
+                $program_id = $program['program_id'];
+            }
+
+            /* Normalizar cuatrimestre (term_number a 'Primero', 'Segundo', etc.) */
+            $term_names = ['Primero', 'Segundo', 'Tercero', 'Cuarto', 'Quinto', 'Sexto', 'Séptimo', 'Octavo', 'Noveno'];
+            $term_name = isset($term_names[$term_number - 1]) ? $term_names[$term_number - 1] : null;
+
+            if (!$term_name) {
+                $errores[] = "Error: Cuatrimestre inválido: " . $term_number;
                 continue;
             }
-            $program_id = $program['program_id'];
 
-            // Buscar el ID del cuatrimestre
+            /* Buscar o insertar el cuatrimestre */
             $stmt_term = $pdo->prepare('SELECT term_id FROM terms WHERE term_name = :term_name');
             $stmt_term->bindParam(':term_name', $term_name);
             $stmt_term->execute();
             $term = $stmt_term->fetch(PDO::FETCH_ASSOC);
-            if (!$term) {
-                echo "Error: Cuatrimestre no encontrado para el nombre: " . $term_name . "<br>";
-                continue;
-            }
-            $term_id = $term['term_id'];
 
-            // Buscar el ID del turno
+            if (!$term) {
+                /* Si no existe el cuatrimestre, insertarlo */
+                $insert_term = $pdo->prepare('INSERT INTO terms (term_name) VALUES (:term_name)');
+                $insert_term->bindParam(':term_name', $term_name);
+                if ($insert_term->execute()) {
+                    $term_id = $pdo->lastInsertId();  /* Obtener el ID del nuevo cuatrimestre */
+                } else {
+                    $errores[] = "Error: No se pudo insertar el cuatrimestre: " . $term_name;
+                    continue;
+                }
+            } else {
+                $term_id = $term['term_id'];
+            }
+
+            /* Buscar el ID del turno */
             $stmt_turn = $pdo->prepare('SELECT shift_id FROM shifts WHERE shift_name = :turn_name');
             $stmt_turn->bindParam(':turn_name', $turn_name);
             $stmt_turn->execute();
             $turn = $stmt_turn->fetch(PDO::FETCH_ASSOC);
             if (!$turn) {
-                echo "Error: Turno no encontrado para el nombre: " . $turn_name . "<br>";
+                $errores[] = "Error: Turno no encontrado para el nombre: " . $turn_name;
                 continue;
             }
             $turn_id = $turn['shift_id'];
 
-            // Preparar la consulta SQL para insertar el grupo
-            $sentencia = $pdo->prepare('INSERT INTO `groups` 
-                (group_name, program_id, term_id, year, volume, turn_id, fyh_creacion, estado) 
-                VALUES (:group_name, :program_id, :term_id, :year, :volume, :turn_id, NOW(), "1")');
+            /* Insertar el grupo en la tabla groups */
+            $sentencia_grupo = $pdo->prepare('INSERT INTO `groups` 
+                (group_name, program_id, term_id, volume, turn_id, fyh_creacion, estado) 
+                VALUES (:group_name, :program_id, :term_id, :volume, :turn_id, NOW(), "1")');
 
-            // Vincular los parámetros
-            $sentencia->bindParam(':group_name', $group_name);
-            $sentencia->bindParam(':program_id', $program_id);
-            $sentencia->bindParam(':term_id', $term_id);  // Cuatrimestre
-            $sentencia->bindParam(':year', $year);
-            $sentencia->bindParam(':volume', $volume);
-            $sentencia->bindParam(':turn_id', $turn_id);  // Turno
+            /* Vincular los parámetros */
+            $sentencia_grupo->bindParam(':group_name', $group_name);
+            $sentencia_grupo->bindParam(':program_id', $program_id);
+            $sentencia_grupo->bindParam(':term_id', $term_id);
+            $sentencia_grupo->bindParam(':volume', $volume);
+            $sentencia_grupo->bindParam(':turn_id', $turn_id);
 
             try {
-                $sentencia->execute();
-                echo "Grupo registrado: " . $group_name . "<br>";
+                $sentencia_grupo->execute();
+
+                /* Obtener el ID del grupo insertado */
+                $group_id = $pdo->lastInsertId();
+
+                /* Insertar el nivel educativo en la tabla educational_levels */
+                $sentencia_nivel = $pdo->prepare('INSERT INTO `educational_levels` 
+                    (level_name, group_id) 
+                    VALUES (:nivel_educativo, :group_id)');
+
+                $sentencia_nivel->bindParam(':nivel_educativo', $nivel_educativo);
+                $sentencia_nivel->bindParam(':group_id', $group_id);
+                $sentencia_nivel->execute();
+
             } catch (Exception $exception) {
-                echo "Error al registrar el grupo: " . $exception->getMessage() . "<br>";
+                $errores[] = "Error al registrar el grupo: " . $exception->getMessage();
             }
         }
         fclose($handle);
 
         session_start();
-        $_SESSION['mensaje'] = "Grupos registrados con éxito.";
-        $_SESSION['icono'] = "success";
+
+        if (!empty($errores)) {
+            $_SESSION['mensaje'] = implode("<br>", $errores);  /* Mostrar todos los errores acumulados */
+            $_SESSION['icono'] = "error";
+        } else {
+            $_SESSION['mensaje'] = "Grupos registrados con éxito.";
+            $_SESSION['icono'] = "success";
+        }
+
         header('Location:' . APP_URL . "/admin/grupos");
         die();
     } else {

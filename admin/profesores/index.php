@@ -40,7 +40,7 @@ include('../../app/controllers/profesores/listado_de_profesores.php');
                                     <tr>
                                         <th><center>Número</center></th>
                                         <th><center>Nombres del profesor</center></th>
-                                        <th><center>Local/Foráneo</center></th>
+                                        <th><center>Programa de Adscripción</center></th> <!-- Nueva columna -->
                                         <th><center>Materias</center></th>
                                         <th><center>Horas Semanales</center></th>
                                         <th><center>Programas</center></th>
@@ -57,9 +57,7 @@ include('../../app/controllers/profesores/listado_de_profesores.php');
                                     <tr>
                                         <td style="text-align: center"><?= $contador_teachers; ?></td>
                                         <td><?= $teacher['profesor']; ?></td>
-                                        <td><center>
-                                            <?= $teacher['es_local'] == 1 ? 'Local' : 'Foráneo'; ?> 
-                                        </center></td>
+                                        <td><center><?= $teacher['programa_adscripcion']; ?></center></td> <!-- Mostrar el programa de adscripción -->
                                         <td><center><?= $teacher['materias']; ?></center></td>
                                         <td><center><?= $teacher['horas_semanales']; ?></center></td>
                                         <td><center><?= $teacher['programas']; ?></center></td>

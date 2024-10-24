@@ -1,19 +1,22 @@
 <?php
 include('../../../app/config.php');
 
-$group_id = $_POST['group_id']; 
-
+$group_id = $_POST['group_id'];
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-
-$sentencia = $pdo->prepare("DELETE FROM `groups` WHERE group_id = :group_id");
-$sentencia->bindParam(':group_id', $group_id);
-
 try {
-    
+    // Eliminar los registros relacionados en la tabla `educational_levels`
+    $sentencia_niveles = $pdo->prepare("DELETE FROM `educational_levels` WHERE group_id = :group_id");
+    $sentencia_niveles->bindParam(':group_id', $group_id);
+    $sentencia_niveles->execute();
+
+    // Ahora eliminar el grupo
+    $sentencia = $pdo->prepare("DELETE FROM `groups` WHERE group_id = :group_id");
+    $sentencia->bindParam(':group_id', $group_id);
+
     if ($sentencia->execute()) {
         $_SESSION['mensaje'] = "El grupo se ha eliminado correctamente.";
         $_SESSION['icono'] = "success";
@@ -26,10 +29,8 @@ try {
         exit();
     }
 } catch (Exception $e) {
-    
     $_SESSION['mensaje'] = "Error al eliminar el grupo: " . $e->getMessage();
     $_SESSION['icono'] = "error";
     header('Location:' . APP_URL . "/admin/grupos");
     exit();
 }
-?>

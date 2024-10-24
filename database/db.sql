@@ -84,11 +84,11 @@ VALUES ('Universidad Tecnológica de Morelia', 'https://ut-morelia.edu.mx/wp-con
 
 /* Tabla de programas */
 CREATE TABLE programs (
-    program_id INT AUTO_INCREMENT PRIMARY KEY, /* ID único del programa */
-    program_name VARCHAR(255) NOT NULL, /* Nombre del programa */
-    fyh_creacion DATETIME NULL, /* Fecha y hora de creación del programa */
-    fyh_actualizacion DATETIME NULL, /* Fecha y hora de la última actualización del programa */
-    estado VARCHAR(11)/* Estado del programa, por ejemplo 'ACTIVO' o 'INACTIVO' */
+    program_id INT AUTO_INCREMENT PRIMARY KEY,   /* ID único del programa */
+    program_name VARCHAR(255) NOT NULL,          /* Nombre del programa */
+    fyh_creacion DATETIME NULL,                   /* Fecha y hora de creación del programa */
+    fyh_actualizacion DATETIME NULL,              /* Fecha y hora de la última actualización del programa */
+    estado VARCHAR(11)                           /* Estado del programa, por ejemplo 'ACTIVO' o 'INACTIVO' */
 ) ENGINE=InnoDB;
 
 /*
@@ -97,18 +97,28 @@ CREATE TABLE programs (
 
 /* Insertar datos de ejemplo en programas */
 INSERT INTO programs (program_name, fyh_creacion, estado) VALUES 
-('ASESOR FINANCIERO', NOW(), '1'),
-('PROCESOS ALIMENTARIOS', NOW(), '1'),
-('DISEÑO TEXTIL Y MODA', NOW(), '1'),
+('ASESOR FINANCIERO COOPERATIVO', NOW(), '1'),
+('DISEÑO Y MODA INDUSTRIAL ÁREA PRODUCCIÓN', NOW(), '1'),
 ('ENERGÍAS RENOVABLES', NOW(), '1'),
-('MANTENIMIENTO INDUSTRIAL', NOW(), '1'),
-('MECATRÓNICA', NOW(), '1'),
+('ENERGÍAS RENOVABLES ÁREA ENERGÍA SOLAR', NOW(), '1'),
+('ENERGÍAS RENOVABLES ÁREA TURBOENERGÍA', NOW(), '1'),
+('MANTENIMIENTO ÁREA INDUSTRIAL', NOW(), '1'),
+('MECATRÓNICA ÁREA AUTOMATIZACIÓN', NOW(), '1'),
 ('TECNOLOGÍAS DE LA INFORMACIÓN', NOW(), '1'),
-('BIOTECNOLOGÍA', NOW(), '1'),
+('TECNOLOGÍAS DE LA INFORMACIÓN ÁREA DESARROLLO DE SOFTWARE MULTIPLATAFORMA', NOW(), '1'),
+('TECNOLOGÍAS DE LA INFORMACIÓN ÁREA ENTORNOS VIRTUALES Y NEGOCIOS DIGITALES', NOW(), '1'),
+('QUÍMICA ÁREA BIOTECNOLOGÍA', NOW(), '1'),
+('INGENIERÍA EN BIOTECNOLOGÍA', NOW(), '1'),
 ('GASTRONOMÍA', NOW(), '1'),
 ('LICENCIATURA DE ENFERMERÍA', NOW(), '1'),
-('SISTEMAS AUTOMOTRICES', NOW(), '1'),
-('LICENCIATURA EN ECONOMÍA SOCIAL SOLIDARIA', NOW(), '1');
+('INGENIERÍA EN DESARROLLO Y GESTIÓN DE SOFTWARE', NOW(), '1'),
+('INGENIERÍA EN DISEÑO TEXTIL Y MODA', NOW(), '1'),
+('INGENIERÍA EN ENERGÍAS RENOVABLES', NOW(), '1'),
+('INGENIERÍA EN ENTORNOS VIRTUALES Y NEGOCIOS DIGITALES', NOW(), '1'),
+('INGENIERÍA EN MANTENIMIENTO INDUSTRIAL', NOW(), '1'),
+('INGENIERÍA EN MECATRÓNICA', NOW(), '1'),
+('LICENCIATURA EN GASTRONOMÍA', NOW(), '1'),
+('MAESTRÍA EN INGENIERÍA APLICADA EN LA INNOVACIÓN TECNOLÓGICA', NOW(), '1');
 
 /*
  Tabla que almacena los cuatrimestres dentro de los programas académicos.
@@ -149,7 +159,7 @@ INSERT INTO terms (term_name, fyh_creacion, estado) VALUES
 /* Tabla de turnos */
 CREATE TABLE shifts (
     shift_id INT AUTO_INCREMENT PRIMARY KEY,
-    shift_name ENUM('MATUTINO', 'VESPERTINO', 'MIXTO') NOT NULL,
+    shift_name ENUM('MATUTINO', 'VESPERTINO', 'MIXTO', 'ZINAPÉCUARO') NOT NULL,
     schedule_details VARCHAR(255) NOT NULL, /* Detalles sobre los horarios */
     fyh_creacion DATETIME NULL,
     fyh_actualizacion DATETIME NULL,
@@ -177,7 +187,6 @@ CREATE TABLE `groups` (
     group_name VARCHAR(255) NOT NULL, /* Nombre del grupo */
     program_id INT, /* ID del programa al que pertenece el grupo */
     term_id INT, /* ID del cuatrimestre en el que está el grupo */
-    year INT, /* Año en el que está activo el grupo */
     volume INT, /* Número de estudiantes en el grupo */
     turn_id INT, /* ID del turno al que pertenece el grupo */
     fyh_creacion DATETIME NULL, /* Fecha y hora de creación del grupo */
@@ -188,34 +197,21 @@ CREATE TABLE `groups` (
     FOREIGN KEY (turn_id) REFERENCES shifts(shift_id) /* Relación con la tabla de turnos */
 ) ENGINE=InnoDB;
 
-
-/*
- Inserta grupos de ejemplo, con el programa, periodo, año, volumen y turno correspondiente.
- */
-
-/* Insertar datos de ejemplo en grupos */
-INSERT INTO `groups` (group_name, program_id, term_id, year, volume, turn_id, fyh_creacion, estado) VALUES 
-('GRUPOA', 3, 1, 2024, 30, 1, NOW(), '1'),
-('GRUPOB', 3, 4, 2024, 25, 2, NOW(), '1'),
-('GRUPOC', 3, 2, 2024, 20, 3, NOW(), '1'),
-('GRUPOD', 1, 3, 2024, 15, 3, NOW(), '1'),
-('GRUPOE', 2, 5, 2024, 10, 1, NOW(), '1');
-
-
 /* Tabla de profesores */
 CREATE TABLE teachers (
-    teacher_id INT AUTO_INCREMENT PRIMARY KEY,
-    teacher_name VARCHAR(100) NOT NULL,
-    fyh_creacion DATETIME NULL,
-    fyh_actualizacion DATETIME NULL,
-    estado VARCHAR(11),
-    es_local BOOLEAN DEFAULT 1  /* ('local', 'foraneo') */
+    teacher_id INT AUTO_INCREMENT PRIMARY KEY,  /* ID único del profesor */
+    teacher_name VARCHAR(100) NOT NULL,         /* Nombre del profesor */
+    fyh_creacion DATETIME NULL,                  /* Fecha y hora de creación */
+    fyh_actualizacion DATETIME NULL,             /* Fecha y hora de última actualización */
+    estado VARCHAR(11),                          /* Estado del profesor, por ejemplo 'ACTIVO' o 'INACTIVO' */
+    program_id INT,                              /* ID del programa de adscripción */
+    CONSTRAINT fk_program FOREIGN KEY (program_id) REFERENCES programs(program_id)  /* Clave foránea a la tabla programs */
 ) ENGINE=InnoDB;
 
 /* Insertar datos de ejemplo en profesores */
-INSERT INTO teachers (teacher_name, fyh_creacion, estado, es_local) VALUES 
-('PROF. JUAN PÉREZ', NOW(), '1', 1),   /* Profesor local */
-('PROF. MARÍA LÓPEZ', NOW(), '1', 0);  /* Profesor foráneo */
+INSERT INTO teachers (teacher_name, fyh_creacion, estado, program_id) VALUES 
+('PROF. JUAN PÉREZ', NOW(), 'ACTIVO', 1),   /* Profesor local, adscrito al programa con ID 1 */
+('PROF. MARÍA LÓPEZ', NOW(), 'ACTIVO', 2);  /* Profesor foráneo, adscrito al programa con ID 2 */
 
 
 /* Tabla de Laboratorios */
@@ -248,7 +244,7 @@ CREATE TABLE subjects (
     fyh_creacion DATETIME NULL,
     fyh_actualizacion DATETIME NULL,
     estado VARCHAR(11),
-    CONSTRAINT fk_program FOREIGN KEY (program_id) REFERENCES programs(program_id),
+    CONSTRAINT fk_program_subject FOREIGN KEY (program_id) REFERENCES programs(program_id), /* Cambiar el nombre aquí */
     CONSTRAINT fk_term FOREIGN KEY (term_id) REFERENCES terms(term_id),
     CONSTRAINT fk_lab FOREIGN KEY (lab_id) REFERENCES labs(lab_id) /* Relación con la tabla de laboratorios */
 ) ENGINE=InnoDB;
@@ -376,31 +372,22 @@ INSERT INTO classrooms (classroom_name, capacity, building, floor, fyh_creacion,
 
 /* Tabla de horarios */
 CREATE TABLE schedules (
-    schedule_id INT AUTO_INCREMENT PRIMARY KEY,
-    teacher_subject_id INT,
-    classroom_id INT,
-    schedule_day ENUM('Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'),
-    start_time TIME,
-    end_time TIME,
-    fyh_creacion DATETIME NULL,
-    fyh_actualizacion DATETIME NULL,
-    estado VARCHAR(11),
-    group_id INT,
-    FOREIGN KEY (teacher_subject_id) REFERENCES teacher_subjects(teacher_subject_id),
-    FOREIGN KEY (classroom_id) REFERENCES classrooms(classroom_id),
-    FOREIGN KEY (group_id) REFERENCES `groups`(group_id)
+    schedule_id INT AUTO_INCREMENT PRIMARY KEY,  /* ID único del horario */
+    teacher_subject_id INT,                      /* ID de la relación entre profesor y materia */
+    classroom_id INT,                            /* ID del salón asignado */
+    schedule_day ENUM('Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'),  /* Día de la semana */
+    start_time TIME,                             /* Hora de inicio */
+    end_time TIME,                               /* Hora de finalización */
+    fyh_creacion DATETIME NULL,                  /* Fecha y hora de creación */
+    fyh_actualizacion DATETIME NULL,             /* Fecha y hora de actualización */
+    estado VARCHAR(11),                          /* Estado del horario */
+    group_id INT,                                /* ID del grupo asociado */
+    
+    /* Claves foráneas con eliminación en cascada */
+    FOREIGN KEY (teacher_subject_id) REFERENCES teacher_subjects(teacher_subject_id) ON DELETE CASCADE,
+    FOREIGN KEY (classroom_id) REFERENCES classrooms(classroom_id) ON DELETE CASCADE,
+    FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
-
-INSERT INTO schedules (teacher_subject_id, classroom_id, schedule_day, start_time, end_time, group_id, fyh_creacion, estado) VALUES
-(NULL, 1, 'LUNES', '07:00:00', '15:00:00', 1, NOW(), '1'),
-(NULL, 2, 'LUNES', '12:00:00', '20:00:00', 1, NOW(), '1'),
-(NULL, 1, 'MARTES', '07:00:00', '15:00:00', 1, NOW(), '1'),
-(NULL, 2, 'MARTES', '12:00:00', '20:00:00', 1, NOW(), '1'),
-(NULL, 1, 'MIERCOLES', '07:00:00', '15:00:00', 1, NOW(), '1'),
-(NULL, 2, 'MIERCOLES', '12:00:00', '20:00:00', 1, NOW(), '1'),
-(NULL, 1, 'JUEVES', '07:00:00', '15:00:00', 1, NOW(), '1'),
-(NULL, 2, 'JUEVES', '12:00:00', '20:00:00', 1, NOW(), '1'),
-(NULL, 3, 'SABADO', '7:00:00', '18:00:00', 2, NOW(), '1');
 
 
 /* Tabla relación de grupos y materias */
@@ -482,4 +469,14 @@ CREATE TABLE schedule_assignments (
 ) ENGINE=InnoDB;
 
 
+CREATE TABLE educational_levels (
+    level_id INT AUTO_INCREMENT PRIMARY KEY,  /* ID único del nivel educativo */
+    level_name VARCHAR(255) NOT NULL,         /* Nombre del nivel educativo (TSU, Licenciatura, Maestría) */
+    group_id INT,                             /* ID del grupo asociado */
+    FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE /* Relación con eliminación en cascada */
+) ENGINE=InnoDB;
 
+INSERT INTO educational_levels (level_name, group_id) VALUES 
+('TSU', NULL),          /* Este nivel no está asociado a ningún grupo aún */
+('LICENCIATURA', NULL), /* Este nivel no está asociado a ningún grupo aún */
+('MAESTRÍA', NULL);     /* Este nivel no está asociado a ningún grupo aún */

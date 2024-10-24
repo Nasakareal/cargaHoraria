@@ -2,8 +2,12 @@
   "ExpandedNodes": [
     "",
     "\\admin",
-    "\\login"
+    "\\admin\\grupos",
+    "\\app",
+    "\\app\\controllers",
+    "\\app\\controllers\\grupos",
+    "\\database"
   ],
-  "SelectedNode": "\\login\\controller_login.php",
+  "SelectedNode": "\\database\\db.sql",
   "PreviewInSolutionExplorer": false
 }

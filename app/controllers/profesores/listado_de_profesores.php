@@ -4,13 +4,15 @@ $sql_teachers = "
     SELECT 
         t.teacher_id,
         t.teacher_name AS profesor,
-        t.es_local,  -- Nueva columna que indica si es local o foráneo
+        COALESCE(p.program_name, 'Sin programa de adscripción') AS programa_adscripcion, /* Programa de adscripción */
+        GROUP_CONCAT(DISTINCT ps.program_name SEPARATOR ', ') AS programas, /* Programas donde imparte materias */
+        GROUP_CONCAT(DISTINCT pt.term_name SEPARATOR ', ') AS cuatrimestres, /* Cuatrimestres asociados */
         GROUP_CONCAT(s.subject_name SEPARATOR ', ') AS materias,
-        SUM(s.weekly_hours) AS horas_semanales,
-        GROUP_CONCAT(DISTINCT p.program_name SEPARATOR ', ') AS programas,
-        GROUP_CONCAT(DISTINCT pt.term_name SEPARATOR ', ') AS cuatrimestres
+        SUM(s.weekly_hours) AS horas_semanales
     FROM
         teachers t
+    LEFT JOIN
+        programs p ON t.program_id = p.program_id /* Relación para obtener el programa de adscripción */
     LEFT JOIN
         teacher_subjects ts ON t.teacher_id = ts.teacher_id
     LEFT JOIN
@@ -18,9 +20,9 @@ $sql_teachers = "
     LEFT JOIN
         program_term_subjects pts ON ts.subject_id = pts.subject_id
     LEFT JOIN
-        programs p ON pts.program_id = p.program_id
+        programs ps ON pts.program_id = ps.program_id /* Programas donde imparte materias */
     LEFT JOIN
-        terms pt ON pts.term_id = pt.term_id
+        terms pt ON pts.term_id = pt.term_id /* Cuatrimestres */
     GROUP BY
         t.teacher_id";
 
