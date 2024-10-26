@@ -33,28 +33,21 @@ if (isset($_FILES['file'])) {
             /* Concatenar la abreviatura con el nombre del grupo */
             $group_name = mb_strtoupper($abreviatura . '-' . $group_suffix, 'UTF-8');
 
-            /* Buscar o insertar el programa educativo */
+            /* Buscar el programa educativo */
             $stmt_program = $pdo->prepare('SELECT program_id FROM programs WHERE program_name = :program_name');
             $stmt_program->bindParam(':program_name', $program_name);
             $stmt_program->execute();
             $program = $stmt_program->fetch(PDO::FETCH_ASSOC);
 
             if (!$program) {
-                /* Si no existe el programa, insertarlo */
-                $insert_program = $pdo->prepare('INSERT INTO programs (program_name) VALUES (:program_name)');
-                $insert_program->bindParam(':program_name', $program_name);
-                if ($insert_program->execute()) {
-                    $program_id = $pdo->lastInsertId();  /* Obtener el ID del nuevo programa */
-                } else {
-                    $errores[] = "Error: No se pudo insertar el programa: " . $program_name;
-                    continue;
-                }
-            } else {
-                $program_id = $program['program_id'];
+                /* Si no existe el programa, omitir esta fila y acumular un error */
+                $errores[] = "Error: Programa no encontrado: " . $program_name;
+                continue;
             }
+            $program_id = $program['program_id'];
 
             /* Normalizar cuatrimestre (term_number a 'Primero', 'Segundo', etc.) */
-            $term_names = ['Primero', 'Segundo', 'Tercero', 'Cuarto', 'Quinto', 'Sexto', 'Séptimo', 'Octavo', 'Noveno'];
+            $term_names = ['Primero', 'Segundo', 'Tercero', 'Cuarto', 'Quinto', 'Sexto', 'Séptimo', 'Octavo', 'Noveno', 'Decimo', 'Undécimo', 'Duodécimo', 'Decimotercero', 'Decimocuarto', 'Decimoquinto', 'Decimosexto', 'Decimoséptimo', 'Decimoctavo', 'Decimonoveno', 'Vigésimo'];
             $term_name = isset($term_names[$term_number - 1]) ? $term_names[$term_number - 1] : null;
 
             if (!$term_name) {

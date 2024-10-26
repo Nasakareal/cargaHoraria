@@ -47,9 +47,11 @@ include('../../app/controllers/programas/listado_de_programas.php');
                                         <th><center>Materias</center></th>
                                         <th><center>Horas Consecutivas</center></th>
                                         <th><center>Horas Semanales</center></th>
-                                        <th><center>¿Es especialización?</center></th>
                                         <th><center>Programa</center></th>
                                         <th><center>Cuatrimestre</center></th>
+                                        <th><center>Laboratorios Asignados</center></th>
+                                        <th><center>Horas Aula</center></th>
+                                        <th><center>Horas Laboratorio</center></th>
                                         <th><center>Acciones</center></th>
                                     </tr>
                                 </thead>
@@ -76,15 +78,17 @@ include('../../app/controllers/programas/listado_de_programas.php');
                                                 break;
                                             }
                                         }
-                                    ?>
+                                        ?>
                                     <tr>
                                         <td style="text-align: center"><?= $contador_subjects; ?></td>
                                         <td style="text-align: center"><?= htmlspecialchars($subject['subject_name']); ?></td>
                                         <td><center><?= htmlspecialchars($subject['hours_consecutive']); ?></center></td>
-                                        <td><center><?= htmlspecialchars($subject['weekly_hours'] ?? 0); ?></center></td>
-                                        <td><center><?= $subject['is_specialization'] ? 'Sí' : 'No'; ?></center></td>
+                                        <td><center><?= htmlspecialchars($subject['class_hours'] + $subject['lab_hours']); ?></center></td>
                                         <td><center><?= $program_name; ?></center></td>
                                         <td><center><?= $term_name; ?></center></td>
+                                        <td><center><?= isset($subject['num_labs']) ? htmlspecialchars($subject['num_labs']) : 'No asignado'; ?></center></td>
+                                        <td><center><?= htmlspecialchars($subject['class_hours']); ?></center></td>
+                                        <td><center><?= htmlspecialchars($subject['lab_hours']); ?></center></td>
                                         <td style="text-align: center">
                                             <div class="btn-group" role="group">
                                                 <a href="show.php?id=<?= $subject['subject_id']; ?>" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>
@@ -142,11 +146,11 @@ include('../../layout/mensajes.php');
             "pageLength": 5,
             "language": {
                 "emptyTable": "No hay información",
-                "info": "Mostrando _START_ a _END_ de _TOTAL_ Usuarios",
-                "infoEmpty": "Mostrando 0 a 0 de 0 Usuarios",
-                "infoFiltered": "(Filtrado de _MAX_ total Usuarios)",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ Materias",
+                "infoEmpty": "Mostrando 0 a 0 de 0 Materias",
+                "infoFiltered": "(Filtrado de _MAX_ total Materias)",
                 "thousands": ",",
-                "lengthMenu": "Mostrar _MENU_ Usuarios",
+                "lengthMenu": "Mostrar _MENU_ Materias",
                 "loadingRecord": "Cargando...",
                 "processing": "Procesando...",
                 "search": "Buscador:",

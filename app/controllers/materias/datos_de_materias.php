@@ -1,28 +1,40 @@
 <?php
-$subject_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
-if (!$subject_id) {
-    echo "ID de materia inválido.";
-    exit;
-}
+$sql_materias = "SELECT 
+                    s.subject_name, 
+                    s.class_hours, 
+                    s.lab_hours, 
+                    s.lab1_hours, 
+                    s.lab2_hours, 
+                    s.lab3_hours, 
+                    s.max_consecutive_class_hours AS hours_consecutive,
+                    p.program_name, 
+                    t.term_name 
+                 FROM 
+                    subjects s 
+                 LEFT JOIN 
+                    programs p ON s.program_id = p.program_id 
+                 LEFT JOIN 
+                    terms t ON s.term_id = t.term_id 
+                 WHERE 
+                    s.subject_id = :subject_id";
 
-$sql_subjects = "SELECT * FROM subjects WHERE subject_id = :subject_id";
-$query_subjects = $pdo->prepare($sql_subjects);
-$query_subjects->bindParam(':subject_id', $subject_id, PDO::PARAM_INT);
-$query_subjects->execute();
-$subjects = $query_subjects->fetchAll(PDO::FETCH_ASSOC);
+$query_materias = $pdo->prepare($sql_materias);
+$query_materias->execute([':subject_id' => $subject_id]);
+$materia = $query_materias->fetch(PDO::FETCH_ASSOC);
 
-if (empty($subjects)) {
+if (!$materia) {
     echo "Materia no encontrada.";
     exit;
 }
 
-foreach ($subjects as $subject) {
-    $subject_name = htmlspecialchars($subject['subject_name']);
-    $is_specialization = $subject['is_specialization'];
-    $hours_consecutive = $subject['hours_consecutive'];
-    $horas_semanales = $subject['weekly_hours'] ?? 0;
-    $program_id = $subject['program_id'];
-    $term_id = $subject['term_id'];
-}
-?>
+$subject_name = $materia['subject_name'];
+$hours_consecutive = $materia['hours_consecutive'];
+$weekly_hours = $materia['class_hours'] + $materia['lab_hours']; // Suma de horas en aula y laboratorio
+$program_name = $materia['program_name'] ?? 'No asignado';
+$term_name = $materia['term_name'] ?? 'No asignado';
+$class_hours = $materia['class_hours'];
+$lab_hours = $materia['lab_hours'];
+$lab1_hours = $materia['lab1_hours'];
+$lab2_hours = $materia['lab2_hours'];
+$lab3_hours = $materia['lab3_hours'];

@@ -7,41 +7,9 @@ if (!$subject_id) {
     exit;
 }
 
-include ('../../app/config.php');
-include ('../../admin/layout/parte1.php');
-
-/* Realiza la consulta para obtener los datos de la materia */
-$sql_materias = "SELECT 
-                    s.subject_name, 
-                    s.hours_consecutive, 
-                    s.weekly_hours, 
-                    s.is_specialization, 
-                    p.program_name, 
-                    t.term_name 
-                 FROM 
-                    subjects s 
-                 LEFT JOIN 
-                    programs p ON s.program_id = p.program_id 
-                 LEFT JOIN 
-                    terms t ON s.term_id = t.term_id 
-                 WHERE 
-                    s.subject_id = :subject_id";
-
-$query_materias = $pdo->prepare($sql_materias);
-$query_materias->execute([':subject_id' => $subject_id]);
-$materia = $query_materias->fetch(PDO::FETCH_ASSOC);
-
-if (!$materia) {
-    echo "Materia no encontrada.";
-    exit;
-}
-
-$subject_name = $materia['subject_name'];
-$hours_consecutive = $materia['hours_consecutive'];
-$weekly_hours = $materia['weekly_hours'];
-$is_specialization = $materia['is_specialization'] ? 'Sí' : 'No';
-$program_name = $materia['program_name'] ?? 'No asignado';
-$term_name = $materia['term_name'] ?? 'No asignado';
+include('../../app/config.php');
+include('../../admin/layout/parte1.php');
+include('../../app/controllers/datos_de_materias.php');
 
 ?>
 
@@ -69,20 +37,14 @@ $term_name = $materia['term_name'] ?? 'No asignado';
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="">Horas Consecutivas</label>
+                                        <label for="">Horas Consecutivas en Aula</label>
                                         <p><?= $hours_consecutive; ?></p> 
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="">Horas Semanales</label>
+                                        <label for="">Horas Semanales Totales</label>
                                         <p><?= $weekly_hours; ?></p> 
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="">Es Especialización?</label>
-                                        <p><?= $is_specialization; ?></p> 
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -95,6 +57,30 @@ $term_name = $materia['term_name'] ?? 'No asignado';
                                     <div class="form-group">
                                         <label for="">Cuatrimestre</label>
                                         <p><?= htmlspecialchars($term_name); ?></p> 
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">Horas en Aula</label>
+                                        <p><?= $class_hours; ?></p> 
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">Horas en Laboratorio 1</label>
+                                        <p><?= $lab1_hours; ?></p> 
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">Horas en Laboratorio 2</label>
+                                        <p><?= $lab2_hours; ?></p> 
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">Horas en Laboratorio 3</label>
+                                        <p><?= $lab3_hours; ?></p> 
                                     </div>
                                 </div>
                             </div>
@@ -118,7 +104,7 @@ $term_name = $materia['term_name'] ?? 'No asignado';
 </div>
 <!-- /.content-wrapper -->
 
-<?php 
-include ('../../admin/layout/parte2.php');
-include ('../../layout/mensajes.php');
+<?php
+include('../../admin/layout/parte2.php');
+include('../../layout/mensajes.php');
 ?>

@@ -2,12 +2,12 @@
   "ExpandedNodes": [
     "",
     "\\admin",
-    "\\admin\\grupos",
+    "\\admin\\horarios_grupos",
     "\\app",
     "\\app\\controllers",
-    "\\app\\controllers\\grupos",
+    "\\app\\controllers\\horarios_grupos",
     "\\database"
   ],
-  "SelectedNode": "\\database\\db.sql",
+  "SelectedNode": "\\admin\\horarios_grupos\\index.php",
   "PreviewInSolutionExplorer": false
 }

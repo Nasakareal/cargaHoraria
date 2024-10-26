@@ -1,7 +1,5 @@
 <?php
-// listado_de_horarios.php
 
-// Consulta para obtener los grupos y sus horarios junto con la información de las materias
 $sql = "
     SELECT 
         g.group_id, 

@@ -6,8 +6,8 @@ if (!$group_id) {
     exit;
 }
 
-include ('../../app/config.php');
-include ('../../admin/layout/parte1.php');
+include('../../app/config.php');
+include('../../admin/layout/parte1.php');
 
 /* Consulta para obtener los detalles del horario asignado al grupo y el turno */
 $sql_horarios = "SELECT 
@@ -144,6 +144,6 @@ foreach ($horarios as $horario) {
 </div>
 <!-- /.content-wrapper -->
 
-<?php 
-include ('../../admin/layout/parte2.php');
+<?php
+include('../../admin/layout/parte2.php');
 ?>
