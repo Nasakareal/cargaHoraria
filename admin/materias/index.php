@@ -65,7 +65,7 @@ include('../../app/controllers/programas/listado_de_programas.php');
                                         $program_name = 'No asignado';
                                         foreach ($programs as $program) {
                                             if ($program['program_id'] == $subject['program_id']) {
-                                                $program_name = $program['programa'] ?? 'No disponible';
+                                                $program_name = $program['program_name'] ?? 'No disponible';
                                                 break;
                                             }
                                         }

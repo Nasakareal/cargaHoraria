@@ -17,23 +17,20 @@ if (isset($_FILES['file'])) {
         while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
             $row++;
 
-            // Ignorar las primeras 2 filas de encabezado y evitar el encabezado "Programa Educativo"
-            if ($row <= 2 || trim($data[1]) == 'Programa Educativo') {
+            // Ignorar las primeras 3 filas de encabezado
+            if ($row <= 3) {
                 continue;
             }
 
-            // Asignar y limpiar columnas del CSV
-            $program_name = trim($data[1]);
-            $term_number = isset($data[2]) ? intval(trim($data[2])) : null;
-            $subject_name = isset($data[3]) ? trim($data[3]) : null;
-            $weekly_hours = isset($data[5]) ? intval(trim($data[5])) : 0;
-            $class_hours = isset($data[7]) ? intval(trim($data[7])) : 0;
-            $lab_hours = isset($data[8]) ? intval(trim($data[8])) : 0;
-            $lab1_hours = isset($data[12]) ? intval(trim($data[12])) : 0;
-            $lab2_hours = isset($data[13]) ? intval(trim($data[13])) : 0;
-            $lab3_hours = isset($data[14]) ? intval(trim($data[14])) : 0;
-            $max_consecutive_class_hours = isset($data[15]) ? intval(trim($data[15])) : 0;
-            $max_consecutive_lab_hours = isset($data[16]) ? intval(trim($data[16])) : 0;
+            // Asignar y limpiar columnas del CSV, omitiendo la quinta columna
+            $program_name = trim($data[0]);
+            $term_number = isset($data[1]) ? intval(trim($data[1])) : null;
+            $subject_name = isset($data[2]) ? trim($data[2]) : null;
+            $weekly_hours = isset($data[3]) ? intval(trim($data[3])) : 0;
+            $class_hours = isset($data[5]) ? intval(trim($data[5])) : 0;
+            $lab_hours = isset($data[6]) ? intval(trim($data[6])) : 0;
+            $max_consecutive_class_hours = isset($data[13]) ? intval(trim($data[13])) : 0;
+            $max_consecutive_lab_hours = isset($data[14]) ? intval(trim($data[14])) : 0;
 
             // Validar campos requeridos
             if (empty($program_name) || empty($subject_name) || $term_number <= 0) {
@@ -42,8 +39,8 @@ if (isset($_FILES['file'])) {
             }
 
             // Convertir número de cuatrimestre a nombre
-            $term_names = ['Primero', 'Segundo', 'Tercero', 'Cuarto', 'Quinto', 'Sexto', 'Séptimo', 'Octavo', 'Noveno', 'Decimo', 'Undécimo', 'Duodécimo', 'Decimotercero', 'Decimocuarto', 'Decimoquinto', 'Decimosexto', 'Decimoséptimo', 'Decimoctavo', 'Decimonoveno', 'Vigésimo'];
-            $term_name = isset($term_names[$term_number - 1]) ? $term_names[$term_number - 1] : null;
+            $term_names = ['Primero', 'Segundo', 'Tercero', 'Cuarto', 'Quinto', 'Sexto', 'Séptimo', 'Octavo', 'Noveno', 'Décimo'];
+            $term_name = $term_names[$term_number - 1] ?? null;
 
             if (!$term_name) {
                 $errores[] = "Error: Cuatrimestre inválido: " . $term_number;
@@ -61,7 +58,7 @@ if (isset($_FILES['file'])) {
                 $mensajes[] = "Programa existente: $program_name (ID: $program_id)";
             } else {
                 $errores[] = "Fila $row: Programa '$program_name' no encontrado.";
-                continue; // Omitir si el programa no existe
+                continue;
             }
 
             // Obtener el cuatrimestre de la base de datos (sin duplicar)
@@ -75,19 +72,16 @@ if (isset($_FILES['file'])) {
                 $mensajes[] = "Cuatrimestre existente: $term_name (ID: $term_id)";
             } else {
                 $errores[] = "Fila $row: Cuatrimestre '$term_name' no encontrado.";
-                continue; // Omitir si el cuatrimestre no existe
+                continue;
             }
 
             // Insertar materia con programa y cuatrimestre verificados
-            $stmt_subject = $pdo->prepare('INSERT INTO subjects (subject_name, weekly_hours, class_hours, lab_hours, lab1_hours, lab2_hours, lab3_hours, max_consecutive_class_hours, max_consecutive_lab_hours, program_id, term_id, fyh_creacion, estado) 
-                                           VALUES (:subject_name, :weekly_hours, :class_hours, :lab_hours, :lab1_hours, :lab2_hours, :lab3_hours, :max_class_hours, :max_lab_hours, :program_id, :term_id, NOW(), "1")');
+            $stmt_subject = $pdo->prepare('INSERT INTO subjects (subject_name, weekly_hours, class_hours, lab_hours, max_consecutive_class_hours, max_consecutive_lab_hours, program_id, term_id, fyh_creacion, estado) 
+                                           VALUES (:subject_name, :weekly_hours, :class_hours, :lab_hours, :max_class_hours, :max_lab_hours, :program_id, :term_id, NOW(), "1")');
             $stmt_subject->bindParam(':subject_name', $subject_name);
             $stmt_subject->bindParam(':weekly_hours', $weekly_hours);
             $stmt_subject->bindParam(':class_hours', $class_hours);
             $stmt_subject->bindParam(':lab_hours', $lab_hours);
-            $stmt_subject->bindParam(':lab1_hours', $lab1_hours);
-            $stmt_subject->bindParam(':lab2_hours', $lab2_hours);
-            $stmt_subject->bindParam(':lab3_hours', $lab3_hours);
             $stmt_subject->bindParam(':max_class_hours', $max_consecutive_class_hours);
             $stmt_subject->bindParam(':max_lab_hours', $max_consecutive_lab_hours);
             $stmt_subject->bindParam(':program_id', $program_id);
@@ -106,6 +100,19 @@ if (isset($_FILES['file'])) {
                 $stmt_relation->execute();
 
                 $mensajes[] = "Relación insertada en program_term_subjects: Programa ID: $program_id, Cuatrimestre ID: $term_id, Materia ID: $subject_id";
+
+                // **Nueva inserción en `group_subjects`**
+                // Relaciona la materia con los grupos correspondientes
+                $stmt_group_subjects = $pdo->prepare('INSERT INTO group_subjects (group_id, subject_id)
+                                                      SELECT g.group_id, :subject_id
+                                                      FROM `groups` g 
+                                                      WHERE g.program_id = :program_id');
+                $stmt_group_subjects->execute([
+                    ':subject_id' => $subject_id,
+                    ':program_id' => $program_id
+                ]);
+
+                $mensajes[] = "Relación insertada en group_subjects para Programa ID: $program_id y Materia ID: $subject_id";
             } catch (Exception $e) {
                 $errores[] = "Error al insertar materia '$subject_name' o en la relación: " . $e->getMessage();
             }
@@ -113,12 +120,12 @@ if (isset($_FILES['file'])) {
         fclose($handle);
 
         session_start();
-        $_SESSION['mensajes_debug'] = implode("<br>", $mensajes); // Guardar mensajes de depuración en la sesión
+        $_SESSION['mensajes_debug'] = implode("<br>", $mensajes);
         if (!empty($errores)) {
             $_SESSION['mensaje'] = implode("<br>", $errores);
             $_SESSION['icono'] = "error";
         } else {
-            $_SESSION['mensaje'] = "Materias registradas con éxito.";
+            $_SESSION['mensaje'] = "Materias y relaciones registradas con éxito.";
             $_SESSION['icono'] = "success";
         }
 
@@ -130,3 +137,4 @@ if (isset($_FILES['file'])) {
 } else {
     echo "No se ha seleccionado ningún archivo.";
 }
+?>

@@ -1,11 +1,23 @@
 <?php
-
 header('Content-Type: text/html; charset=utf-8');
 
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/grupos/listado_de_grupos.php');
-include('../../app/controllers/materias/listado_de_materias.php'); // Asegúrate de incluir el listado de materias
+include('../../app/controllers/materias/listado_de_materias.php');
+
+// Nueva función para obtener materias asignadas a un grupo
+function obtenerMateriasAsignadas($pdo, $group_id)
+{
+    $sql = "SELECT s.subject_name 
+            FROM group_subjects gs
+            JOIN subjects s ON gs.subject_id = s.subject_id
+            WHERE gs.group_id = :group_id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':group_id' => $group_id]);
+    $materias = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    return implode(', ', $materias); // Devolver las materias en un string separado por comas
+}
 
 ?>
 
@@ -46,15 +58,15 @@ include('../../app/controllers/materias/listado_de_materias.php'); // Asegúrate
                                     foreach ($groups as $group) {
                                         $group_id = $group['group_id'];
                                         $contador_groups++;
-                                        
-                                        // Aquí iría la lógica para obtener las materias asignadas a cada grupo
-                                        $materias_asignadas = ''; // Supón que obtienes un string con las materias asignadas
+
+                                        // Obtener las materias asignadas a cada grupo
+                                        $materias_asignadas = obtenerMateriasAsignadas($pdo, $group_id);
 
                                         ?>
                                         <tr>
                                             <td style="text-align: center"><?= $contador_groups; ?></td>
-                                            <td class="text-center"><?= $group['group_name']; ?></td>
-                                            <td class="text-center"><?= $materias_asignadas; ?></td>
+                                            <td class="text-center"><?= htmlspecialchars($group['group_name']); ?></td>
+                                            <td class="text-center"><?= htmlspecialchars($materias_asignadas); ?></td>
                                             <td style="text-align: center">
                                                 <div class="btn-group" role="group" aria-label="Basic example">
                                                     <a href="show.php?id=<?= $group_id; ?>" type="button" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>
