@@ -4,25 +4,19 @@ include('../../admin/layout/parte1.php');
 include('../../app/controllers/grupos/listado_de_grupos.php');
 include('../../app/controllers/salones/listado_de_salones.php');
 
-/* Lógica para asignar salones según la capacidad */
-function asignarSalones($pdo, $capacidad_grupo, $salones_asignados)
-{
-    $salones_asignados_str = implode(',', array_map('intval', $salones_asignados));
-    $sql = "SELECT * FROM classrooms WHERE capacity >= :capacidad_grupo";
-
-    if (!empty($salones_asignados)) {
-        $sql .= " AND classroom_id NOT IN ($salones_asignados_str)";
-    }
-
-    $sql .= " ORDER BY capacity ASC";
-
-    $query = $pdo->prepare($sql);
-    $query->execute(['capacidad_grupo' => $capacidad_grupo]);
-    return $query->fetchAll(PDO::FETCH_ASSOC);
-}
+// Obtener datos de grupos y salones asignados para mostrar
+$sql_grupos = "
+    SELECT g.group_id, g.group_name, g.volume AS capacidad_grupo, s.shift_name AS turn, g.classroom_assigned AS salon_asignado 
+    FROM `groups` g
+    JOIN shifts s ON g.turn_id = s.shift_id
+    WHERE g.volume > 0 
+    ORDER BY g.volume DESC";
+$query_grupos = $pdo->prepare($sql_grupos);
+$query_grupos->execute();
+$grupos_con_salones = $query_grupos->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<!-- Content Wrapper. Contains page content -->
+<!-- Content Wrapper -->
 <div class="content-wrapper">
     <br>
     <div class="content">
@@ -30,15 +24,20 @@ function asignarSalones($pdo, $capacidad_grupo, $salones_asignados)
             <div class="row">
                 <h1>Listado de Grupos y Asignación de Salones</h1>
             </div>
+
+
             <div class="row">
                 <div class="col-md-12">
                     <div class="card card-outline card-primary">
                         <div class="card-header">
                             <h3 class="card-title">Grupos registrados</h3>
                             <div class="card-tools d-flex">
-                                <a href="create.php" class="btn btn-primary me-2">
-                                    <i class="bi bi-plus-square"></i> Agregar nuevo grupo
-                                </a>
+                                
+                                <form action="../../app/controllers/autoSalones/logica.php" method="POST" style="display:inline;">
+                                    <button type="submit" name="auto-assign" class="btn btn-secondary">
+                                        <i class="bi bi-arrow-repeat"></i> Asignar Salones
+                                    </button>
+                                </form>
                             </div>
                         </div>
 
@@ -48,36 +47,29 @@ function asignarSalones($pdo, $capacidad_grupo, $salones_asignados)
                                     <tr>
                                         <th class="text-center"><center>Numero</center></th>
                                         <th class="text-center"><center>Nombre del Grupo</center></th>
+                                        <th class="text-center"><center>Turno</center></th>
                                         <th class="text-center"><center>Volumen</center></th>
                                         <th class="text-center"><center>Salón Asignado</center></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 <?php
-                                $contador_grupos = 0;
-                                $salones_asignados = [];
-                                foreach ($groups as $group) {
-                                    $contador_grupos++;
-                                    $capacidad_grupo = $group['volume'];
-                                
-                                    $salones_asignados_temp = asignarSalones($pdo, $capacidad_grupo, $salones_asignados);
-                                    $salon_asignado = null;
-
-                                    if (!empty($salones_asignados_temp)) {
-                                        $salon_asignado = $salones_asignados_temp[0];
-                                        $salones_asignados[] = $salon_asignado['classroom_id'];
+                                if (is_array($grupos_con_salones) && count($grupos_con_salones) > 0) {
+                                    $contador_grupos = 0;
+                                    foreach ($grupos_con_salones as $grupo) {
+                                        $contador_grupos++;
+                                        ?>
+                                        <tr>
+                                            <td style="text-align: center"><?= $contador_grupos; ?></td>
+                                            <td class="text-center"><?= $grupo['group_name']; ?></td>
+                                            <td class="text-center"><?= $grupo['turn']; ?></td>
+                                            <td style="text-align: center"><?= $grupo['capacidad_grupo']; ?></td>
+                                            <td style="text-align: center"><?= $grupo['salon_asignado'] ?? 'No disponible'; ?></td>
+                                        </tr>
+                                        <?php
                                     }
-
-                                    // Concatenar el nombre del salón con el último dígito del edificio
-                                    $salon_nombre = $salon_asignado ? $salon_asignado['classroom_name'] . ' (' . substr($salon_asignado['building'], -1) . ')' : 'No disponible';
-                                    ?>
-                                    <tr>
-                                        <td style="text-align: center"><?= $contador_grupos; ?></td>
-                                        <td class="text-center"><?= $group['group_name']; ?></td>
-                                        <td style="text-align: center"><?= $capacidad_grupo; ?></td>
-                                        <td style="text-align: center"><?= $salon_nombre; ?></td> <!-- Mostrar el nombre del salón -->
-                                    </tr>
-                                    <?php
+                                } else {
+                                    echo "<tr><td colspan='5' class='text-center'>No hay información disponible</td></tr>";
                                 }
                                 ?>
                                 </tbody>
@@ -86,16 +78,12 @@ function asignarSalones($pdo, $capacidad_grupo, $salones_asignados)
                     </div>
                 </div>
             </div>
-            <!-- /.row -->
-        </div><!-- /.container-fluid -->
+        </div>
     </div>
-    <!-- /.content -->
 </div>
-<!-- /.content-wrapper -->
 
 <?php
 include('../../admin/layout/parte2.php');
-include('../../layout/mensajes.php');
 ?>
 
 <script>
@@ -106,7 +94,7 @@ include('../../layout/mensajes.php');
                 "emptyTable": "No hay información",
                 "info": "Mostrando _START_ a _END_ de _TOTAL_ Grupos",
                 "infoEmpty": "Mostrando 0 a 0 de 0 Grupos",
-                "infoFiltered": "(Filtrado de _Max_ total Grupos)",
+                "infoFiltered": "(Filtrado de _MAX_ total Grupos)",
                 "lengthMenu": "Mostrar _MENU_ Grupos",
                 "loadingRecord": "Cargando...",
                 "processing": "Procesando...",

@@ -4,6 +4,22 @@ include('../../admin/layout/parte1.php');
 include('../../app/controllers/materias/listado_de_materias.php');
 include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
 include('../../app/controllers/programas/listado_de_programas.php');
+include('../../app/controllers/laboratorios/listado_de_laboratorios.php');
+
+// Función para obtener los laboratorios asignados a una materia
+function obtenerLaboratoriosAsignados($pdo, $subject_id) {
+    $stmt = $pdo->prepare('
+        SELECT labs.lab_name 
+        FROM subject_labs 
+        INNER JOIN labs ON subject_labs.lab_id = labs.lab_id 
+        WHERE subject_labs.subject_id = :subject_id
+    ');
+    $stmt->bindParam(':subject_id', $subject_id);
+    $stmt->execute();
+    $laboratorios = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    return $laboratorios ? implode(", ", $laboratorios) : 'No asignado';
+}
+
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -78,6 +94,9 @@ include('../../app/controllers/programas/listado_de_programas.php');
                                                 break;
                                             }
                                         }
+
+                                        /* Obtener laboratorios asignados */
+                                        $laboratorios_asignados = obtenerLaboratoriosAsignados($pdo, $subject['subject_id']);
                                         ?>
                                     <tr>
                                         <td style="text-align: center"><?= $contador_subjects; ?></td>
@@ -86,7 +105,7 @@ include('../../app/controllers/programas/listado_de_programas.php');
                                         <td><center><?= htmlspecialchars($subject['class_hours'] + $subject['lab_hours']); ?></center></td>
                                         <td><center><?= $program_name; ?></center></td>
                                         <td><center><?= $term_name; ?></center></td>
-                                        <td><center><?= isset($subject['num_labs']) ? htmlspecialchars($subject['num_labs']) : 'No asignado'; ?></center></td>
+                                        <td><center><?= $laboratorios_asignados; ?></center></td>
                                         <td><center><?= htmlspecialchars($subject['class_hours']); ?></center></td>
                                         <td><center><?= htmlspecialchars($subject['lab_hours']); ?></center></td>
                                         <td style="text-align: center">

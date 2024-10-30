@@ -107,14 +107,15 @@ INSERT INTO programs (program_name, fyh_creacion, estado) VALUES
 ('ENERGIAS RENOVABLES AREA ENERGIA SOLAR', NOW(), '1'),
 ('ENERGÍA Y DESARROLLO SOSTENIBLE AREA ENERGÍA SOLAR', NOW(), '1'),
 ('ENERGÍA Y DESARROLLO SOSTENIBLE AREA TURBO SOLAR', NOW(), '1'),
-('MANTENIMIENTO ÁREA INDUSTRIAL', NOW(), '1'),
+('MANTENIMIENTO INDUSTRIAL', NOW(), '1'),
+('MANTENIMIENTO AREA INDUSTRIAL', NOW(), '1'),
 ('MECATRÓNICA', NOW(), '1'),
 ('MECATRÓNICA AREA AUTOMATIZACIÓN', NOW(), '1'),
 ('TECNOLOGÍAS DE LA INFORMACIÓN', NOW(), '1'),
 ('TECNOLOGÍAS DE LA INFORMACIÓN ÁREA DESARROLLO DE SOFTWARE MULTIPLATAFORMA', NOW(), '1'),
 ('TECNOLOGÍAS DE LA INFORMACIÓN ÁREA ENTORNOS VIRTUALES Y NEGOCIOS DIGITALES', NOW(), '1'),
 ('QUÍMICA ÁREA BIOTECNOLOGÍA', NOW(), '1'),
-('INGENIERÍA EN BIOTECNOLOGÍA BIOTECNOLOGÍA', NOW(), '1'),
+('INGENIERÍA EN BIOTECNOLOGÍA', NOW(), '1'),
 ('BIOTECNOLOGÍA', NOW(), '1'),
 ('GASTRONOMÍA', NOW(), '1'),
 ('LICENCIATURA EN ENFERMERÍA', NOW(), '1'),
@@ -126,6 +127,10 @@ INSERT INTO programs (program_name, fyh_creacion, estado) VALUES
 ('INGENIERÍA EN MECATRÓNICA', NOW(), '1'),
 ('ELECTROMOVILIDAD', NOW(), '1'),
 ('LICENCIATURA EN GASTRONOMÍA', NOW(), '1'),
+('TECNOLOGÍAS DE LA INFORMACIÓN E INNOVACIÓN DIGITAL', NOW(), '1'),
+('TECNOLOGÍAS DE LA INFORMACIÓN E INNOVACIÓN DIGITAL ÁREA ENTORNOS VIRTUALES Y NEGOCIOS DIGITALES', NOW(), '1'),
+('TECNOLOGÍAS DE LA INFORMACIÓN INGENIERÍA EN DESARROLLO Y GESTIÓN DE SOFTWARE', NOW(), '1'),
+('ENERGÍAS RENOVABLES AREA CALIDAD Y AHORRO DE ENERGIA', NOW(), '1'),
 ('MAESTRÍA EN INGENIERÍA APLICADA EN LA INNOVACIÓN TECNOLÓGICA', NOW(), '1');
 
 /*
@@ -147,26 +152,26 @@ CREATE TABLE terms (
 
 /* Insertar datos de ejemplo en cuatrimestres */
 INSERT INTO terms (term_name, fyh_creacion, estado) VALUES 
-('PRIMERO', NOW(), '1'),
-('SEGUNDO', NOW(), '1'),
-('TERCERO', NOW(), '1'),
-('CUARTO', NOW(), '1'),
-('QUINTO', NOW(), '1'),
-('SEXTO', NOW(), '1'),
-('SEPTIMO', NOW(), '1'),
-('OCTAVO', NOW(), '1'),
-('NOVENO', NOW(), '1'),
-('DÉCIMO', NOW(), '1'),
-('UNDÉCIMO', NOW(), '1'),
-('DUODÉCIMO', NOW(), '1'),
-('DECIMOTERCERO', NOW(), '1'),
-('DECIMOCUARTO', NOW(), '1'),
-('DECIMOQUINTO', NOW(), '1'),
-('DECIMOSEXTO', NOW(), '1'),
-('DECIMOSÉPTIMO', NOW(), '1'),
-('DECIMOOCTAVO', NOW(), '1'),
-('DECIMONOVENO', NOW(), '1'),
-('VIGÉSIMO', NOW(), '1');
+('1', NOW(), '1'),
+('2', NOW(), '1'),
+('3', NOW(), '1'),
+('4', NOW(), '1'),
+('5', NOW(), '1'),
+('6', NOW(), '1'),
+('7', NOW(), '1'),
+('8', NOW(), '1'),
+('9', NOW(), '1'),
+('10', NOW(), '1'),
+('11', NOW(), '1'),
+('12', NOW(), '1'),
+('13', NOW(), '1'),
+('14', NOW(), '1'),
+('15', NOW(), '1'),
+('16', NOW(), '1'),
+('17', NOW(), '1'),
+('18', NOW(), '1'),
+('19', NOW(), '1'),
+('20', NOW(), '1');
 
 /*
  Tabla que almacena los turnos disponibles para los grupos.
@@ -236,45 +241,42 @@ CREATE TABLE labs (
 ) ENGINE=InnoDB;
 
 INSERT INTO labs (lab_name, description, fyh_creacion) VALUES 
-('LABORATORIO DE COMPUTO II', 'ESPACIO EQUIPADO CON COMPUTADORAS PARA EL DESARROLLO DE HABILIDADES EN PROGRAMACIÓN Y USO DE SOFTWARE ESPECIALIZADO.', NOW()),
-('LABORATORIO DE COMPUTO MULTIDIMENSIONAL', 'LABORATORIO DESTINADO A LA EXPLORACIÓN DE APLICACIONES COMPUTACIONALES EN ENTORNOS MULTIDIMENSIONALES.', NOW()),
-('LABORATORIO DE SIMULACIÓN (MULTIDIMENSIONAL)', 'FACILITA LA REALIZACIÓN DE SIMULACIONES COMPLEJAS EN ENTORNOS VIRTUALES Y MULTIDIMENSIONALES.', NOW()),
-('LABORATORIO DE COMPUTO A2', 'LABORATORIO DE COMPUTACIÓN EQUIPADO PARA LA ENSEÑANZA DE TECNOLOGÍA Y HERRAMIENTAS DIGITALES AVANZADAS.', NOW()),
-('LABORATORIO DE REDES DE COMPUTO', 'ESPACIO PARA EL ESTUDIO Y PRÁCTICA DE REDES DE COMPUTACIÓN Y ADMINISTRACIÓN DE SISTEMAS.', NOW()),
-('LABORATORIO DE COMPUTO A1', 'LABORATORIO DESTINADO A LA ENSEÑANZA DE FUNDAMENTOS DE COMPUTACIÓN Y SOFTWARE BÁSICO.', NOW()),
-('LABORATORIO DE COMPUTO B2', 'ESPACIO PARA EL DESARROLLO DE HABILIDADES EN SOFTWARE Y HARDWARE DE COMPUTACIÓN AVANZADA.', NOW()),
-('LABORATORIO DE COMPUTO B1', 'LABORATORIO DE COMPUTACIÓN ENFOCADO EN LA FORMACIÓN EN TECNOLOGÍAS DE LA INFORMACIÓN.', NOW()),
-('LABORATORIO DE CONTROL NUMÉRICO COMPUTARIZADO "CNC"', 'LABORATORIO PARA LA PRÁCTICA DE OPERACIONES DE CONTROL NÚMERO Y FABRICACIÓN ASISTIDA POR COMPUTADORA.', NOW()),
-('LABORATORIO DE IDIOMAS A I', 'LABORATORIO DEDICADO AL APRENDIZAJE DE IDIOMAS MEDIANTE RECURSOS MULTIMEDIA Y SOFTWARE INTERACTIVO.', NOW()),
-('LABORATORIO DE IDIOMAS A', 'ESPACIO PARA LA ENSEÑANZA Y PRÁCTICA DE IDIOMAS CON HERRAMIENTAS TECNOLÓGICAS Y DE COMUNICACIÓN.', NOW()),
-('LABORATORIO DE IDIOMAS B II', 'LABORATORIO EQUIPADO PARA LA PRÁCTICA AVANZADA DE IDIOMAS, ENFOCÁNDOSE EN LA CONVERSACIÓN Y COMPRENSIÓN.', NOW()),
-('LABORATORIO DE IDIOMAS B', 'ESPACIO DE APRENDIZAJE DE IDIOMAS QUE COMBINA MÉTODOS TRADICIONALES Y TECNOLOGÍAS INTERACTIVAS.', NOW()),
-('LABORATORIO DE CULTIVO DE TEJIDOS', 'LABORATORIO PARA LA PRÁCTICA DE TÉCNICAS DE CULTIVO CELULAR Y TEJIDOS VEGETALES.', NOW()),
-('LABORATORIO DE TEÑIDO Y ESTAMPADO', 'LABORATORIO PARA LA PRÁCTICA DE TEÑIDO Y ESTAMPADO EN TEXTILES.', NOW()),
-('LABORATORIO DE CORTE Y CONFECCIÓN', 'LABORATORIO PARA APRENDER TÉCNICAS DE CORTE Y CONFECCIÓN DE PRENDAS DE VESTIR.', NOW()),
-('LABORATORIO DE DISEÑO Y PATRONAJE', 'ESPACIO PARA EL DISEÑO DE MODA Y DESARROLLO DE PATRONES PARA CONFECCIÓN.', NOW()),
-('LABORATORIO DE TEJIDOS Y BORDADOS', 'LABORATORIO DEDICADO A LA CREACIÓN DE TEJIDOS Y TÉCNICAS DE BORDADO.', NOW()),
-('LABORATORIO DE MICROBIOLOGÍA', 'ESPACIO PARA EL ESTUDIO Y ANÁLISIS DE MICROORGANISMOS MEDIANTE TÉCNICAS MICROBIOLÓGICAS.', NOW()),
-('LABORATORIO DE QUÍMICA ANALÍTICA', 'LABORATORIO DESTINADO A LA PRÁCTICA DE ANÁLISIS QUÍMICOS Y TÉCNICAS DE LABORATORIO.', NOW()),
-('LABORATORIO DE ALIMENTOS', 'LABORATORIO PARA EL ESTUDIO Y PRÁCTICA DE TÉCNICAS DE PROCESAMIENTO Y ANÁLISIS DE ALIMENTOS.', NOW()),
-('LABORATORIO DE COCINA CALIENTE 1', 'ESPACIO PARA LA PRÁCTICA DE TÉCNICAS DE COCINA CALIENTE Y ELABORACIÓN DE PLATOS.', NOW()),
-('LABORATORIO DE COCINA CALIENTE 2', 'LABORATORIO ADICIONAL PARA PROFUNDIZAR EN TÉCNICAS AVANZADAS DE COCINA CALIENTE.', NOW()),
-('LABORATORIO DE PANADERÍA', 'LABORATORIO PARA LA PRÁCTICA DE TÉCNICAS DE PANADERÍA Y ELABORACIÓN DE PRODUCTOS DE PAN.', NOW()),
-('LABORATORIO DE BEBIDAS', 'ESPACIO PARA EL ESTUDIO Y PRÁCTICA EN LA PREPARACIÓN DE DIVERSAS BEBIDAS.', NOW()),
-('LABORATORIO DE ENERGÍAS RENOVABLES', 'LABORATORIO ENFOCADO EN LA INVESTIGACIÓN Y PRÁCTICA DE TECNOLOGÍAS DE ENERGÍAS RENOVABLES.', NOW()),
-('LABORATORIO DE TERMODINÁMICA', 'LABORATORIO PARA LA PRÁCTICA DE PRINCIPIOS Y APLICACIONES DE LA TERMODINÁMICA.', NOW()),
-('LABORATORIO DE ELÉCTRICA Y ELECTRÓNICA', 'ESPACIO PARA EL APRENDIZAJE Y PRÁCTICA EN SISTEMAS ELÉCTRICOS Y ELECTRÓNICOS.', NOW()),
-('LABORATORIO DE ELECTRÓNICA', 'LABORATORIO ESPECIALIZADO EN CIRCUITOS Y SISTEMAS ELECTRÓNICOS.', NOW()),
-('LABORATORIO DE ELECTRICIDAD', 'ESPACIO PARA LA PRÁCTICA Y ENSEÑANZA DE PRINCIPIOS ELÉCTRICOS BÁSICOS Y AVANZADOS.', NOW()),
-('LABORATORIO DE ELECTRÓNICA ANALÓGICA Y DIGITAL', 'LABORATORIO PARA EL ESTUDIO Y PRÁCTICA DE ELECTRÓNICA ANALÓGICA Y DIGITAL.', NOW()),
-('LABORATORIO U079', 'LABORATORIO GENERAL PARA DIVERSAS PRÁCTICAS EDUCATIVAS Y EXPERIMENTALES.', NOW()),
-('LABORATORIO DE CIENCIAS BÁSICAS', 'ESPACIO PARA LA PRÁCTICA DE PRINCIPIOS CIENTÍFICOS FUNDAMENTALES EN DIVERSAS DISCIPLINAS.', NOW()),
-('LABORATORIO DE METROLOGÍA', 'LABORATORIO PARA LA PRÁCTICA DE TÉCNICAS DE MEDICIÓN Y CALIBRACIÓN DE INSTRUMENTOS.', NOW()),
-('LABORATORIO DE METAL-MECÁNICA', 'ESPACIO DEDICADO AL APRENDIZAJE DE TÉCNICAS DE METALURGIA Y MECANIZADO.', NOW()),
-('LABORATORIO DE ÓPTICA', 'LABORATORIO PARA EL ESTUDIO Y EXPERIMENTACIÓN DE FENÓMENOS ÓPTICOS.', NOW()),
-('LABORATORIO DE ROBÓTICA EDUCATIVA, DISEÑO Y MANUFACTURA ADITIVA', 'ESPACIO PARA LA ENSEÑANZA DE ROBÓTICA Y TÉCNICAS DE FABRICACIÓN ADITIVA.', NOW()),
-('LABORATORIO DE AUTOMATIZACIÓN Y CONTROL', 'LABORATORIO ENFOCADO EN SISTEMAS DE AUTOMATIZACIÓN Y CONTROL INDUSTRIAL.', NOW()),
-('LABORATORIO DE MULTIMEDIA', 'ESPACIO PARA LA CREACIÓN Y EDICIÓN DE CONTENIDOS MULTIMEDIA.', NOW());
+('AUTOMATIZACIÓN Y CONTROL', 'Espacio para sistemas de automatización y control industrial.', NOW()),
+('LABORATORIO DE ALIMENTOS', 'Laboratorio para el procesamiento y análisis de alimentos.', NOW()),
+('LABORATORIO DE BEBIDAS', 'Espacio para la preparación y estudio de bebidas.', NOW()),
+('LABORATORIO DE BIOTECNOLOGIAS PARA PROCESAMIENTO DE ALIMENTOS U079', 'Laboratorio especializado en biotecnologías aplicadas a alimentos.', NOW()),
+('LABORATORIO DE CIENCIAS BÁSICAS', 'Espacio para prácticas en ciencias fundamentales.', NOW()),
+('LABORATORIO DE COCINA CALIENTE 1', 'Área para prácticas de cocina caliente y elaboración de platos.', NOW()),
+('LABORATORIO DE COCINA CALIENTE 2', 'Laboratorio adicional para técnicas avanzadas de cocina caliente.', NOW()),
+('LABORATORIO DE CÓMPUTO A1', 'Laboratorio de cómputo equipado para enseñanza de informática básica.', NOW()),
+('LABORATORIO DE CÓMPUTO A2', 'Espacio de cómputo avanzado para aplicaciones informáticas.', NOW()),
+('LABORATORIO DE CÓMPUTO B1', 'Laboratorio de tecnologías de la información y cómputo.', NOW()),
+('LABORATORIO DE CÓMPUTO B2', 'Espacio para desarrollo de software y aplicaciones computacionales.', NOW()),
+('LABORATORIO DE CÓMPUTO MULTIDIMENSIONAL', 'Espacio destinado a entornos computacionales multidimensionales.', NOW()),
+('LABORATORIO DE CORTE Y CONFECCIÓN', 'Laboratorio para la práctica de corte y confección textil.', NOW()),
+('LABORATORIO DE CULTIVO DE TEJIDOS', 'Laboratorio para cultivo de células y tejidos vegetales.', NOW()),
+('LABORATORIO DE DISEÑO Y PATRONAJE', 'Espacio para diseño y desarrollo de patrones en moda.', NOW()),
+('LABORATORIO DE ELECTRICA Y ELECTRÓNICA', 'Laboratorio de sistemas eléctricos y electrónicos.', NOW()),
+('LABORATORIO DE ELECTRICIDAD', 'Espacio de enseñanza en fundamentos eléctricos.', NOW()),
+('LABORATORIO DE ELECTRÓNICA ANALÓGICA Y DIGITAL', 'Espacio para prácticas en electrónica analógica y digital.', NOW()),
+('LABORATORIO DE ENERGIAS RENOVABLES', 'Laboratorio enfocado en energías alternativas y sostenibles.', NOW()),
+('LABORATORIO DE IDIOMAS A I', 'Laboratorio de idiomas con recursos multimedia.', NOW()),
+('LABORATORIO DE IDIOMAS B I', 'Espacio para aprendizaje de idiomas con herramientas digitales.', NOW()),
+('LABORATORIO DE IDIOMAS B II', 'Laboratorio avanzado para práctica de idiomas.', NOW()),
+('LABORATORIO DE METAL-MECÁNICA', 'Área para prácticas de metalurgia y mecanizado.', NOW()),
+('LABORATORIO DE METROLOGÍA', 'Laboratorio de medición y calibración de instrumentos.', NOW()),
+('LABORATORIO DE MICROBIOLOGÍA', 'Espacio para análisis de microorganismos y técnicas microbiológicas.', NOW()),
+('LABORATORIO DE MULTIMEDIA', 'Espacio para creación y edición de contenido multimedia.', NOW()),
+('LABORATORIO DE ÓPTICA', 'Laboratorio para estudio y experimentación en óptica.', NOW()),
+('LABORATORIO DE PANADERIA', 'Espacio para técnicas de panadería y repostería básica.', NOW()),
+('LABORATORIO DE REDES DE CÓMPUTO', 'Laboratorio para redes de computación y administración de sistemas.', NOW()),
+('LABORATORIO DE REPOSTERIA', 'Espacio para la elaboración de productos de repostería avanzada.', NOW()),
+('LABORATORIO DE ROBOTICA EDUCATIVA, DISEÑO Y MANUFACTURA ADITIVA', 'Laboratorio para robótica y fabricación aditiva.', NOW()),
+('LABORATORIO DE SIMULACIÓN', 'Laboratorio para simulación en entornos virtuales.', NOW()),
+('LABORATORIO DE TEJIDOS Y BORDADOS', 'Laboratorio para técnicas de tejido y bordado.', NOW()),
+('LABORATORIO DE TEÑIDO Y ESTAMPADO', 'Espacio para prácticas de teñido y estampado en textiles.', NOW()),
+('LABORATORIO DE TERMODINÁMICA', 'Laboratorio para estudios en principios termodinámicos.', NOW()),
+('LABORATORIO QUIMICA ANALITICA', 'Espacio para análisis químico y técnicas de laboratorio.', NOW());
 
 
 /* Tabla de Materias */
@@ -411,15 +413,6 @@ CREATE TABLE schedules (
 ) ENGINE=InnoDB;
 
 
-/* Tabla relación de grupos y materias */
-CREATE TABLE group_subjects (
-    group_subject_id INT AUTO_INCREMENT PRIMARY KEY,
-    group_id INT,
-    subject_id INT,
-    FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (subject_id) REFERENCES subjects(subject_id) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB;
-
 
 /* Tabla relación de programas cuatrimestres y materias */
 CREATE TABLE program_term_subjects (
@@ -490,4 +483,41 @@ CREATE TABLE subject_labs (
     lab_hours INT DEFAULT 0, /* Horas asignadas a este laboratorio específico */
     CONSTRAINT fk_subject FOREIGN KEY (subject_id) REFERENCES subjects(subject_id),
     CONSTRAINT fk_lab FOREIGN KEY (lab_id) REFERENCES labs(lab_id)
+) ENGINE=InnoDB;
+
+/* Tabla de relación Grupos-Profesores */
+CREATE TABLE teacher_groups (
+    teacher_group_id INT AUTO_INCREMENT PRIMARY KEY,
+    teacher_id INT NOT NULL,  /* ID del profesor */
+    group_id INT NOT NULL,    /* ID del grupo */
+    fyh_creacion DATETIME DEFAULT NOW(),
+    FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id) ON DELETE CASCADE,
+    FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+
+/* Tabla de relación Grupos-Materias */
+CREATE TABLE group_subjects (
+    group_subject_id INT AUTO_INCREMENT PRIMARY KEY, /* ID único de la relación */
+    group_id INT NOT NULL,                           /* ID del grupo */
+    subject_id INT NOT NULL,                         /* ID de la materia */
+    fyh_creacion DATETIME DEFAULT NOW(),             /* Fecha y hora de creación */
+    fyh_actualizacion DATETIME ON UPDATE NOW(),      /* Fecha y hora de última actualización */
+    estado VARCHAR(11) DEFAULT '1',                  /* Estado de la relación */
+    FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE ON UPDATE CASCADE, /* Clave foránea a grupos */
+    FOREIGN KEY (subject_id) REFERENCES subjects(subject_id) ON DELETE CASCADE ON UPDATE CASCADE /* Clave foránea a materias */
+) ENGINE=InnoDB;
+
+
+CREATE TABLE group_schedule_teacher (
+    group_schedule_teacher_id INT AUTO_INCREMENT PRIMARY KEY,
+    schedule_id INT NOT NULL,            /* ID del horario de grupo */
+    teacher_id INT NOT NULL,             /* ID del profesor asignado */
+    subject_id INT NOT NULL,             /* ID de la materia */
+    fyh_creacion DATETIME DEFAULT NOW(),
+    fyh_actualizacion DATETIME ON UPDATE NOW(),
+    estado VARCHAR(11) DEFAULT '1',      /* Estado de la asignación */
+    FOREIGN KEY (schedule_id) REFERENCES schedules(schedule_id) ON DELETE CASCADE,
+    FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id) ON DELETE CASCADE,
+    FOREIGN KEY (subject_id) REFERENCES subjects(subject_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;

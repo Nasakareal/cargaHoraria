@@ -15,6 +15,12 @@ include('../../app/controllers/horarios_grupos/logica.php');
                     <div class="card card-outline card-primary">
                         <div class="card-header">
                             <h3 class="card-title">Grupos registrados</h3>
+                            
+
+                             <div class="card-tools">
+                                <a href="create.php" class="btn btn-secondary"><i class="bi bi-arrow-repeat"></i> Asignar Horario</a>
+                                
+                            </div>
                         </div>
                         <div class="card-body">
                             <table id="example1" class="table table-striped table-bordered table-hover table-sm">

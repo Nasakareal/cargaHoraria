@@ -22,7 +22,7 @@ $fechaHora = date('Y-m-d H:i:s');
 try {
     $pdo->beginTransaction();
 
-    // Actualizar materia
+    /* Actualizar materia */
     $sentencia_actualizar = $pdo->prepare("UPDATE subjects
         SET subject_name = :nombres,
             hours_consecutive = :horas_consecutivas,
@@ -44,7 +44,7 @@ try {
 
     $sentencia_actualizar->execute();
 
-    // Actualiza o inserta la relación en program_term_subjects
+    /* Actualiza o inserta la relación en program_term_subjects */
     $sentencia_relacion = $pdo->prepare("REPLACE INTO program_term_subjects (program_id, term_id, subject_id)
         VALUES (:program_id, :term_id, :subject_id)");
 

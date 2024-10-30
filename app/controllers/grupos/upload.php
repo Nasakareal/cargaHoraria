@@ -30,8 +30,8 @@ if (isset($_FILES['file'])) {
             $turn_name = trim($data[7]);      /* Columna 8: turno */
             $volume = trim($data[8]);         /* Columna 9: volumen de alumnos */
 
-            /* Concatenar la abreviatura con el nombre del grupo */
-            $group_name = mb_strtoupper($abreviatura . '-' . $group_suffix, 'UTF-8');
+            /* Concatenar la abreviatura, cuatrimestre y el nombre del grupo */
+            $group_name = mb_strtoupper("{$abreviatura}-{$term_number}{$group_suffix}", 'UTF-8');
 
             /* Buscar el programa educativo */
             $stmt_program = $pdo->prepare('SELECT program_id FROM programs WHERE program_name = :program_name');
@@ -45,35 +45,6 @@ if (isset($_FILES['file'])) {
                 continue;
             }
             $program_id = $program['program_id'];
-
-            /* Normalizar cuatrimestre (term_number a 'Primero', 'Segundo', etc.) */
-            $term_names = ['Primero', 'Segundo', 'Tercero', 'Cuarto', 'Quinto', 'Sexto', 'Séptimo', 'Octavo', 'Noveno', 'Decimo', 'Undécimo', 'Duodécimo', 'Decimotercero', 'Decimocuarto', 'Decimoquinto', 'Decimosexto', 'Decimoséptimo', 'Decimoctavo', 'Decimonoveno', 'Vigésimo'];
-            $term_name = isset($term_names[$term_number - 1]) ? $term_names[$term_number - 1] : null;
-
-            if (!$term_name) {
-                $errores[] = "Error: Cuatrimestre inválido: " . $term_number;
-                continue;
-            }
-
-            /* Buscar o insertar el cuatrimestre */
-            $stmt_term = $pdo->prepare('SELECT term_id FROM terms WHERE term_name = :term_name');
-            $stmt_term->bindParam(':term_name', $term_name);
-            $stmt_term->execute();
-            $term = $stmt_term->fetch(PDO::FETCH_ASSOC);
-
-            if (!$term) {
-                /* Si no existe el cuatrimestre, insertarlo */
-                $insert_term = $pdo->prepare('INSERT INTO terms (term_name) VALUES (:term_name)');
-                $insert_term->bindParam(':term_name', $term_name);
-                if ($insert_term->execute()) {
-                    $term_id = $pdo->lastInsertId();  /* Obtener el ID del nuevo cuatrimestre */
-                } else {
-                    $errores[] = "Error: No se pudo insertar el cuatrimestre: " . $term_name;
-                    continue;
-                }
-            } else {
-                $term_id = $term['term_id'];
-            }
 
             /* Buscar el ID del turno */
             $stmt_turn = $pdo->prepare('SELECT shift_id FROM shifts WHERE shift_name = :turn_name');
@@ -94,7 +65,7 @@ if (isset($_FILES['file'])) {
             /* Vincular los parámetros */
             $sentencia_grupo->bindParam(':group_name', $group_name);
             $sentencia_grupo->bindParam(':program_id', $program_id);
-            $sentencia_grupo->bindParam(':term_id', $term_id);
+            $sentencia_grupo->bindParam(':term_id', $term_number); // Usar el número directamente
             $sentencia_grupo->bindParam(':volume', $volume);
             $sentencia_grupo->bindParam(':turn_id', $turn_id);
 
@@ -137,3 +108,4 @@ if (isset($_FILES['file'])) {
 } else {
     echo "No se ha seleccionado ningún archivo.";
 }
+?>

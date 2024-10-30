@@ -197,15 +197,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
               </li>
             </ul>
 
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="<?= APP_URL; ?>/admin/grupos_materias" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Listado de Grupos y Materias</p>
-                </a>
-              </li>
-            </ul>
-
              <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="<?= APP_URL; ?>/admin/horarios_grupos" class="nav-link">

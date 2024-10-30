@@ -1,140 +1,128 @@
 <?php
-include('../../../app/config.php');
+include_once('../../app/config.php');
 
-if (isset($_FILES['file'])) {
-    $file = $_FILES['file']['tmp_name'];
+/* Limpiar todas las asignaciones activas previas antes de asignar nuevas */
+$pdo->exec("DELETE FROM schedule_assignments WHERE estado = 'activo'");
 
-    if ($_FILES['file']['error'] !== UPLOAD_ERR_OK) {
-        echo "Error al cargar el archivo.";
-        die();
-    }
+/* Obtener todos los grupos activos con sus programas y cuatrimestres */
+$sql_groups = "SELECT g.group_id, g.group_name, g.turn_id, p.program_id, g.term_id
+               FROM `groups` g
+               JOIN programs p ON g.program_id = p.program_id
+               WHERE g.estado = '1'";
+$stmt_groups = $pdo->prepare($sql_groups);
+$stmt_groups->execute();
+$groups = $stmt_groups->fetchAll(PDO::FETCH_ASSOC);
 
-    $errores = [];       // Array para acumular errores
-    $mensajes = [];      // Array para mensajes de depuración
+/* Obtener todas las materias activas y agruparlas por programa y cuatrimestre */
+$sql_subjects = "SELECT * FROM subjects WHERE estado = '1'";
+$stmt_subjects = $pdo->prepare($sql_subjects);
+$stmt_subjects->execute();
+$all_subjects = $stmt_subjects->fetchAll(PDO::FETCH_ASSOC);
 
-    if (($handle = fopen($file, 'r')) !== FALSE) {
-        $row = 0;  // Contador para las filas
-        while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
-            $row++;
+/* Agrupar materias por programa y cuatrimestre */
+$subjects_by_program_and_term = [];
+foreach ($all_subjects as $subject) {
+    $subjects_by_program_and_term[$subject['program_id']][$subject['term_id']][] = $subject;
+}
 
-            // Ignorar las primeras 3 filas de encabezado
-            if ($row <= 3) {
-                continue;
+/* Definir horarios disponibles para cada turno */
+$horarios_disponibles = [
+    'MATUTINO' => [
+        'Lunes' => [['start' => '07:00:00', 'end' => '15:00:00']],
+        'Martes' => [['start' => '07:00:00', 'end' => '15:00:00']],
+        'Miércoles' => [['start' => '07:00:00', 'end' => '15:00:00']],
+        'Jueves' => [['start' => '07:00:00', 'end' => '15:00:00']],
+        'Viernes' => [['start' => '07:00:00', 'end' => '12:00:00']], /* Matutino desaloja a las 12 */
+    ],
+    'VESPERTINO' => [
+        'Lunes' => [['start' => '12:00:00', 'end' => '20:00:00']],
+        'Martes' => [['start' => '12:00:00', 'end' => '20:00:00']],
+        'Miércoles' => [['start' => '12:00:00', 'end' => '20:00:00']],
+        'Jueves' => [['start' => '12:00:00', 'end' => '20:00:00']],
+        'Viernes' => [['start' => '12:00:00', 'end' => '20:00:00']], /* Vespertino inicia a las 12 */
+    ],
+    'MIXTO' => [
+        'Viernes' => [['start' => '16:00:00', 'end' => '20:00:00']],
+        'Sábado' => [['start' => '07:00:00', 'end' => '18:00:00']],
+    ]
+];
+
+/* Asignación de horarios para cada grupo */
+foreach ($groups as $group) {
+    $turno = $group['turn_id'] == 1 ? 'MATUTINO' : ($group['turn_id'] == 2 ? 'VESPERTINO' : 'MIXTO');
+    $horario = $horarios_disponibles[$turno];
+    $subjects = $subjects_by_program_and_term[$group['program_id']][$group['term_id']] ?? [];
+
+    /* Filtrado y prioridad de asignación para turnos 'MIXTO' y 'ZINAPECUARO' */
+    $turno_prioritario = in_array($turno, ['MIXTO', 'ZINAPECUARO']);
+
+    foreach ($subjects as $subject) {
+        $horas_restantes = $subject['weekly_hours'];
+        $max_consecutive_hours = $subject['max_consecutive_class_hours'];
+
+        foreach ($horario as $dia => $bloques) {
+            $horas_asignadas_dia = 0;
+            foreach ($bloques as $bloque) {
+                $current_start_time = isset($hora_inicio_dia[$dia]) ? $hora_inicio_dia[$dia] : strtotime($bloque['start']);
+                $end_time_block = strtotime($bloque['end']);
+
+                /* Verificar si es laboratorio */
+                $es_laboratorio = $subject['lab_hours'] > 0;
+                if ($es_laboratorio) {
+                    /* Comprobar si el laboratorio está ocupado en ese horario */
+                    $sql_check_lab = "SELECT COUNT(*) FROM schedule_assignments 
+                                      WHERE schedule_day = :dia 
+                                      AND ((start_time BETWEEN :start_time AND :end_time) 
+                                           OR (end_time BETWEEN :start_time AND :end_time))";
+                    $stmt_check_lab = $pdo->prepare($sql_check_lab);
+                    $stmt_check_lab->execute([
+                        ':dia' => $dia,
+                        ':start_time' => date('H:i:s', $current_start_time),
+                        ':end_time' => date('H:i:s', $end_time_block)
+                    ]);
+
+                    $lab_occupied = $stmt_check_lab->fetchColumn() > 0;
+                    if ($lab_occupied && !$turno_prioritario) {
+                        continue;
+                    }
+                }
+
+                while ($horas_restantes > 0 && $horas_asignadas_dia < 8 && $current_start_time < $end_time_block) {
+                    $horas_disponibles_en_bloque = ($end_time_block - $current_start_time) / 3600;
+                    $horas_a_asignar = min($horas_restantes, $max_consecutive_hours, $horas_disponibles_en_bloque);
+
+                    if ($horas_a_asignar <= 0)
+                        break;
+
+                    // Asegurar el registro preciso de inicio y fin de cada materia en base de datos
+                    $end_time_assignment = date('H:i:s', strtotime("+{$horas_a_asignar} hours", $current_start_time));
+
+                    $sql_insert = "INSERT INTO schedule_assignments (subject_id, teacher_id, group_id, classroom_id, schedule_day, start_time, end_time, estado, fyh_creacion)
+                                   VALUES (:subject_id, NULL, :group_id, NULL, :schedule_day, :start_time, :end_time, 'activo', NOW())";
+                    $stmt_insert = $pdo->prepare($sql_insert);
+                    $stmt_insert->execute([
+                        ':subject_id' => $subject['subject_id'],
+                        ':group_id' => $group['group_id'],
+                        ':schedule_day' => $dia,
+                        ':start_time' => date('H:i:s', $current_start_time),
+                        ':end_time' => $end_time_assignment
+                    ]);
+
+                    $horas_restantes -= $horas_a_asignar;
+                    $horas_asignadas_dia += $horas_a_asignar;
+                    $current_start_time = strtotime($end_time_assignment);
+                    $hora_inicio_dia[$dia] = $current_start_time;
+
+                    if ($horas_asignadas_dia >= $max_consecutive_hours)
+                        break;
+                }
+
+                if ($horas_restantes <= 0)
+                    break;
             }
-
-            // Asignar y limpiar columnas del CSV, omitiendo la quinta columna
-            $program_name = trim($data[0]);
-            $term_number = isset($data[1]) ? intval(trim($data[1])) : null;
-            $subject_name = isset($data[2]) ? trim($data[2]) : null;
-            $weekly_hours = isset($data[3]) ? intval(trim($data[3])) : 0;
-            $class_hours = isset($data[5]) ? intval(trim($data[5])) : 0;
-            $lab_hours = isset($data[6]) ? intval(trim($data[6])) : 0;
-            $max_consecutive_class_hours = isset($data[13]) ? intval(trim($data[13])) : 0;
-            $max_consecutive_lab_hours = isset($data[14]) ? intval(trim($data[14])) : 0;
-
-            // Validar campos requeridos
-            if (empty($program_name) || empty($subject_name) || $term_number <= 0) {
-                $errores[] = "Fila $row: Datos insuficientes. Programa: $program_name, Materia: $subject_name, Cuatrimestre: $term_number";
-                continue;
-            }
-
-            // Convertir número de cuatrimestre a nombre
-            $term_names = ['Primero', 'Segundo', 'Tercero', 'Cuarto', 'Quinto', 'Sexto', 'Séptimo', 'Octavo', 'Noveno', 'Décimo'];
-            $term_name = $term_names[$term_number - 1] ?? null;
-
-            if (!$term_name) {
-                $errores[] = "Error: Cuatrimestre inválido: " . $term_number;
-                continue;
-            }
-
-            // Obtener el programa de la base de datos (sin duplicar)
-            $stmt_program = $pdo->prepare('SELECT program_id FROM programs WHERE program_name = :program_name');
-            $stmt_program->bindParam(':program_name', $program_name);
-            $stmt_program->execute();
-            $program = $stmt_program->fetch(PDO::FETCH_ASSOC);
-
-            if ($program) {
-                $program_id = $program['program_id'];
-                $mensajes[] = "Programa existente: $program_name (ID: $program_id)";
-            } else {
-                $errores[] = "Fila $row: Programa '$program_name' no encontrado.";
-                continue;
-            }
-
-            // Obtener el cuatrimestre de la base de datos (sin duplicar)
-            $stmt_term = $pdo->prepare('SELECT term_id FROM terms WHERE term_name = :term_name');
-            $stmt_term->bindParam(':term_name', $term_name);
-            $stmt_term->execute();
-            $term = $stmt_term->fetch(PDO::FETCH_ASSOC);
-
-            if ($term) {
-                $term_id = $term['term_id'];
-                $mensajes[] = "Cuatrimestre existente: $term_name (ID: $term_id)";
-            } else {
-                $errores[] = "Fila $row: Cuatrimestre '$term_name' no encontrado.";
-                continue;
-            }
-
-            // Insertar materia con programa y cuatrimestre verificados
-            $stmt_subject = $pdo->prepare('INSERT INTO subjects (subject_name, weekly_hours, class_hours, lab_hours, max_consecutive_class_hours, max_consecutive_lab_hours, program_id, term_id, fyh_creacion, estado) 
-                                           VALUES (:subject_name, :weekly_hours, :class_hours, :lab_hours, :max_class_hours, :max_lab_hours, :program_id, :term_id, NOW(), "1")');
-            $stmt_subject->bindParam(':subject_name', $subject_name);
-            $stmt_subject->bindParam(':weekly_hours', $weekly_hours);
-            $stmt_subject->bindParam(':class_hours', $class_hours);
-            $stmt_subject->bindParam(':lab_hours', $lab_hours);
-            $stmt_subject->bindParam(':max_class_hours', $max_consecutive_class_hours);
-            $stmt_subject->bindParam(':max_lab_hours', $max_consecutive_lab_hours);
-            $stmt_subject->bindParam(':program_id', $program_id);
-            $stmt_subject->bindParam(':term_id', $term_id);
-
-            try {
-                $stmt_subject->execute();
-                $subject_id = $pdo->lastInsertId();
-                $mensajes[] = "Materia insertada: $subject_name (Programa ID: $program_id, Cuatrimestre ID: $term_id)";
-
-                // Insertar en la tabla de relación program_term_subjects
-                $stmt_relation = $pdo->prepare('INSERT INTO program_term_subjects (program_id, term_id, subject_id) VALUES (:program_id, :term_id, :subject_id)');
-                $stmt_relation->bindParam(':program_id', $program_id);
-                $stmt_relation->bindParam(':term_id', $term_id);
-                $stmt_relation->bindParam(':subject_id', $subject_id);
-                $stmt_relation->execute();
-
-                $mensajes[] = "Relación insertada en program_term_subjects: Programa ID: $program_id, Cuatrimestre ID: $term_id, Materia ID: $subject_id";
-
-                // **Nueva inserción en `group_subjects`**
-                // Relaciona la materia con los grupos correspondientes
-                $stmt_group_subjects = $pdo->prepare('INSERT INTO group_subjects (group_id, subject_id)
-                                                      SELECT g.group_id, :subject_id
-                                                      FROM `groups` g 
-                                                      WHERE g.program_id = :program_id');
-                $stmt_group_subjects->execute([
-                    ':subject_id' => $subject_id,
-                    ':program_id' => $program_id
-                ]);
-
-                $mensajes[] = "Relación insertada en group_subjects para Programa ID: $program_id y Materia ID: $subject_id";
-            } catch (Exception $e) {
-                $errores[] = "Error al insertar materia '$subject_name' o en la relación: " . $e->getMessage();
-            }
+            if ($horas_restantes <= 0)
+                break;
         }
-        fclose($handle);
-
-        session_start();
-        $_SESSION['mensajes_debug'] = implode("<br>", $mensajes);
-        if (!empty($errores)) {
-            $_SESSION['mensaje'] = implode("<br>", $errores);
-            $_SESSION['icono'] = "error";
-        } else {
-            $_SESSION['mensaje'] = "Materias y relaciones registradas con éxito.";
-            $_SESSION['icono'] = "success";
-        }
-
-        header('Location:' . APP_URL . "/admin/materias");
-        die();
-    } else {
-        echo "No se pudo abrir el archivo.";
     }
-} else {
-    echo "No se ha seleccionado ningún archivo.";
 }
 ?>

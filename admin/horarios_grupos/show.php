@@ -110,7 +110,7 @@ foreach ($horarios as $horario) {
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <table class="table table-bordered table-hover">
+                                    <table id="example1" class="table table-bordered table-hover">
                                         <thead>
                                             <tr>
                                                 <th>Hora/Día</th>
@@ -158,52 +158,40 @@ include('../../admin/layout/parte2.php');
 <script>
     $(function () {
         $("#example1").DataTable({
-            "pageLength": 5,
+            "pageLength": 10,
             "language": {
-              "emptyTable": "No hay información",
-              "info": "Mostrando _START_ a _END_ de _TOTAL_ Roles",
-              "infoEmpty": "Mostrando 0 a 0 de 0 Roles",
-              "infoFiltered": "(Filtrado de _Max_ total Roles)",
-              "infoPostFix": "",
-              "thousands": ",",
-              "lengthMenu": "Mostrar _MENU_ Roles",
-              "loadingRecord": "Cargando...",
-              "processing": "Procesando...",
-              "search": "Buscador:",
-              "zeroRecords": "Sin resultados encontrados",
-              "paginate": {
-                "first": "Primero",
-                "last": "Ultimo",
-                "next": "Siguiente",
-                "previous": "Anterior"
-              }
+                "emptyTable": "No hay información",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ Materias",
+                "infoEmpty": "Mostrando 0 a 0 de 0 Materias",
+                "infoFiltered": "(Filtrado de _MAX_ total Materias)",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ Materias",
+                "loadingRecord": "Cargando...",
+                "processing": "Procesando...",
+                "search": "Buscador:",
+                "zeroRecords": "Sin resultados encontrados",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
             },
-            "responsive": true, "lengthChange": true, "autoWidth": false,
-            buttons: [{
-              extend: 'collection',
-              text: 'Opciones',
-              orientation: 'landscape',
-              buttons: [{
-                text: 'Copiar',
-                extend: 'copy',
-              }, {
-                extend: 'pdf'
-              }, {
-                extend: 'csv'
-              }, {
-                extend: 'excel'
-              }, {
-                text: 'Imprimir',
-                extend: 'print'
-              }
-              ]
-            },
-              {
-                extend: 'colvis',
-                text: 'Visor de columnas',
-                collectionLayout: 'fixed three-column'
-              }
-            ],
-        }) .buttons() .container() .appendTo('#example1_wrapper .col-md-6:eq(0)');
+            "responsive": true, 
+            "lengthChange": true, 
+            "autoWidth": false,
+            "dom": 'Bfrtip', // Importante para que los botones se muestren
+            buttons: [ // Opciones de descarga
+                {
+                    extend: 'collection',
+                    text: 'Opciones',
+                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+                },
+                {
+                    extend: 'colvis',
+                    text: 'Visor de columnas'
+                }
+            ]
+        });
     });
 </script>

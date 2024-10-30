@@ -40,7 +40,7 @@ include('../../app/controllers/profesores/listado_de_profesores.php');
                                     <tr>
                                         <th><center>Número</center></th>
                                         <th><center>Nombres del profesor</center></th>
-                                        <th><center>Programa de Adscripción</center></th> <!-- Nueva columna -->
+                                        <th><center>Programa de Adscripción</center></th>
                                         <th><center>Materias</center></th>
                                         <th><center>Horas Semanales</center></th>
                                         <th><center>Programas</center></th>
@@ -57,7 +57,7 @@ include('../../app/controllers/profesores/listado_de_profesores.php');
                                     <tr>
                                         <td style="text-align: center"><?= $contador_teachers; ?></td>
                                         <td><?= $teacher['profesor']; ?></td>
-                                        <td><center><?= $teacher['programa_adscripcion']; ?></center></td> <!-- Mostrar el programa de adscripción -->
+                                        <td><center><?= $teacher['programa_adscripcion']; ?></center></td>
                                         <td><center><?= $teacher['materias']; ?></center></td>
                                         <td><center><?= $teacher['horas_semanales']; ?></center></td>
                                         <td><center><?= $teacher['programas']; ?></center></td>
@@ -67,32 +67,14 @@ include('../../app/controllers/profesores/listado_de_profesores.php');
                                             <div class="btn-group" role="group" aria-label="Basic example">
                                                 <a href="show.php?id=<?= $teacher_id; ?>" type="button" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>
                                                 <a href="edit.php?id=<?= $teacher_id; ?>" type="button" class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></a>
-                                                <form action="<?= APP_URL; ?>/app/controllers/profesores/delete.php" onclick="preguntar<?= $teacher_id; ?>(event)" method="post" id="miFormulario<?= $teacher_id; ?>">
+                                                <form action="<?= APP_URL; ?>/app/controllers/profesores/delete.php" onclick="preguntar<?= $teacher_id; ?>(event)" method="post" id="miFormulario<?= $teacher_id; ?>" style="display:inline;">
                                                     <input type="text" name="teacher_id" value="<?= $teacher_id; ?>" hidden>
-                                                    <button type="submit" class="btn btn-danger btn-sm" style="border-radius: 0px 5px 5px 0px"><i class="bi bi-trash"></i></button>
+                                                    <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
                                                 </form>
-
-                                                <script>
-                                                    function preguntar<?= $teacher_id; ?>(event){
-                                                        event.preventDefault();
-                                                        Swal.fire({
-                                                            title: 'Eliminar Profesor',
-                                                            text: '¿Desea eliminar este Profesor?',
-                                                            icon: 'question',
-                                                            showDenyButton: true,
-                                                            confirmButtonText: 'Eliminar',
-                                                            confirmButtonColor: '#a5161d',
-                                                            denyButtonColor: '#007bff',
-                                                            denyButtonText: 'Cancelar',
-                                                        }).then((result) => {
-                                                            if (result.isConfirmed) { 
-                                                                var form = $('#miFormulario<?= $teacher_id; ?>');
-                                                                form.submit();
-                                                            }
-                                                        });
-                                                        return false;
-                                                    }
-                                                </script>
+                                                <!-- Botón para asignar horario al profesor con estilo gris -->
+                                                <a href="asignar_horario_profesor.php?teacher_id=<?= $teacher_id; ?>" class="btn btn-secondary btn-sm" style="background-color: #d3d3d3; color: #555;">
+                                                    <i class="bi bi-calendar2-week"></i>
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>

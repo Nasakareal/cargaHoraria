@@ -1,34 +1,34 @@
 <?php
-include('../../app/config.php');
-include('../../admin/layout/parte1.php');
 
-/* Consulta para obtener la lista de profesores sin duplicar filas */
-$query = "
-    SELECT 
-        t.teacher_id, 
-        t.teacher_name, 
-        t.es_local
-    FROM 
-        teachers t
-    GROUP BY 
-        t.teacher_id, t.teacher_name, t.es_local
-";
 
-$result = $pdo->query($query);
-$profesores = $result->fetchAll(PDO::FETCH_ASSOC);
+include_once('../../app/config.php');  // Usar include_once para evitar inclusión duplicada
+include_once('../../admin/layout/parte1.php');
+include_once('../../app/controllers/parte1.php');
+
+// Verificar que $pdo esté definido y conectado correctamente
+if (!isset($pdo)) {
+    echo "Error: No se pudo conectar a la base de datos.";
+    exit;
+}
+
+// Consulta para obtener la lista de profesores
+$sql_profesores = "SELECT teacher_id, teacher_name, program_id FROM teachers WHERE estado = 'ACTIVO'";
+$stmt_profesores = $pdo->prepare($sql_profesores);
+$stmt_profesores->execute();
+$profesores = $stmt_profesores->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <div class="content-wrapper">
     <div class="content">
         <div class="container">
             <div class="row">
-                <h1>Autoasignación de Horarios para Profesores</h1>
+                <h1>Listado de Profesores</h1>
             </div>
             <div class="row">
                 <div class="col-md-12">
                     <div class="card card-outline card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Listado de Profesores</h3>
+                            <h3 class="card-title">Profesores registrados</h3>
                         </div>
                         <div class="card-body">
                             <table id="example1" class="table table-striped table-bordered table-hover table-sm">
@@ -36,7 +36,6 @@ $profesores = $result->fetchAll(PDO::FETCH_ASSOC);
                                     <tr>
                                         <th class="text-center">Número</th>
                                         <th class="text-center">Nombre del Profesor</th>
-                                        <th class="text-center">Es Local</th>
                                         <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
@@ -49,12 +48,10 @@ $profesores = $result->fetchAll(PDO::FETCH_ASSOC);
                                     <tr>
                                         <td style="text-align: center"><?= $contador_profesores; ?></td>
                                         <td class="text-center"><?= htmlspecialchars($profesor['teacher_name']); ?></td>
-                                        <!-- Verificar correctamente si el profesor es local o foráneo -->
-                                        <td class="text-center"><?= $profesor['es_local'] == 1 ? 'Sí (Local)' : 'No (Foráneo)'; ?></td>
                                         <td class="text-center">
-                                            <!-- Botón para ver el horario del profesor -->
-                                            <a href="show.php?id=<?= $profesor['teacher_id']; ?>" class="btn btn-info btn-sm">
-                                                <i class="bi bi-eye"></i> Ver Horario
+                                            <!-- Botón Asignar Horario que redirige a asignar_horario_profesor.php con el ID del profesor -->
+                                            <a href="asignar_horario_profesor.php?teacher_id=<?= $profesor['teacher_id']; ?>" class="btn btn-info btn-sm">
+                                                <i class="bi bi-calendar-plus"></i> Asignar Horario
                                             </a>
                                         </td>
                                     </tr>
@@ -72,7 +69,7 @@ $profesores = $result->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <?php
-include('../../admin/layout/parte2.php');
+include_once('../../admin/layout/parte2.php');
 ?>
 
 <script>

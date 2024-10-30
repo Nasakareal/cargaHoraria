@@ -53,6 +53,9 @@ foreach ($groups as $group) {
     $horario = $horarios_disponibles[$turno];
     $subjects = $subjects_by_program_and_term[$group['program_id']][$group['term_id']] ?? [];
 
+    /* Filtrado y prioridad de asignación para turnos 'MIXTO' y 'ZINAPECUARO' */
+    $turno_prioritario = in_array($turno, ['MIXTO', 'ZINAPECUARO']);
+
     foreach ($subjects as $subject) {
         $horas_restantes = $subject['weekly_hours'];
         $max_consecutive_hours = $subject['max_consecutive_class_hours'];
@@ -64,6 +67,28 @@ foreach ($groups as $group) {
             foreach ($bloques as $bloque) {
                 $current_start_time = isset($hora_inicio_dia[$dia]) ? $hora_inicio_dia[$dia] : strtotime($bloque['start']);
                 $end_time_block = strtotime($bloque['end']);
+
+                /* Verificar si la materia requiere laboratorio */
+                $es_laboratorio = $subject['lab_hours'] > 0;
+                if ($es_laboratorio) {
+                    // Verificar disponibilidad de laboratorios
+                    $sql_check_lab = "SELECT COUNT(*) FROM schedule_assignments 
+                                      WHERE schedule_day = :dia 
+                                      AND ((start_time BETWEEN :start_time AND :end_time) 
+                                           OR (end_time BETWEEN :start_time AND :end_time))";
+                    $stmt_check_lab = $pdo->prepare($sql_check_lab);
+                    $stmt_check_lab->execute([
+                        ':dia' => $dia,
+                        ':start_time' => date('H:i:s', $current_start_time),
+                        ':end_time' => date('H:i:s', $end_time_block)
+                    ]);
+
+                    $lab_occupied = $stmt_check_lab->fetchColumn() > 0;
+                    if ($lab_occupied && !$turno_prioritario) {
+                        // Saltar si el laboratorio está ocupado y no tiene prioridad
+                        continue;
+                    }
+                }
 
                 while ($horas_restantes > 0 && $horas_asignadas_dia < 8 && $current_start_time < $end_time_block) {
                     /* Calcular las horas a asignar */
@@ -92,7 +117,7 @@ foreach ($groups as $group) {
                     $horas_restantes -= $horas_a_asignar;
                     $horas_asignadas_dia += $horas_a_asignar;
                     $current_start_time = strtotime($end_time_assignment);
-                    $hora_inicio_dia[$dia] = $current_start_time; // Actualiza el inicio disponible en el día */
+                    $hora_inicio_dia[$dia] = $current_start_time; // Actualiza el inicio disponible en el día
 
                     /* Romper si alcanzamos el máximo de horas consecutivas */
                     if ($horas_asignadas_dia >= $max_consecutive_hours)
