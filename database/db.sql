@@ -102,6 +102,7 @@ INSERT INTO programs (program_name, fyh_creacion, estado) VALUES
 ('DISEÑO Y MODA INDUSTRIAL', NOW(), '1'),
 ('ENERGÍAS RENOVABLES', NOW(), '1'),
 ('DISEÑO Y MODA INDUSTRIAL AREA PRODUCCIÓN', NOW(), '1'),
+('DISEÑO TEXTIL Y MODA AREA PRODUCCIÓN', NOW(), '1'),
 ('ENERGÍAS RENOVABLES AREA TURBOENERGIA', NOW(), '1'),
 ('ENERGÍA Y DESARROLLO SOSTENIBLE AREA TURBO ENERGÍA', NOW(), '1'),
 ('ENERGIAS RENOVABLES AREA ENERGIA SOLAR', NOW(), '1'),
@@ -111,6 +112,7 @@ INSERT INTO programs (program_name, fyh_creacion, estado) VALUES
 ('MANTENIMIENTO AREA INDUSTRIAL', NOW(), '1'),
 ('MECATRÓNICA', NOW(), '1'),
 ('MECATRÓNICA AREA AUTOMATIZACIÓN', NOW(), '1'),
+('MECATRÓNICA AREA DE AUTOMATIZACIÓN', NOW(), '1'),
 ('TECNOLOGÍAS DE LA INFORMACIÓN', NOW(), '1'),
 ('TECNOLOGÍAS DE LA INFORMACIÓN ÁREA DESARROLLO DE SOFTWARE MULTIPLATAFORMA', NOW(), '1'),
 ('TECNOLOGÍAS DE LA INFORMACIÓN ÁREA ENTORNOS VIRTUALES Y NEGOCIOS DIGITALES', NOW(), '1'),
@@ -199,25 +201,38 @@ VALUES
 ('MIXTO', 'VIERNES DE 16:00 A 20:00 Y SÁBADO DE 7:00 A 18:00', NOW(), '1'),
 ('ZINAPÉCUARO', 'VIERNES DE 16:00 A 20:00 Y SÁBADO DE 7:00 A 18:00', NOW(), '1');
 
-/*
- Tabla que almacena los grupos que pertenecen a un programa y tienen asignado un turno.
- */
+
+/* Tabla de salones */
+CREATE TABLE classrooms (
+    classroom_id INT AUTO_INCREMENT PRIMARY KEY,
+    classroom_name VARCHAR(50) NOT NULL,
+    capacity INT NOT NULL,
+    building VARCHAR(100) NOT NULL, /* Campo para el edificio */
+    floor ENUM('ALTA', 'BAJA') NOT NULL, /* Planta que solo puede ser ALTA o BAJA */
+    fyh_creacion DATETIME NULL,
+    fyh_actualizacion DATETIME NULL,
+    estado VARCHAR(11)
+) ENGINE=InnoDB;
+
 
 /* Tabla de grupos */
 CREATE TABLE `groups` (
-    group_id INT AUTO_INCREMENT PRIMARY KEY, /* ID único del grupo */
-    group_name VARCHAR(255) NOT NULL, /* Nombre del grupo */
-    program_id INT, /* ID del programa al que pertenece el grupo */
-    term_id INT, /* ID del cuatrimestre en el que está el grupo */
-    volume INT, /* Número de estudiantes en el grupo */
-    turn_id INT, /* ID del turno al que pertenece el grupo */
-    fyh_creacion DATETIME NULL, /* Fecha y hora de creación del grupo */
-    fyh_actualizacion DATETIME NULL, /* Fecha y hora de la última actualización del grupo */
-    estado VARCHAR(11), /* Estado del grupo, por ejemplo 'ACTIVO' o 'INACTIVO' */
-    FOREIGN KEY (program_id) REFERENCES programs(program_id), /* Relación con la tabla de programas */
-    FOREIGN KEY (term_id) REFERENCES terms(term_id), /* Relación con la tabla de cuatrimestres */
-    FOREIGN KEY (turn_id) REFERENCES shifts(shift_id) /* Relación con la tabla de turnos */
+    group_id INT AUTO_INCREMENT PRIMARY KEY,       /* ID único del grupo */
+    group_name VARCHAR(255) NOT NULL,              /* Nombre del grupo */
+    program_id INT,                                /* ID del programa al que pertenece el grupo */
+    term_id INT,                                   /* ID del cuatrimestre en el que está el grupo */
+    volume INT,                                    /* Número de estudiantes en el grupo */
+    turn_id INT,                                   /* ID del turno al que pertenece el grupo */
+    classroom_assigned INT DEFAULT NULL,           /* ID del salón asignado (puede ser nulo si no está asignado) */
+    fyh_creacion DATETIME NULL,                    /* Fecha y hora de creación del grupo */
+    fyh_actualizacion DATETIME NULL,               /* Fecha y hora de la última actualización del grupo */
+    estado VARCHAR(11),                            /* Estado del grupo, por ejemplo 'ACTIVO' o 'INACTIVO' */
+    FOREIGN KEY (program_id) REFERENCES programs(program_id),       /* Relación con la tabla de programas */
+    FOREIGN KEY (term_id) REFERENCES terms(term_id),                /* Relación con la tabla de cuatrimestres */
+    FOREIGN KEY (turn_id) REFERENCES shifts(shift_id),              /* Relación con la tabla de turnos */
+    FOREIGN KEY (classroom_assigned) REFERENCES classrooms(classroom_id) /* Relación con la tabla de salones */
 ) ENGINE=InnoDB;
+
 
 /* Tabla de profesores */
 CREATE TABLE teachers (
@@ -311,18 +326,6 @@ CREATE TABLE teacher_subjects (
     estado VARCHAR(11),
     FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES subjects(subject_id) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB;
-
-/* Tabla de salones */
-CREATE TABLE classrooms (
-    classroom_id INT AUTO_INCREMENT PRIMARY KEY,
-    classroom_name VARCHAR(50) NOT NULL,
-    capacity INT NOT NULL,
-    building VARCHAR(100) NOT NULL, /* Campo para el edificio */
-    floor ENUM('ALTA', 'BAJA') NOT NULL, /* Planta que solo puede ser ALTA o BAJA */
-    fyh_creacion DATETIME NULL,
-    fyh_actualizacion DATETIME NULL,
-    estado VARCHAR(11)
 ) ENGINE=InnoDB;
 
 
@@ -455,6 +458,7 @@ CREATE TABLE schedule_assignments (
     estado VARCHAR(11),
     fyh_creacion DATETIME,
     fyh_actualizacion DATETIME,
+    tipo_espacio VARCHAR(50) DEFAULT 'Aula',
     FOREIGN KEY (schedule_id) REFERENCES schedules(schedule_id),
     FOREIGN KEY (subject_id) REFERENCES subjects(subject_id),
     FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id),

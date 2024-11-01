@@ -1,135 +1,118 @@
 <?php
+
 include_once('../../app/config.php');
 
-/* Limpiar todas las asignaciones activas previas antes de asignar nuevas */
+/* Configuración del tiempo de ejecución */
+set_time_limit(300);
 $pdo->exec("DELETE FROM schedule_assignments WHERE estado = 'activo'");
 
-/* Obtener todos los grupos activos con sus programas y cuatrimestres */
-$sql_groups = "SELECT g.group_id, g.group_name, g.turn_id, p.program_id, g.term_id
-               FROM `groups` g
-               JOIN programs p ON g.program_id = p.program_id
-               WHERE g.estado = '1'";
-$stmt_groups = $pdo->prepare($sql_groups);
-$stmt_groups->execute();
-$groups = $stmt_groups->fetchAll(PDO::FETCH_ASSOC);
+/* Horarios para cada turno */
+$horarios_disponibles = [
+    'MATUTINO' => ['07:00:00' => '15:00:00'],
+    'VESPERTINO' => ['12:00:00' => '20:00:00'],
+    'MIXTO' => ['16:00:00' => '20:00:00', '07:00:00' => '18:00:00'],
+    'ZINAPECUARO' => ['16:00:00' => '20:00:00', '07:00:00' => '18:00:00']
+];
 
-/* Obtener todas las materias activas y agruparlas por programa y cuatrimestre */
-$sql_subjects = "SELECT * FROM subjects WHERE estado = '1'";
-$stmt_subjects = $pdo->prepare($sql_subjects);
-$stmt_subjects->execute();
-$all_subjects = $stmt_subjects->fetchAll(PDO::FETCH_ASSOC);
+/* Días para la asignación */
+$dias_semana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
 
-/* Agrupar materias por programa y cuatrimestre */
+/* Obtener datos de grupos y materias activas */
+$groups = $pdo->query("SELECT * FROM `groups` WHERE estado = '1'")->fetchAll(PDO::FETCH_ASSOC);
+$subjects = $pdo->query("SELECT * FROM subjects WHERE estado = '1'")->fetchAll(PDO::FETCH_ASSOC);
+
+/* Materias agrupadas por programa y término */
 $subjects_by_program_and_term = [];
-foreach ($all_subjects as $subject) {
+foreach ($subjects as $subject) {
     $subjects_by_program_and_term[$subject['program_id']][$subject['term_id']][] = $subject;
 }
 
-/* Definir horarios disponibles para cada turno */
-$horarios_disponibles = [
-    'MATUTINO' => [
-        'Lunes' => [['start' => '07:00:00', 'end' => '15:00:00']],
-        'Martes' => [['start' => '07:00:00', 'end' => '15:00:00']],
-        'Miércoles' => [['start' => '07:00:00', 'end' => '15:00:00']],
-        'Jueves' => [['start' => '07:00:00', 'end' => '15:00:00']],
-        'Viernes' => [['start' => '07:00:00', 'end' => '15:00:00']],
-    ],
-    'VESPERTINO' => [
-        'Lunes' => [['start' => '12:00:00', 'end' => '20:00:00']],
-        'Martes' => [['start' => '12:00:00', 'end' => '20:00:00']],
-        'Miércoles' => [['start' => '12:00:00', 'end' => '20:00:00']],
-        'Jueves' => [['start' => '12:00:00', 'end' => '20:00:00']],
-        'Viernes' => [['start' => '12:00:00', 'end' => '20:00:00']],
-    ],
-    'MIXTO' => [
-        'Viernes' => [['start' => '16:00:00', 'end' => '20:00:00']],
-        'Sábado' => [['start' => '07:00:00', 'end' => '18:00:00']],
-    ]
-];
+/* Función para asignar horas respetando el máximo consecutivo */
+function asignarHoras($pdo, $subject, $group, $dia, $inicio, $fin, $tipo_espacio)
+{
+    $horas_restantes = $subject['weekly_hours'];
+    $max_horas = $subject['lab_hours'] > 0 ? $subject['max_consecutive_lab_hours'] : $subject['max_consecutive_class_hours'];
+    $current_start_time = strtotime($inicio);
+    $bloque_fin = strtotime($fin);
 
-/* Asignación de horarios para cada grupo */
+    while ($horas_restantes > 0 && $current_start_time < $bloque_fin) {
+        $horas_a_asignar = min($horas_restantes, $max_horas);
+        $current_end_time = strtotime("+{$horas_a_asignar} hours", $current_start_time);
+
+        if ($current_end_time > $bloque_fin) {
+            $horas_a_asignar = ($bloque_fin - $current_start_time) / 3600;
+            $current_end_time = $bloque_fin;
+        }
+
+        /* Formateo */
+        $formatted_start_time = date('H:i:s', $current_start_time);
+        $formatted_end_time = date('H:i:s', $current_end_time);
+
+        /* Comprobar disponibilidad del horario para evitar duplicados */
+        $check_availability = $pdo->prepare("
+            SELECT COUNT(*) FROM schedule_assignments 
+            WHERE group_id = :group_id 
+            AND schedule_day = :schedule_day 
+            AND (
+                (start_time <= :start_time AND end_time > :start_time) OR 
+                (start_time < :end_time AND end_time >= :end_time)
+            )
+        ");
+        $check_availability->execute([
+            ':group_id' => $group['group_id'],
+            ':schedule_day' => $dia,
+            ':start_time' => $formatted_start_time,
+            ':end_time' => $formatted_end_time
+        ]);
+        if ($check_availability->fetchColumn() > 0) {
+            break; // Saltar si el horario está ocupado
+        }
+
+        /* Insertar asignación */
+        $sql_insert = "INSERT INTO schedule_assignments 
+                       (subject_id, group_id, classroom_id, schedule_day, start_time, end_time, estado, fyh_creacion, tipo_espacio)
+                       VALUES (:subject_id, :group_id, :classroom_id, :schedule_day, :start_time, :end_time, 'activo', NOW(), :tipo_espacio)";
+        $stmt_insert = $pdo->prepare($sql_insert);
+        $stmt_insert->execute([
+            ':subject_id' => $subject['subject_id'],
+            ':group_id' => $group['group_id'],
+            ':classroom_id' => $tipo_espacio === 'Laboratorio' ? null : $group['classroom_assigned'],
+            ':schedule_day' => $dia,
+            ':start_time' => $formatted_start_time,
+            ':end_time' => $formatted_end_time,
+            ':tipo_espacio' => $tipo_espacio
+        ]);
+
+        /* Reducir horas restantes */
+        $horas_restantes -= $horas_a_asignar;
+        $current_start_time = $current_end_time;
+    }
+}
+
+/* Asignación principal */
 foreach ($groups as $group) {
-    $turno = $group['turn_id'] == 1 ? 'MATUTINO' : ($group['turn_id'] == 2 ? 'VESPERTINO' : 'MIXTO');
-    $horario = $horarios_disponibles[$turno];
-    $subjects = $subjects_by_program_and_term[$group['program_id']][$group['term_id']] ?? [];
+    $turno = $group['turn_id'] == 1 ? 'MATUTINO' : ($group['turn_id'] == 2 ? 'VESPERTINO' : ($group['turn_id'] == 3 ? 'MIXTO' : 'ZINAPECUARO'));
+    $horario_turno = $horarios_disponibles[$turno];
 
-    /* Filtrado y prioridad de asignación para turnos 'MIXTO' y 'ZINAPECUARO' */
-    $turno_prioritario = in_array($turno, ['MIXTO', 'ZINAPECUARO']);
+    if (!isset($subjects_by_program_and_term[$group['program_id']][$group['term_id']])) {
+        continue;
+    }
+
+    $subjects = $subjects_by_program_and_term[$group['program_id']][$group['term_id']];
+    $dia_actual = 0;
 
     foreach ($subjects as $subject) {
-        $horas_restantes = $subject['weekly_hours'];
-        $max_consecutive_hours = $subject['max_consecutive_class_hours'];
+        $tipo_espacio = $subject['lab_hours'] > 0 ? 'Laboratorio' : 'Aula';
 
-        /* Variable para rastrear la última hora de inicio en cada día */
-        foreach ($horario as $dia => $bloques) {
-            $horas_asignadas_dia = 0;
+        if (($turno == 'MIXTO' || $turno == 'ZINAPECUARO') && !$subject['lab_hours']) {
+            continue;
+        }
 
-            foreach ($bloques as $bloque) {
-                $current_start_time = isset($hora_inicio_dia[$dia]) ? $hora_inicio_dia[$dia] : strtotime($bloque['start']);
-                $end_time_block = strtotime($bloque['end']);
+        $dia = $dias_semana[$dia_actual % count($dias_semana)];
+        $dia_actual++;
 
-                /* Verificar si la materia requiere laboratorio */
-                $es_laboratorio = $subject['lab_hours'] > 0;
-                if ($es_laboratorio) {
-                    // Verificar disponibilidad de laboratorios
-                    $sql_check_lab = "SELECT COUNT(*) FROM schedule_assignments 
-                                      WHERE schedule_day = :dia 
-                                      AND ((start_time BETWEEN :start_time AND :end_time) 
-                                           OR (end_time BETWEEN :start_time AND :end_time))";
-                    $stmt_check_lab = $pdo->prepare($sql_check_lab);
-                    $stmt_check_lab->execute([
-                        ':dia' => $dia,
-                        ':start_time' => date('H:i:s', $current_start_time),
-                        ':end_time' => date('H:i:s', $end_time_block)
-                    ]);
-
-                    $lab_occupied = $stmt_check_lab->fetchColumn() > 0;
-                    if ($lab_occupied && !$turno_prioritario) {
-                        // Saltar si el laboratorio está ocupado y no tiene prioridad
-                        continue;
-                    }
-                }
-
-                while ($horas_restantes > 0 && $horas_asignadas_dia < 8 && $current_start_time < $end_time_block) {
-                    /* Calcular las horas a asignar */
-                    $horas_disponibles_en_bloque = ($end_time_block - $current_start_time) / 3600;
-                    $horas_a_asignar = min($horas_restantes, $max_consecutive_hours, $horas_disponibles_en_bloque);
-
-                    if ($horas_a_asignar <= 0)
-                        break;
-
-                    /* Definir el tiempo de finalización de esta asignación */
-                    $end_time_assignment = date('H:i:s', strtotime("+{$horas_a_asignar} hours", $current_start_time));
-
-                    /* Insertar la asignación en la base de datos */
-                    $sql_insert = "INSERT INTO schedule_assignments (subject_id, teacher_id, group_id, classroom_id, schedule_day, start_time, end_time, estado, fyh_creacion)
-                                   VALUES (:subject_id, NULL, :group_id, NULL, :schedule_day, :start_time, :end_time, 'activo', NOW())";
-                    $stmt_insert = $pdo->prepare($sql_insert);
-                    $stmt_insert->execute([
-                        ':subject_id' => $subject['subject_id'],
-                        ':group_id' => $group['group_id'],
-                        ':schedule_day' => $dia,
-                        ':start_time' => date('H:i:s', $current_start_time),
-                        ':end_time' => $end_time_assignment
-                    ]);
-
-                    /* Actualizar las variables para el siguiente bloque de tiempo */
-                    $horas_restantes -= $horas_a_asignar;
-                    $horas_asignadas_dia += $horas_a_asignar;
-                    $current_start_time = strtotime($end_time_assignment);
-                    $hora_inicio_dia[$dia] = $current_start_time; // Actualiza el inicio disponible en el día
-
-                    /* Romper si alcanzamos el máximo de horas consecutivas */
-                    if ($horas_asignadas_dia >= $max_consecutive_hours)
-                        break;
-                }
-
-                if ($horas_restantes <= 0)
-                    break;
-            }
-            if ($horas_restantes <= 0)
-                break;
+        foreach ($horario_turno as $inicio => $fin) {
+            asignarHoras($pdo, $subject, $group, $dia, $inicio, $fin, $tipo_espacio);
         }
     }
 }
-?>

@@ -1,7 +1,17 @@
 <?php
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
-include('../../app/controllers/horarios_grupos/logica.php');
+
+// Ejecutar la lógica de generación de horarios solo si se hace clic en el botón
+if (isset($_GET['accion']) && $_GET['accion'] === 'generar_horario') {
+    include('../../app/controllers/horarios_grupos/logica.php');
+}
+
+// Obtener todos los grupos activos para mostrarlos en la tabla, aunque no se genere el horario
+$sql_groups = "SELECT group_id, group_name FROM `groups` WHERE estado = '1'";
+$stmt_groups = $pdo->prepare($sql_groups);
+$stmt_groups->execute();
+$groups = $stmt_groups->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <div class="content-wrapper">
@@ -15,11 +25,12 @@ include('../../app/controllers/horarios_grupos/logica.php');
                     <div class="card card-outline card-primary">
                         <div class="card-header">
                             <h3 class="card-title">Grupos registrados</h3>
-                            
 
-                             <div class="card-tools">
-                                <a href="create.php" class="btn btn-secondary"><i class="bi bi-arrow-repeat"></i> Asignar Horario</a>
-                                
+                            <div class="card-tools">
+                                <!-- Botón para asignar horario -->
+                                <a href="index.php?accion=generar_horario" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-repeat"></i> Asignar Horario
+                                </a>
                             </div>
                         </div>
                         <div class="card-body">

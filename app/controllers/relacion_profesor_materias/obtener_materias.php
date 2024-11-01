@@ -1,41 +1,65 @@
 <?php
 include('../../config.php');
 
+/* Obtener los datos del POST */
 $programa_id = filter_input(INPUT_POST, 'programa_id', FILTER_VALIDATE_INT);
 $cuatrimestre_id = filter_input(INPUT_POST, 'cuatrimestre_id', FILTER_VALIDATE_INT);
-$teacher_id = filter_input(INPUT_POST, 'teacher_id', FILTER_VALIDATE_INT);
 
-if ($programa_id && $cuatrimestre_id && $teacher_id) {
-    
-    $sql_materias_disponibles = "
-        SELECT 
-            s.subject_id, 
-            s.subject_name
-        FROM 
-            subjects s
-        INNER JOIN 
-            program_term_subjects pts ON s.subject_id = pts.subject_id
-        WHERE 
-            pts.program_id = :programa_id
-        AND 
-            pts.term_id = :cuatrimestre_id
-        AND 
-            s.subject_id NOT IN (
-                SELECT subject_id 
-                FROM teacher_subjects 
-                WHERE teacher_id = :teacher_id
-            )";
+/* Obtener los IDs de materias ya asignadas */
+$assigned_subjects = filter_input(INPUT_POST, 'assigned_subjects', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
+if (!$assigned_subjects) {
+    $assigned_subjects = [];
+} else {
+    /* Asegurarse de que todos los IDs sean numéricos */
+    $assigned_subjects = array_filter($assigned_subjects, 'is_numeric');
+}
 
-    $query = $pdo->prepare($sql_materias_disponibles);
-    $query->bindParam(':programa_id', $programa_id, PDO::PARAM_INT);
-    $query->bindParam(':cuatrimestre_id', $cuatrimestre_id, PDO::PARAM_INT);
-    $query->bindParam(':teacher_id', $teacher_id, PDO::PARAM_INT);
-    $query->execute();
-    $materias_disponibles = $query->fetchAll(PDO::FETCH_ASSOC);
+/* Verificar que se reciban correctamente los IDs de programa y cuatrimestre */
+if (!$programa_id || !$cuatrimestre_id) {
+    echo "ID de programa o cuatrimestre no válidos.";
+    exit;
+}
 
-    /* Generar el HTML para el select de materias disponibles */
-    foreach ($materias_disponibles as $materia) {
-        echo '<option value="' . $materia['subject_id'] . '">' . htmlspecialchars($materia['subject_name']) . '</option>';
+/* Base de la consulta SQL */
+$sql = "
+    SELECT s.subject_id, s.subject_name, s.weekly_hours
+    FROM subjects s
+    INNER JOIN program_term_subjects pts ON s.subject_id = pts.subject_id
+    WHERE pts.program_id = :programa_id AND pts.term_id = :cuatrimestre_id
+";
+
+$params = [':programa_id' => $programa_id, ':cuatrimestre_id' => $cuatrimestre_id];
+
+/* Excluir las materias ya asignadas */
+if (!empty($assigned_subjects)) {
+    $placeholders = [];
+    foreach ($assigned_subjects as $index => $subject_id) {
+        $key = ":subject_id_$index";
+        $placeholders[] = $key;
+        $params[$key] = $subject_id;
     }
+    $placeholders_str = implode(',', $placeholders);
+    $sql .= " AND s.subject_id NOT IN ($placeholders_str)";
+}
+
+try {
+    /* Preparar y ejecutar la consulta */
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+
+    /* Obtener las materias disponibles */
+    $materias_disponibles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    /* Verificar si se obtuvieron resultados */
+    if (empty($materias_disponibles)) {
+        echo "No se encontraron materias.";
+    } else {
+        /* Generar las opciones */
+        foreach ($materias_disponibles as $materia) {
+            echo '<option value="' . $materia['subject_id'] . '" data-hours="' . $materia['weekly_hours'] . '">' . htmlspecialchars($materia['subject_name']) . '</option>';
+        }
+    }
+} catch (PDOException $e) {
+    echo "Error en la consulta: " . $e->getMessage();
 }
 ?>

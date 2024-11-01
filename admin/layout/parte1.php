@@ -62,6 +62,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
       
+      
 
       <!-- Notifications Dropdown Menu -->
       
@@ -73,7 +74,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <li class="nav-item">
         <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
           <i class="fas fa-th-large"></i>
+          
         </a>
+        
       </li>
     </ul>
   </nav>
@@ -81,6 +84,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4" style="background-color: #008080">
+    
     <!-- Brand Logo -->
     <a href="<?=APP_URL;?>/admin" class="brand-link" style="background-color: #008080">
       <img src="https://ut-morelia.edu.mx/wp-content/uploads/2022/05/Logo-UTM-Claro.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8; width: 50px; height: 50px; object-fit: contain;">
@@ -301,7 +305,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </ul>
 
           </li>
-
+          <br>
           <li class="nav-item">
             <a href="<?=APP_URL;?>/login/logout.php" class="nav-link" style= "background-color: #f44336;color: black">
               <i class="nav-icon fas"><i class="bi bi-door-open"></i></i>
@@ -316,6 +320,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
+       
     </div>
     <!-- /.sidebar -->
+     
   </aside>

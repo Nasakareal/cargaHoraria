@@ -6,9 +6,11 @@ include('../../app/controllers/salones/listado_de_salones.php');
 
 // Obtener datos de grupos y salones asignados para mostrar
 $sql_grupos = "
-    SELECT g.group_id, g.group_name, g.volume AS capacidad_grupo, s.shift_name AS turn, g.classroom_assigned AS salon_asignado 
+    SELECT g.group_id, g.group_name, g.volume AS capacidad_grupo, s.shift_name AS turn, 
+           c.classroom_name, c.building 
     FROM `groups` g
     JOIN shifts s ON g.turn_id = s.shift_id
+    LEFT JOIN classrooms c ON g.classroom_assigned = c.classroom_id
     WHERE g.volume > 0 
     ORDER BY g.volume DESC";
 $query_grupos = $pdo->prepare($sql_grupos);
@@ -24,7 +26,6 @@ $grupos_con_salones = $query_grupos->fetchAll(PDO::FETCH_ASSOC);
             <div class="row">
                 <h1>Listado de Grupos y Asignación de Salones</h1>
             </div>
-
 
             <div class="row">
                 <div class="col-md-12">
@@ -58,13 +59,16 @@ $grupos_con_salones = $query_grupos->fetchAll(PDO::FETCH_ASSOC);
                                     $contador_grupos = 0;
                                     foreach ($grupos_con_salones as $grupo) {
                                         $contador_grupos++;
+                                        $salon_asignado = $grupo['classroom_name'] 
+                                                          ? $grupo['classroom_name'] . ' (' . substr($grupo['building'], -1) . ')'
+                                                          : 'No disponible';
                                         ?>
                                         <tr>
                                             <td style="text-align: center"><?= $contador_grupos; ?></td>
                                             <td class="text-center"><?= $grupo['group_name']; ?></td>
                                             <td class="text-center"><?= $grupo['turn']; ?></td>
                                             <td style="text-align: center"><?= $grupo['capacidad_grupo']; ?></td>
-                                            <td style="text-align: center"><?= $grupo['salon_asignado'] ?? 'No disponible'; ?></td>
+                                            <td style="text-align: center"><?= $salon_asignado; ?></td>
                                         </tr>
                                         <?php
                                     }

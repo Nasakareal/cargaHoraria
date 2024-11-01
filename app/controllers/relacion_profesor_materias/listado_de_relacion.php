@@ -1,5 +1,5 @@
 <?php
-// Cargar materias disponibles para el programa y cuatrimestre del profesor
+/* Cargar materias disponibles para el programa y cuatrimestre del profesor */
 $sql_materias_disponibles = "
     SELECT 
         s.subject_id, 
@@ -26,7 +26,7 @@ $query_materias_disponibles->bindParam(':teacher_id', $teacher_id, PDO::PARAM_IN
 $query_materias_disponibles->execute();
 $materias_disponibles = $query_materias_disponibles->fetchAll(PDO::FETCH_ASSOC);
 
-// Cargar materias ya asignadas al profesor
+/* Cargar materias ya asignadas al profesor */
 $sql_materias_asignadas = "
     SELECT 
         s.subject_id, 
@@ -42,4 +42,3 @@ $query_materias_asignadas = $pdo->prepare($sql_materias_asignadas);
 $query_materias_asignadas->bindParam(':teacher_id', $teacher_id, PDO::PARAM_INT);
 $query_materias_asignadas->execute();
 $materias_asignadas = $query_materias_asignadas->fetchAll(PDO::FETCH_ASSOC);
-?>

@@ -1,7 +1,7 @@
 <?php
 include('../../app/config.php');
 
-// Obtener el ID del profesor desde la URL
+
 $teacher_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$teacher_id) {
     echo "ID de profesor inválido.";
@@ -9,12 +9,11 @@ if (!$teacher_id) {
 }
 
 include('../../admin/layout/parte1.php');
-include('../../app/controllers/profesores/datos_del_profesor.php');  // Cargar datos del profesor
-include('../../app/controllers/programas/listado_de_programas.php');  // Cargar la lista de programas
-include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');  // Cargar la lista de cuatrimestres
-include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.php');  // Cargar la relación de materias disponibles y asignadas
+include('../../app/controllers/profesores/datos_del_profesor.php');
+include('../../app/controllers/programas/listado_de_programas.php');
+include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
+include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.php');
 ?>
-
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <br>
@@ -74,33 +73,38 @@ include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.ph
                                     </div>
                                 </div>
 
-                                <!-- Materias disponibles -->
+                                <!-- Materias disponibles y asignadas -->
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <!-- Materias disponibles -->
+                                    <div class="col-md-5">
                                         <label for="">Materias disponibles</label>
-                                        <select id="materias_disponibles" name="materias_disponibles[]" class="form-control" multiple>
-                                            <!-- Materias se cargarán aquí con AJAX -->
+                                        <select id="materias_disponibles" class="form-control" multiple style="height:200px;">
+                                            <?php foreach ($materias_disponibles as $materia): ?>
+                                                <?php if (!in_array($materia['subject_id'], array_column($materias_asignadas, 'subject_id'))): ?>
+                                                    <option value="<?= $materia['subject_id']; ?>" data-hours="<?= isset($materia['weekly_hours']) ? $materia['weekly_hours'] : 0; ?>">
+                                                        <?= htmlspecialchars($materia['subject_name']); ?>
+                                                    </option>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
                                         </select>
                                     </div>
 
+                                    <!-- Botones para agregar y quitar materias -->
+                                    <div class="col-md-2 text-center" style="margin-top: 80px;">
+                                        <button type="button" id="add_subject" class="btn btn-primary btn-block">Agregar &gt;&gt;</button>
+                                        <button type="button" id="remove_subject" class="btn btn-primary btn-block">&lt;&lt; Quitar</button>
+                                    </div>
+
                                     <!-- Materias asignadas -->
-                                    <div class="col-md-6">
+                                    <div class="col-md-5">
                                         <label for="">Materias asignadas</label>
-                                        <select id="materias_asignadas" name="materias_asignadas[]" class="form-control" multiple>
+                                        <select id="materias_asignadas" name="materias_asignadas[]" class="form-control" multiple style="height:200px;">
                                             <?php foreach ($materias_asignadas as $materia_asignada): ?>
-                                                <option value="<?= $materia_asignada['subject_id']; ?>" data-hours="<?= isset($materia_asignada['weekly_hours']) ? $materia_asignada['weekly_hours'] : 0; ?>">
+                                                <option value="<?= $materia_asignada['subject_id']; ?>" data-hours="<?= isset($materia_asignada['weekly_hours']) ? $materia_asignada['weekly_hours'] : 0; ?>" selected>
                                                     <?= htmlspecialchars($materia_asignada['subject_name']); ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
-                                    </div>
-                                </div>
-
-                                <!-- Botones para agregar y quitar materias -->
-                                <div class="row">
-                                    <div class="col-md-12 text-center">
-                                        <button type="button" id="add_subject" class="btn btn-primary"> > </button>
-                                        <button type="button" id="remove_subject" class="btn btn-primary"> < </button>
                                     </div>
                                 </div>
 
@@ -111,8 +115,43 @@ include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.ph
                                     </div>
                                 </div>
 
-                                <!-- Botón de actualización -->
+                                <!-- Grupos disponibles y asignados -->
                                 <div class="row">
+                                    <!-- Grupos disponibles -->
+                                    <div class="col-md-5">
+                                        <label for="">Grupos disponibles</label>
+                                        <select id="grupos_disponibles" class="form-control" multiple style="height:200px;">
+                                            <?php foreach ($grupos_disponibles as $grupo): ?>
+                                                <?php if (!in_array($grupo['group_id'], array_column($grupos_asignados, 'group_id'))): ?>
+                                                    <option value="<?= $grupo['group_id']; ?>">
+                                                        <?= htmlspecialchars($grupo['group_name']); ?>
+                                                    </option>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+
+                                    <!-- Botones para agregar y quitar grupos -->
+                                    <div class="col-md-2 text-center" style="margin-top: 80px;">
+                                        <button type="button" id="add_group" class="btn btn-primary btn-block">Agregar &gt;&gt;</button>
+                                        <button type="button" id="remove_group" class="btn btn-primary btn-block">&lt;&lt; Quitar</button>
+                                    </div>
+
+                                    <!-- Grupos asignados -->
+                                    <div class="col-md-5">
+                                        <label for="">Grupos asignados</label>
+                                        <select id="grupos_asignados" name="grupos_asignados[]" class="form-control" multiple style="height:200px;">
+                                            <?php foreach ($grupos_asignados as $grupo_asignado): ?>
+                                                <option value="<?= $grupo_asignado['group_id']; ?>" selected>
+                                                    <?= htmlspecialchars($grupo_asignado['group_name']); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Botón de actualización -->
+                                <div class="row" style="margin-top:20px;">
                                     <div class="col-md-12">
                                         <button type="submit" class="btn btn-primary">Actualizar</button>
                                         <a href="<?= APP_URL; ?>/admin/profesores" class="btn btn-secondary">Cancelar</a>
@@ -132,78 +171,121 @@ include('../../admin/layout/parte2.php');
 include('../../layout/mensajes.php');
 ?>
 
-<!-- Script para manejar AJAX y cargar las materias -->
+<!-- Script para manejar AJAX y cargar las materias y grupos -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function() {
-        /* Evento al cambiar el programa o cuatrimestre */
-        $('#programa_id, #cuatrimestre_id').change(function() {
-            var programa_id = $('#programa_id').val();
-            var cuatrimestre_id = $('#cuatrimestre_id').val();
-            var teacher_id = <?= $teacher_id; ?>;
-
-            if (programa_id && cuatrimestre_id) {
-                /* Solicitud AJAX para obtener las materias */
-                $.ajax({
-                    url: '../../app/controllers/relacion_profesor_materias/obtener_materias.php',
-                    type: 'POST',
-                    data: {
-                        programa_id: programa_id,
-                        cuatrimestre_id: cuatrimestre_id,
-                        teacher_id: teacher_id
-                    },
-                    success: function(response) {
-                        
-                        $('#materias_disponibles').html(response);
-                        
-                        updateTotalHours();
-                    }
-                });
-            }
+$(document).ready(function() {
+    /* Función para actualizar el contador de horas */
+    function updateTotalHours() {
+        let totalHours = 0;
+        $('#materias_asignadas option').each(function() {
+            totalHours += parseInt($(this).data('hours') || 0);
         });
+        $('#total_hours').text(totalHours);
+    }
 
-        /* Scripts para mover materias entre listas y actualizar el contador */
-        document.getElementById('add_subject').addEventListener('click', function() {
-            const available = document.getElementById('materias_disponibles');
-            const assigned = document.getElementById('materias_asignadas');
+    /* Actualizar horas al cargar la página */
+    updateTotalHours();
 
-            Array.from(available.selectedOptions).forEach(option => {
-                console.log('Añadiendo materia:', option.text, 'Horas:', option.getAttribute('data-hours')); 
-                assigned.appendChild(option);
+    /* Seleccionar todas las opciones en 'materias_asignadas' y 'grupos_asignados' al cargar la página */
+    $('#materias_asignadas option').prop('selected', true);
+    $('#grupos_asignados option').prop('selected', true);
+
+    /* Evento al cambiar el programa o cuatrimestre */
+    $('#programa_id, #cuatrimestre_id').change(function() {
+        var programa_id = $('#programa_id').val();
+        var cuatrimestre_id = $('#cuatrimestre_id').val();
+
+        if (programa_id && cuatrimestre_id) {
+            /* Obtener IDs de materias asignadas */
+            var assignedSubjectIds = [];
+            $('#materias_asignadas option').each(function() {
+                assignedSubjectIds.push($(this).val());
             });
 
-            /* Actualizar las horas después de mover materias */
-            updateTotalHours();
-        });
-
-        document.getElementById('remove_subject').addEventListener('click', function() {
-            const assigned = document.getElementById('materias_asignadas');
-            const available = document.getElementById('materias_disponibles');
-
-            Array.from(assigned.selectedOptions).forEach(option => {
-                console.log('Quitando materia:', option.text, 'Horas:', option.getAttribute('data-hours')); // Verificar si las horas están presentes
-                available.appendChild(option);
+            /* Solicitud AJAX para obtener las materias disponibles */
+            $.ajax({
+                url: '../../app/controllers/relacion_profesor_materias/obtener_materias.php',
+                type: 'POST',
+                data: {
+                    programa_id: programa_id,
+                    cuatrimestre_id: cuatrimestre_id,
+                    assigned_subjects: assignedSubjectIds
+                },
+                success: function(response) {
+                    $('#materias_disponibles').html(response);
+                    updateTotalHours();
+                },
+                error: function() {
+                    console.log('Error en la solicitud de materias');
+                }
             });
 
-            /* Actualizar las horas después de mover materias */
-            updateTotalHours();
-        });
-
-        /* Función para actualizar el contador de horas */
-        function updateTotalHours() {
-            let totalHours = 0;
-            const assigned = document.getElementById('materias_asignadas');
-
-            Array.from(assigned.options).forEach(option => {
-                const hours = parseInt(option.getAttribute('data-hours')) || 0;
-                console.log('Suma de horas:', hours);  /* Verificar si las horas están siendo leídas correctamente */
-                totalHours += hours;
+            /* Obtener IDs de grupos asignados */
+            var assignedGroupIds = [];
+            $('#grupos_asignados option').each(function() {
+                assignedGroupIds.push($(this).val());
             });
 
-            document.getElementById('total_hours').innerText = totalHours;
+            /* Solicitud AJAX para obtener los grupos disponibles */
+            $.ajax({
+                url: '../../app/controllers/relacion_profesor_grupos/obtener_grupos.php',
+                type: 'POST',
+                data: {
+                    programa_id: programa_id,
+                    cuatrimestre_id: cuatrimestre_id,
+                    assigned_groups: assignedGroupIds
+                },
+                success: function(response) {
+                    $('#grupos_disponibles').html(response);
+                },
+                error: function() {
+                    console.log('Error en la solicitud de grupos');
+                }
+            });
         }
+    });
 
-        /* Actualizar horas iniciales cuando cargamos la página */
+    /* Eventos para mover materias entre listas */
+    $('#add_subject').click(function() {
+        $('#materias_disponibles option:selected').each(function() {
+            $(this).appendTo('#materias_asignadas');
+        });
+        /* Seleccionar todas las opciones en 'materias_asignadas' */
+        $('#materias_asignadas option').prop('selected', true);
         updateTotalHours();
     });
+
+    $('#remove_subject').click(function() {
+        $('#materias_asignadas option:selected').each(function() {
+            $(this).appendTo('#materias_disponibles');
+        });
+        /* Seleccionar todas las opciones en 'materias_asignadas' */
+        $('#materias_asignadas option').prop('selected', true);
+        updateTotalHours();
+    });
+
+    /* Eventos para mover grupos entre listas */
+    $('#add_group').click(function() {
+        $('#grupos_disponibles option:selected').each(function() {
+            $(this).appendTo('#grupos_asignados');
+        });
+        /* Seleccionar todas las opciones en 'grupos_asignados' */
+        $('#grupos_asignados option').prop('selected', true);
+    });
+
+    $('#remove_group').click(function() {
+        $('#grupos_asignados option:selected').each(function() {
+            $(this).appendTo('#grupos_disponibles');
+        });
+        /* Seleccionar todas las opciones en 'grupos_asignados' */
+        $('#grupos_asignados option').prop('selected', true);
+    });
+
+    /* Seleccionar todas las opciones antes de enviar el formulario */
+    $('form').submit(function() {
+        $('#materias_asignadas option').prop('selected', true);
+        $('#grupos_asignados option').prop('selected', true);
+    });
+});
 </script>

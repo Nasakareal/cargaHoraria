@@ -17,6 +17,7 @@ function obtenerHorarioGrupo($group_id, $pdo)
                         sa.start_time AS start, 
                         sa.end_time AS end, 
                         s.subject_name, 
+                        s.lab_hours,          /* Añadimos lab_hours para saber si es laboratorio */
                         sh.shift_name
                      FROM 
                         schedule_assignments sa
@@ -39,7 +40,9 @@ function obtenerHorarioGrupo($group_id, $pdo)
 $horarios = obtenerHorarioGrupo($group_id, $pdo);
 
 if (empty($horarios)) {
-    echo "No se encontraron horarios asignados para este grupo.";
+    echo "<p class='text-center text-muted'>No se encontraron horarios asignados para este grupo.</p>";
+    echo "<div class='text-center'><a href='../../admin/horarios_grupos' class='btn btn-secondary'>Volver</a></div>";
+    include('../../admin/layout/parte2.php');
     exit;
 }
 
@@ -80,6 +83,9 @@ foreach ($horarios as $horario) {
     $dia = $horario['day'];
     $materia = $horario['subject_name'];
 
+    // Determinar si es Aula o Laboratorio
+    $tipo_espacio = ($horario['lab_hours'] > 0) ? 'Laboratorio' : 'Aula';
+
     // Iterar en bloques de una hora entre el inicio y el fin de la materia
     for ($current_time = $start_time; $current_time < $end_time; $current_time = strtotime("+1 hour", $current_time)) {
         $hora = date("H:i", $current_time);
@@ -87,7 +93,7 @@ foreach ($horarios as $horario) {
         // Verificar si el bloque horario y el día están en el horario definido
         if (in_array($hora, $horas) && in_array($dia, $dias)) {
             // Asignar la materia a la celda correspondiente solo si está vacía
-            $tabla_horarios[$hora][$dia] .= htmlspecialchars($materia) . "<br>";
+            $tabla_horarios[$hora][$dia] .= htmlspecialchars($materia) . " - " . htmlspecialchars($tipo_espacio) . "<br>";
         }
     }
 }
@@ -180,8 +186,8 @@ include('../../admin/layout/parte2.php');
             "responsive": true, 
             "lengthChange": true, 
             "autoWidth": false,
-            "dom": 'Bfrtip', // Importante para que los botones se muestren
-            buttons: [ // Opciones de descarga
+            "dom": 'Bfrtip',
+            buttons: [
                 {
                     extend: 'collection',
                     text: 'Opciones',
