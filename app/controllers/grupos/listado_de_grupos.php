@@ -3,11 +3,11 @@
 $sql = "SELECT 
             g.group_id, 
             g.group_name, 
-            p.program_name,   /* Obtener el nombre del programa */
-            t.term_name,      /* Obtener el nombre del cuatrimestre */
+            p.program_name,
+            t.term_name,
             g.volume,
-            s.shift_name,     /* Obtener el nombre del turno */
-            el.level_name     /* Obtener el nombre del nivel educativo */
+            s.shift_name,
+            el.level_name
         FROM 
             `groups` g
         LEFT JOIN 
@@ -26,4 +26,3 @@ $groups = $stmt->fetchAll(PDO::FETCH_ASSOC);
 if (empty($groups)) {
     $groups = [];
 }
-?>

@@ -43,4 +43,3 @@ if ($statement->execute([':programa_id' => $programa_id, ':cuatrimestre_id' => $
     $errorInfo = $statement->errorInfo();
     echo "<option>Error en la consulta de grupos: {$errorInfo[2]}</option>";
 }
-?>

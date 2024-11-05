@@ -65,7 +65,7 @@ if (isset($_FILES['file'])) {
             /* Vincular los parámetros */
             $sentencia_grupo->bindParam(':group_name', $group_name);
             $sentencia_grupo->bindParam(':program_id', $program_id);
-            $sentencia_grupo->bindParam(':term_id', $term_number); // Usar el número directamente
+            $sentencia_grupo->bindParam(':term_id', $term_number);
             $sentencia_grupo->bindParam(':volume', $volume);
             $sentencia_grupo->bindParam(':turn_id', $turn_id);
 
@@ -100,7 +100,7 @@ if (isset($_FILES['file'])) {
             $_SESSION['icono'] = "success";
         }
 
-        header('Location:' . APP_URL . "/admin/grupos");
+        header('Location:' . APP_URL . "/portal/grupos");
         die();
     } else {
         echo "No se pudo abrir el archivo.";

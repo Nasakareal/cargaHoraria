@@ -26,7 +26,7 @@ if ($group_data) {
     $term_name = htmlspecialchars($group_data['term_name'] ?? "Cuatrimestre no encontrado", ENT_QUOTES, 'UTF-8');
     $volumen_grupo = htmlspecialchars($group_data['volume'] ?? "Volumen no encontrado", ENT_QUOTES, 'UTF-8');
     $turno = htmlspecialchars($group_data['turno'] ?? "Turno no encontrado", ENT_QUOTES, 'UTF-8');
-    $nivel_educativo = htmlspecialchars($group_data['nivel_educativo'] ?? "Nivel educativo no encontrado", ENT_QUOTES, 'UTF-8');  /* Añadimos el nivel educativo */
+    $nivel_educativo = htmlspecialchars($group_data['nivel_educativo'] ?? "Nivel educativo no encontrado", ENT_QUOTES, 'UTF-8');
 } else {
     $group_name = "Grupo no encontrado (ID: $group_id)";
     $program_id = null;
@@ -35,6 +35,5 @@ if ($group_data) {
     $year = "Año no encontrado";
     $volumen_grupo = "N/A";
     $turno = "Turno no encontrado";
-    $nivel_educativo = "Nivel educativo no encontrado";  /* Añadimos la respuesta por defecto */
+    $nivel_educativo = "Nivel educativo no encontrado";
 }
-?>

@@ -10,7 +10,7 @@ if ($term_name == "") {
     session_start();
     $_SESSION['mensaje'] = "Tiene que llenar el campo para continuar";
     $_SESSION['icono'] = "error";
-    header('Location:' . APP_URL . "/admin/cuatrimestres/edit.php?id=" . $term_id);
+    header('Location:' . APP_URL . "/portal/cuatrimestres/edit.php?id=" . $term_id);
 } else {
     $sentencia = $pdo->prepare("UPDATE terms
 SET term_name=:term_name,
@@ -26,18 +26,18 @@ WHERE term_id=:term_id ");
             session_start();
             $_SESSION['mensaje'] = "Se ha actualizado el cuatrimestre";
             $_SESSION['icono'] = "success";
-            header('Location:' . APP_URL . "/admin/cuatrimestres");
+            header('Location:' . APP_URL . "/portal/cuatrimestres");
         } else {
             session_start();
             $_SESSION['mensaje'] = "No se ha podido actualizar el cuatrimestre, comuniquese con el area de IT";
             $_SESSION['icono'] = "error";
-            header('Location:' . APP_URL . "/admin/cuatrimestres/edit.php?id=" . $term_id);
+            header('Location:' . APP_URL . "/portal/cuatrimestres/edit.php?id=" . $term_id);
         }
     } catch (Exception $exception) {
         session_start();
         $_SESSION['mensaje'] = "Este cuatrimestre ya existe";
         $_SESSION['icono'] = "error";
-        header('Location:' . APP_URL . "/admin/cuatrimestres/edit.php?id=" . $term_id);
+        header('Location:' . APP_URL . "/portal/cuatrimestres/edit.php?id=" . $term_id);
     }
 
 

@@ -2,6 +2,7 @@
 header('Content-Type: text/html; charset=utf-8');
 
 include('../../app/config.php');
+include('../../admin/verificar/verificar_admin.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/grupos/listado_de_grupos.php');
 include('../../app/controllers/materias/listado_de_materias.php');

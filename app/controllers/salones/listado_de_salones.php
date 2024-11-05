@@ -1,5 +1,5 @@
 <?php
-// Consulta para obtener los salones con el nombre concatenado con el último dígito del edificio
+
 $sql_classrooms = "SELECT 
                     c.classroom_id,   
                     CONCAT(c.classroom_name, '-', RIGHT(c.building, 1)) AS nombre_salon,
@@ -15,5 +15,3 @@ $sql_classrooms = "SELECT
 $query_classrooms = $pdo->prepare($sql_classrooms);
 $query_classrooms->execute();
 $classrooms = $query_classrooms->fetchAll(PDO::FETCH_ASSOC);
-
-?>

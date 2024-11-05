@@ -16,4 +16,3 @@ $sql_relacion = "SELECT
 $query_relacion = $pdo->prepare($sql_relacion);
 $query_relacion->execute(['teacher_id' => $teacher_id]);
 $relacion_programas_cuatrimestres = $query_relacion->fetchAll(PDO::FETCH_ASSOC);
-?>

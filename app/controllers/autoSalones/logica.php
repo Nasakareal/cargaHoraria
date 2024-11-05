@@ -1,7 +1,7 @@
 <?php
 include_once('../../../app/config.php');
 
-/* Asegúrate de que no haya salida antes de `session_start()` para evitar el error de encabezados */
+
 ob_start();
 session_start();
 
@@ -109,5 +109,5 @@ try {
 
 /* Enviar todos los encabezados */
 ob_end_clean();
-header('Location: ' . APP_URL . "/admin/autoSalones/index.php");
+header('Location: ' . APP_URL . "/portal/autoSalones/index.php");
 exit();

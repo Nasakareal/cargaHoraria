@@ -1,19 +1,24 @@
 <?php
-session_start();
 
-if(isset($_SESSION['sesion_email'])){
-    //echo "el usuario paso por el login";
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (isset($_SESSION['sesion_email'])) {
     $email_sesion = $_SESSION['sesion_email'];
-    $query_sesion = $pdo->prepare("SELECT * FROM usuarios WHERE email = '$email_sesion' AND estado = '1' ");
+    $rol_id = $_SESSION['sesion_rol'];
+    $query_sesion = $pdo->prepare("SELECT * FROM usuarios WHERE email = :email AND estado = '1'");
+    $query_sesion->bindParam(':email', $email_sesion);
     $query_sesion->execute();
 
     $datos_sesion_usuarios = $query_sesion->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($datos_sesion_usuarios as $datos_sesion_usuario){
+    foreach ($datos_sesion_usuarios as $datos_sesion_usuario) {
         $nombre_sesion_usuario = $datos_sesion_usuario['nombres'];
     }
-}else{
-    //echo "el usuario no paso por el login";
-    header('Location:'.APP_URL."/login");
+} else {
+    
+    header('Location:' . APP_URL . "/login");
+    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -99,7 +104,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <img src="https://cdn-icons-png.flaticon.com/512/74/74472.png" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="#" class="d-block"><?=$nombre_sesion_usuario;?></a>
+          <a href="usuarios/show.php?id=<?= $_SESSION['sesion_id_usuario']; ?>" class="d-block"><?=$nombre_sesion_usuario;?></a>
         </div>
       </div>
 
@@ -120,7 +125,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="<?=APP_URL;?>/admin/profesores" class="nav-link">
+                <a href="<?=APP_URL;?>/portal/profesores" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Listado de Profesores</p>
                 </a>
@@ -129,7 +134,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
               <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="<?= APP_URL; ?>/admin/horarios_profesores" class="nav-link">
+                <a href="<?= APP_URL; ?>/portal/horarios_profesores" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Horario de Profesores</p>
                 </a>
@@ -148,7 +153,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="<?=APP_URL;?>/admin/materias" class="nav-link">
+                <a href="<?=APP_URL;?>/portal/materias" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Listado de Materias</p>
                 </a>
@@ -166,7 +171,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="<?= APP_URL; ?>/admin/programas" class="nav-link">
+                <a href="<?= APP_URL; ?>/portal/programas" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Listado de Programas</p>
                 </a>
@@ -175,7 +180,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="<?=APP_URL;?>/admin/relacion_materia_cuatrimestre_programa" class="nav-link">
+                <a href="<?=APP_URL;?>/portal/relacion_materia_cuatrimestre_programa" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Listado relacionado de Materias, Programas, y cuatrimestre</p>
                 </a>
@@ -194,7 +199,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="<?= APP_URL; ?>/admin/grupos" class="nav-link">
+                <a href="<?= APP_URL; ?>/portal/grupos" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Listado de Grupos</p>
                 </a>
@@ -203,7 +208,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
              <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="<?= APP_URL; ?>/admin/horarios_grupos" class="nav-link">
+                <a href="<?= APP_URL; ?>/portal/horarios_grupos" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Horarios de Grupos</p>
                 </a>
@@ -223,7 +228,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="<?= APP_URL; ?>/admin/cuatrimestres" class="nav-link">
+                <a href="<?= APP_URL; ?>/portal/cuatrimestres" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Listado de Cuatrimestres</p>
                 </a>
@@ -243,7 +248,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="<?= APP_URL; ?>/admin/salones" class="nav-link">
+                <a href="<?= APP_URL; ?>/portal/salones" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Listado de Salones</p>
                 </a>
@@ -252,7 +257,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="<?= APP_URL; ?>/admin/autoSalones" class="nav-link">
+                <a href="<?= APP_URL; ?>/portal/autoSalones" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Autoasignación de salones</p>
                 </a>
@@ -261,7 +266,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="<?= APP_URL; ?>/admin/laboratorios" class="nav-link">
+                <a href="<?= APP_URL; ?>/portal/laboratorios" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Listado de Laboratorios</p>
                 </a>

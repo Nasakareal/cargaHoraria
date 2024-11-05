@@ -15,4 +15,3 @@ $programs = $query_programs->fetchAll(PDO::FETCH_ASSOC);
 if (empty($programs)) {
     $programs = [];
 }
-?>

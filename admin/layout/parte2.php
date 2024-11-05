@@ -2,14 +2,17 @@
   <aside class="control-sidebar control-sidebar-info">
     <!-- Control sidebar content goes here -->
     <div class="p-3">
-      <h5>Juramento Inquebrantable</h5>
-      <p>En el día más brillante,
-         en la noche más oscura,
-         ningún mal escapará de mi vista,
-         que aquellos que adoran al mal teman mi poder.
+      <h5>Juramento</h5>
+      <br>
+      <p>En el aula, o en el hogar,
+         ningún estudiante quedará atrás.
+         Nuestra misión es aprender y crecer,
+         en cada mente una chispa encender.
+         Con valor y dedicación en mano,
+         la educación siempre en alto mantenemos.
           <br>
           <br>
-         ¡La luz de la educación!
+         ¡La luz de lint... <br>!La luz de la educación!
       </p>
     </div>
   </aside>

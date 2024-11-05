@@ -4,10 +4,9 @@ include('../../../app/config.php');
 
 $teacher_id = $_POST['teacher_id'];
 $nombres = $_POST['nombres'];
-$programa_id = $_POST['programa_id'];  // Programa seleccionado
-$cuatrimestre_id = $_POST['cuatrimestre_id'];  // Cuatrimestre seleccionado
-$es_local = $_POST['es_local'];  // Si es local o foráneo
-$materia_ids = $_POST['materias_asignadas'];  // IDs de las materias
+$programa_id = $_POST['programa_id'];
+$cuatrimestre_id = $_POST['cuatrimestre_id'];
+$materia_ids = $_POST['materias_asignadas'];
 $fechaHora = date('Y-m-d H:i:s');
 
 try {
@@ -17,7 +16,6 @@ try {
     $sentencia_profesor = $pdo->prepare("
         UPDATE teachers 
         SET teacher_name = :nombres, 
-            es_local = :es_local, 
             fyh_actualizacion = :fyh_actualizacion 
         WHERE teacher_id = :teacher_id");
     $sentencia_profesor->bindParam(':nombres', $nombres);
@@ -60,14 +58,13 @@ try {
     session_start();
     $_SESSION['mensaje'] = "Se ha actualizado con éxito";
     $_SESSION['icono'] = "success";
-    header('Location: ' . APP_URL . "/admin/profesores");
+    header('Location: ' . APP_URL . "/portal/profesores");
     exit;
 } catch (Exception $exception) {
     $pdo->rollBack();
     session_start();
     $_SESSION['mensaje'] = "Ocurrió un error: " . $exception->getMessage();
     $_SESSION['icono'] = "error";
-    header('Location: ' . APP_URL . "/admin/profesores");
+    header('Location: ' . APP_URL . "/portal/profesores");
     exit;
 }
-?>

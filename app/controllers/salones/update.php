@@ -12,9 +12,9 @@ $classroom_name = mb_strtoupper($classroom_name, 'UTF-8');
 
 if ($classroom_name == "" || $capacity == "" || $building == "" || $floor == "") {
     session_start();
-    $_SESSION['mensaje'] = "Los campos Nombre del sal髇, Capacidad, Edificio y Planta son obligatorios.";
+    $_SESSION['mensaje'] = "Los campos Nombre del sal贸n, Capacidad, Edificio y Planta son obligatorios.";
     $_SESSION['icono'] = "error";
-    header('Location:' . APP_URL . "/admin/salones/edit.php?id=" . $classroom_id);
+    header('Location:' . APP_URL . "/portal/salones/edit.php?id=" . $classroom_id);
     exit;
 }
 
@@ -37,21 +37,21 @@ try {
     
     if ($sentencia->execute()) {
         session_start();
-        $_SESSION['mensaje'] = "Se ha actualizado el sal髇 correctamente";
+        $_SESSION['mensaje'] = "Se ha actualizado el sal贸n correctamente";
         $_SESSION['icono'] = "success";
-        header('Location:' . APP_URL . "/admin/salones");
+        header('Location:' . APP_URL . "/portal/salones");
         exit; 
     } else {
         session_start();
-        $_SESSION['mensaje'] = "No se ha podido actualizar el sal髇, posiblemente ya existe.";
+        $_SESSION['mensaje'] = "No se ha podido actualizar el sal贸n, posiblemente ya existe.";
         $_SESSION['icono'] = "error";
-        header('Location:' . APP_URL . "/admin/salones/edit.php?id=" . $classroom_id);
+        header('Location:' . APP_URL . "/portal/salones/edit.php?id=" . $classroom_id);
         exit;
     }
 } catch (Exception $e) {
     session_start();
-    $_SESSION['mensaje'] = "Error al actualizar el sal髇: " . $e->getMessage();
+    $_SESSION['mensaje'] = "Error al actualizar el sal贸n: " . $e->getMessage();
     $_SESSION['icono'] = "error";
-    header('Location:' . APP_URL . "/admin/salones/edit.php?id=" . $classroom_id);
+    header('Location:' . APP_URL . "/portal/salones/edit.php?id=" . $classroom_id);
     exit;
 }

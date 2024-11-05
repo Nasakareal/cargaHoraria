@@ -9,7 +9,7 @@ $estado = '1';
 
 $sentencia = $pdo->prepare('INSERT INTO programs (program_name, fyh_creacion, estado) VALUES (:program_name, :fyh_creacion, :estado)');
 
-/* Víncula las variables */
+/* VÃ­ncula las variables */
 $sentencia->bindParam(':program_name', $nombre_programa);
 $sentencia->bindParam(':fyh_creacion', $fecha_creacion);
 $sentencia->bindParam(':estado', $estado);
@@ -19,11 +19,11 @@ try {
         session_start();
         $_SESSION['mensaje'] = "Se ha registrado el programa educativo";
         $_SESSION['icono'] = "success";
-        header('Location:' . APP_URL . "/admin/programas");
+        header('Location:' . APP_URL . "/portal/programas");
         exit; 
     } else {
         session_start();
-        $_SESSION['mensaje'] = "Error: no se ha podido registrar el programa, comuníquese con el area de IT";
+        $_SESSION['mensaje'] = "Error: no se ha podido registrar el programa, comunÃ­quese con el area de IT";
         $_SESSION['icono'] = "error";
         ?><script>window.history.back();</script><?php
     }

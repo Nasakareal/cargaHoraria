@@ -24,18 +24,18 @@ VALUES  (:term_name, :fyh_creacion, :estado) ");
             session_start();
             $_SESSION['mensaje'] = "Se ha registrado el nuevo cuatrimestre";
             $_SESSION['icono'] = "success";
-            header('Location:' . APP_URL . "/admin/cuatrimestres");
+            header('Location:' . APP_URL . "/portal/cuatrimestres");
         } else {
             session_start();
             $_SESSION['mensaje'] = "No se ha podido registrar el nuevo cuatrimestre, comuniquese con el area de IT";
             $_SESSION['icono'] = "error";
-            header('Location:' . APP_URL . "/admin/cuatrimestres/create.php");
+            header('Location:' . APP_URL . "/portal/cuatrimestres/create.php");
         }
     } catch (Exception $exception) {
         session_start();
         $_SESSION['mensaje'] = "Este cuatrimestre ya existe";
         $_SESSION['icono'] = "error";
-        header('Location:' . APP_URL . "/admin/cuatrimestres/create.php");
+        header('Location:' . APP_URL . "/portal/cuatrimestres/create.php");
     }
 
 

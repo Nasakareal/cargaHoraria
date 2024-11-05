@@ -30,7 +30,7 @@ if (!$materia) {
 
 $subject_name = $materia['subject_name'];
 $hours_consecutive = $materia['hours_consecutive'];
-$weekly_hours = $materia['class_hours'] + $materia['lab_hours']; // Suma de horas en aula y laboratorio
+$weekly_hours = $materia['class_hours'] + $materia['lab_hours'];
 $program_name = $materia['program_name'] ?? 'No asignado';
 $term_name = $materia['term_name'] ?? 'No asignado';
 $class_hours = $materia['class_hours'];

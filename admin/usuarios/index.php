@@ -1,5 +1,6 @@
 <?php
 include ('../../app/config.php');
+include('../../admin/verificar/verificar_admin.php');
 include ('../../admin/layout/parte1.php');
 include ('../../app/controllers/usuarios/listado_de_usuarios.php');
 ?>
@@ -32,7 +33,6 @@ include ('../../app/controllers/usuarios/listado_de_usuarios.php');
                     <th><center>Nombres del usuario</center></th>
                     <th><center>Rol</center></th>
                     <th><center>Email</center></th>
-                    <th><center>Password</center></th>
                     <th><center>Fecha de creación</center></th>
                     <th><center>Estado</center></th>
                     <th><center>Acciones</center></th>
@@ -49,7 +49,6 @@ include ('../../app/controllers/usuarios/listado_de_usuarios.php');
                     <td><?=$usuario['nombres'];?></td>
                     <td><?=$usuario['nombre_rol'];?></td>
                     <td><?=$usuario['email'];?></td>
-                    <td><?=$usuario['password'];?></td>
                     <td><?=$usuario['fyh_creacion'];?></td>
                     <td><?=$usuario['estado'];?></td>
                     

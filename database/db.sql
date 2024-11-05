@@ -12,10 +12,6 @@ CREATE TABLE roles (
     estado VARCHAR(11) /* Estado del rol, por ejemplo 'ACTIVO' o 'INACTIVO' */
 ) ENGINE=InnoDB;
 
-/*
- Inserta los roles básicos que estarán disponibles en el sistema.
- Cada rol se asocia a un estado y la fecha de creación es la actual.
- */
 
 /* Insertar roles */
 INSERT INTO roles (nombre_rol, fyh_creacion, estado) VALUES 
@@ -43,18 +39,6 @@ CREATE TABLE usuarios (
     FOREIGN KEY (rol_id) REFERENCES roles(id_rol) ON DELETE NO ACTION ON UPDATE CASCADE /* Relación con la tabla roles */
 ) ENGINE=InnoDB;
 
-/*
- Inserta un usuario administrador en el sistema con el rol de 'ADMINISTRADOR'.
- */
-
-/* Insertar usuarios */
-INSERT INTO usuarios (nombres, rol_id, email, password, fyh_creacion, estado) 
-VALUES ('Mario Bautista', 1, 'admin@admin.com', 'ansq98', NOW(), '1');
-
-/*
- Tabla que almacena la configuración de las instituciones registradas en el sistema.
- Incluye información como nombre, dirección, teléfono, y logotipo de la institución.
- */
 
 /* Tabla de configuración de instituciones */
 CREATE TABLE configuracion_instituciones (

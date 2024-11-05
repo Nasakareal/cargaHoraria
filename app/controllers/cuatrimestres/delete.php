@@ -18,7 +18,7 @@ foreach ($terms as $term) {
     session_start();
     $_SESSION['mensaje'] = "Existe este cuatrimestre en grupos, no se puede eliminar";
     $_SESSION['icono'] = "error";
-    header('Location:' . APP_URL . "/admin/cuatrimestres");
+    header('Location:' . APP_URL . "/portal/cuatrimestres");
 
     $sentencia = $pdo->prepare("DELETE FROM terms WHERE term_id=:term_id ");
 
@@ -29,11 +29,11 @@ foreach ($terms as $term) {
         session_start();
         $_SESSION['mensaje'] = "Se ha eliminado el cuatrimestre";
         $_SESSION['icono'] = "success";
-        header('Location:' . APP_URL . "/admin/cuatrimestres");
+        header('Location:' . APP_URL . "/portal/cuatrimestres");
     } else {
         session_start();
         $_SESSION['mensaje'] = "No se ha podido eliminar el cuatrimestre, comuniquese con el area de IT";
         $_SESSION['icono'] = "error";
-        header('Location:' . APP_URL . "/admin/cuatrimestres");
+        header('Location:' . APP_URL . "/portal/cuatrimestres");
     }
 

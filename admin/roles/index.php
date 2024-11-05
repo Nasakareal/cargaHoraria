@@ -1,5 +1,6 @@
 <?php
 include ('../../app/config.php');
+include('../../admin/verificar/verificar_admin.php');
 include ('../../admin/layout/parte1.php');
 include ('../../app/controllers/roles/listado_de_roles.php');
 ?>

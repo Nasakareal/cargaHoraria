@@ -7,10 +7,10 @@ if (isset($_FILES['file'])) {
     /* Verificar si el archivo es un CSV */
     if (($handle = fopen($file, 'r')) !== FALSE) {
         while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
-            $group_name = $data[0];  // Nombre del grupo
-            $program_id = $data[1];   // ID del programa (puede ser un nombre si quieres buscarlo)
-            $term_id = $data[2];       // ID del cuatrimestre (puede ser un nombre si quieres buscarlo)
-            $volume = $data[3];        // Volumen del grupo (puede ser nulo)
+            $group_name = $data[0];
+            $program_id = $data[1];
+            $term_id = $data[2];
+            $volume = $data[3];
 
             /* Inserción en la base de datos */
             $sentencia = $pdo->prepare('INSERT INTO `groups` (group_name, program_id, term_id, volumen_grupo) VALUES (:group_name, :program_id, :term_id, :volume)');
@@ -32,10 +32,9 @@ if (isset($_FILES['file'])) {
         session_start();
         $_SESSION['mensaje'] = "Grupos registrados con éxito.";
         $_SESSION['icono'] = "success";
-        header('Location:' . APP_URL . "/admin/grupos");
+        header('Location:' . APP_URL . "/portal/grupos");
     }
 } else {
     /* Manejo de errores si no se seleccionó ningún archivo */
     echo "No se ha seleccionado ningún archivo.";
 }
-?>

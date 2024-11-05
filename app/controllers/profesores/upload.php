@@ -57,7 +57,7 @@ if (isset($_FILES['file'])) {
         session_start();
         $_SESSION['mensaje'] = "Profesores registrados con éxito.";
         $_SESSION['icono'] = "success";
-        header('Location:' . APP_URL . "/admin/profesores");
+        header('Location:' . APP_URL . "/portal/profesores");
         exit;
     }
 } else {

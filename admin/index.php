@@ -1,5 +1,6 @@
 <?php
-include ('../app/config.php');
+include('../app/config.php');
+include('../admin/verificar/verificar_admin.php');
 include ('../admin/layout/parte1.php');
 include ('../app/controllers/roles/listado_de_roles.php');
 include ('../app/controllers/usuarios/listado_de_usuarios.php');
@@ -78,7 +79,7 @@ include('../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
               <div class="icon">
                 <i class="fas"><i class="bi bi-people-fill"></i></i>
               </div>
-              <a href="<?= APP_URL; ?>/admin/profesores" class="small-box-footer">
+              <a href="<?= APP_URL; ?>/portal/profesores" class="small-box-footer">
                 Más información <i class="fas fa-arrow-circle-right"></i>
               </a>
             </div>
@@ -99,7 +100,7 @@ include('../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
               <div class="icon">
                 <i class="fas"><i class="bi bi-journal-bookmark-fill"></i></i>
               </div>
-              <a href="<?= APP_URL; ?>/admin/materias" class="small-box-footer">
+              <a href="<?= APP_URL; ?>/portal/materias" class="small-box-footer">
                 Más información <i class="fas fa-arrow-circle-right"></i>
               </a>
             </div>
@@ -120,7 +121,7 @@ include('../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
               <div class="icon">
                 <i class="fas"><i class="bi bi-backpack2"></i></i>
               </div>
-              <a href="<?= APP_URL; ?>/admin/programas" class="small-box-footer">
+              <a href="<?= APP_URL; ?>/portal/programas" class="small-box-footer">
                 Más información <i class="fas fa-arrow-circle-right"></i>
               </a>
             </div>
@@ -141,7 +142,7 @@ include('../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
               <div class="icon">
                 <i class="fas"><i class="bi bi-boxes"></i></i>
               </div>
-              <a href="<?= APP_URL; ?>/admin/grupos" class="small-box-footer">
+              <a href="<?= APP_URL; ?>/portal/grupos" class="small-box-footer">
                 Más información <i class="fas fa-arrow-circle-right"></i>
               </a>
             </div>
@@ -162,7 +163,7 @@ include('../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
               <div class="icon">
                 <i class="fas"><i class="bi bi-calendar3"></i></i>
               </div>
-              <a href="<?= APP_URL; ?>/admin/cuatrimestres" class="small-box-footer">
+              <a href="<?= APP_URL; ?>/portal/cuatrimestres" class="small-box-footer">
                 Más información <i class="fas fa-arrow-circle-right"></i>
               </a>
             </div>

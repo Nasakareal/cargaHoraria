@@ -1,8 +1,7 @@
 <?php
 
-
 try {
-    // Consulta para obtener los niveles educativos y los grupos asociados
+    
     $sql = "SELECT 
                 el.level_id, 
                 el.level_name, 
@@ -10,7 +9,7 @@ try {
             FROM 
                 educational_levels el
             LEFT JOIN 
-                `groups` g ON el.group_id = g.group_id";  // Corregir comillas en `groups`
+                `groups` g ON el.group_id = g.group_id";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
@@ -22,4 +21,3 @@ try {
 } catch (Exception $e) {
     echo "Error al obtener los niveles educativos: " . $e->getMessage();
 }
-?>

@@ -65,7 +65,7 @@ function asignarHoras($pdo, $subject, $group, $dia, $inicio, $fin, $tipo_espacio
             ':end_time' => $formatted_end_time
         ]);
         if ($check_availability->fetchColumn() > 0) {
-            break; // Saltar si el horario está ocupado
+            break;
         }
 
         /* Insertar asignación */

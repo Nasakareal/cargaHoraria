@@ -13,7 +13,7 @@ if (!$subject_id || !$nombres || !isset($is_specialization) || !$horas_consecuti
     session_start();
     $_SESSION['mensaje'] = "Error: Datos inválidos.";
     $_SESSION['icono'] = "error";
-    header('Location: ' . APP_URL . "/admin/materias");
+    header('Location: ' . APP_URL . "/portal/materias");
     exit;
 }
 
@@ -59,14 +59,14 @@ try {
     session_start();
     $_SESSION['mensaje'] = "Materia actualizada";
     $_SESSION['icono'] = "success";
-    header('Location: ' . APP_URL . "/admin/materias");
+    header('Location: ' . APP_URL . "/portal/materias");
     exit;
 } catch (Exception $exception) {
     $pdo->rollBack();
     session_start();
     $_SESSION['mensaje'] = "Ocurrió un error: " . $exception->getMessage();
     $_SESSION['icono'] = "error";
-    header('Location: ' . APP_URL . "/admin/materias");
+    header('Location: ' . APP_URL . "/portal/materias");
     exit;
 }
 ?>

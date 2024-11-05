@@ -1,6 +1,5 @@
 <?php
 
-
 /* Obtener el ID de asignación de horario y el ID del profesor */
 $assignment_id = filter_input(INPUT_GET, 'assignment_id', FILTER_VALIDATE_INT);
 $teacher_id = filter_input(INPUT_GET, 'teacher_id', FILTER_VALIDATE_INT);
@@ -18,4 +17,3 @@ $stmt->execute([':teacher_id' => $teacher_id, ':assignment_id' => $assignment_id
 echo "Horario asignado exitosamente.";
 header("Location: asignar_horario_profesor.php?teacher_id=$teacher_id");
 exit;
-?>

@@ -1,14 +1,17 @@
 {
   "ExpandedNodes": [
     "",
-    "\\admin",
-    "\\admin\\profesores",
     "\\app",
     "\\app\\controllers",
-    "\\app\\controllers\\horarios_grupos",
-    "\\database",
-    "\\login"
+    "\\app\\controllers\\profesores",
+    "\\portal",
+    "\\portal\\autoSalones",
+    "\\portal\\profesores",
+    "\\public",
+    "\\public\\dist",
+    "\\public\\dist\\css",
+    "\\public\\dist\\js"
   ],
-  "SelectedNode": "\\app\\controllers\\horarios_grupos\\logica.php",
+  "SelectedNode": "\\public\\dist\\js\\app.js",
   "PreviewInSolutionExplorer": false
 }

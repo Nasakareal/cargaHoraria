@@ -1,5 +1,5 @@
 <?php
-// Consulta para obtener las relaciones de programas, cuatrimestres y materias
+/* Consulta para obtener las relaciones de programas, cuatrimestres y materias */
 $sql_relacion = "
     SELECT 
         p.program_name, 
@@ -21,4 +21,3 @@ $sql_relacion = "
 $query_relacion = $pdo->prepare($sql_relacion);
 $query_relacion->execute();
 $relations = $query_relacion->fetchAll(PDO::FETCH_ASSOC);
-?>

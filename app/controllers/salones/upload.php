@@ -11,13 +11,13 @@ if (isset($_FILES['file'])) {
 
     if (($handle = fopen($file, 'r')) !== FALSE) {
         while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
-            echo "Datos le韉os: " . implode(", ", $data) . "<br>";
+            echo "Datos le铆dos: " . implode(", ", $data) . "<br>";
 
             $classroom_name = $data[0];
             $building = $data[1];
             $floor = $data[2];  
 
-            /* Verificar si el sal髇 ya existe */
+            /* Verificar si el sal贸n ya existe */
             $stmt_check = $pdo->prepare('SELECT classroom_id FROM classrooms WHERE classroom_name = :classroom_name AND building = :building AND floor = :floor');
             $stmt_check->bindParam(':classroom_name', $classroom_name);
             $stmt_check->bindParam(':building', $building);
@@ -26,7 +26,7 @@ if (isset($_FILES['file'])) {
             $existing_classroom = $stmt_check->fetch(PDO::FETCH_ASSOC);
 
             if ($existing_classroom) {
-                echo "El sal髇 ya existe: " . $classroom_name . "<br>";
+                echo "El sal贸n ya existe: " . $classroom_name . "<br>";
                 continue;
             }
 
@@ -37,22 +37,21 @@ if (isset($_FILES['file'])) {
 
             try {
                 $sentencia->execute();
-                echo "Sal髇 registrado: " . $classroom_name . "<br>";
+                echo "Sal贸n registrado: " . $classroom_name . "<br>";
             } catch (Exception $exception) {
-                echo "Error al registrar el sal髇: " . $exception->getMessage() . "<br>";
+                echo "Error al registrar el sal贸n: " . $exception->getMessage() . "<br>";
             }
         }
         fclose($handle);
 
         session_start();
-        $_SESSION['mensaje'] = "Salones registrados con 閤ito.";
+        $_SESSION['mensaje'] = "Salones registrados con 茅xito.";
         $_SESSION['icono'] = "success";
-        header('Location:' . APP_URL . "/admin/salones");
+        header('Location:' . APP_URL . "/portal/salones");
         die();
     } else {
         echo "No se pudo abrir el archivo.";
     }
 } else {
-    echo "No se ha seleccionado ning鷑 archivo.";
+    echo "No se ha seleccionado ning煤n archivo.";
 }
-?>

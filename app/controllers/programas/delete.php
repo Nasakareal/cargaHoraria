@@ -1,8 +1,7 @@
-﻿<?php
+<?php
 
 include('../../../app/config.php');
 
-// Eliminar las comillas alrededor de $program_id
 $program_id = $_POST['program_id'];
 
 $sentencia = $pdo->prepare("DELETE FROM programs WHERE program_id = :program_id");
@@ -12,10 +11,10 @@ if ($sentencia->execute()) {
     session_start();
     $_SESSION['mensaje'] = "Se ha eliminado el programa";
     $_SESSION['icono'] = "success";
-    header('Location: ' . APP_URL . "/admin/programas");
+    header('Location: ' . APP_URL . "/portal/programas");
 } else {
     session_start();
     $_SESSION['mensaje'] = "No se ha podido eliminar el programa, comun�quese con el �rea de IT";
     $_SESSION['icono'] = "error";
-    header('Location: ' . APP_URL . "/admin/programas");
+    header('Location: ' . APP_URL . "/portal/programas");
 }

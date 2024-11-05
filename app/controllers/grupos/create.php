@@ -17,7 +17,7 @@ $estado_de_registro = '1';
 if (empty($group_name) || empty($programa_id) || empty($term_id) || empty($year) || empty($volume) || empty($turn_id)) {
     $_SESSION['mensaje'] = "Todos los campos son obligatorios.";
     $_SESSION['icono'] = "error";
-    header('Location:' . APP_URL . "/admin/grupos/create.php");
+    header('Location:' . APP_URL . "/portal/grupos/create.php");
     exit();
 }
 
@@ -41,15 +41,14 @@ try {
     if ($sentencia->execute()) {
         $_SESSION['mensaje'] = "Se ha registrado el nuevo grupo.";
         $_SESSION['icono'] = "success";
-        header('Location:' . APP_URL . "/admin/grupos");
+        header('Location:' . APP_URL . "/portal/grupos");
     } else {
         $_SESSION['mensaje'] = "No se ha podido registrar el nuevo grupo, comuníquese con el área de IT.";
         $_SESSION['icono'] = "error";
-        header('Location:' . APP_URL . "/admin/grupos/create.php");
+        header('Location:' . APP_URL . "/portal/grupos/create.php");
     }
 } catch (Exception $exception) {
     $_SESSION['mensaje'] = "Error al registrar el grupo: " . $exception->getMessage();
     $_SESSION['icono'] = "error";
-    header('Location:' . APP_URL . "/admin/grupos/create.php");
+    header('Location:' . APP_URL . "/portal/grupos/create.php");
 }
-?>
