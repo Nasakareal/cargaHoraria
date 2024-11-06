@@ -3,15 +3,9 @@
     "",
     "\\app",
     "\\app\\controllers",
-    "\\app\\controllers\\profesores",
-    "\\portal",
-    "\\portal\\autoSalones",
-    "\\portal\\profesores",
-    "\\public",
-    "\\public\\dist",
-    "\\public\\dist\\css",
-    "\\public\\dist\\js"
+    "\\app\\controllers\\materias",
+    "\\database"
   ],
-  "SelectedNode": "\\public\\dist\\js\\app.js",
+  "SelectedNode": "\\app\\controllers\\materias\\upload.php",
   "PreviewInSolutionExplorer": false
 }

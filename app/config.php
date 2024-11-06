@@ -12,7 +12,7 @@ $servidor = "mysql:dbname=" . BD . ";host=" . SERVIDOR . ";charset=utf8mb4";
 
 try{
     $pdo = new PDO($servidor, USUARIO, PASSWORD, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
-    //echo "Conexión exitosa a la base de datos";
+    
 }catch (PDOException $e) {
     print_r($e);
     echo "Error de conexión con la base de datos";
@@ -27,6 +27,3 @@ $mes_actual = date('m');
 $ano_actual = date('Y');
 
 $estado_de_registro = '1';
-
-
-

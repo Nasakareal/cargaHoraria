@@ -1,8 +1,3 @@
-/* 
- Tabla que almacena los diferentes roles de usuario dentro del sistema.
- Cada rol tiene un nombre único y se registran fechas de creación y actualización.
- */
-
  /* Tabla de roles */
 CREATE TABLE roles (
     id_rol INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, /* ID único para cada rol */
@@ -12,7 +7,6 @@ CREATE TABLE roles (
     estado VARCHAR(11) /* Estado del rol, por ejemplo 'ACTIVO' o 'INACTIVO' */
 ) ENGINE=InnoDB;
 
-
 /* Insertar roles */
 INSERT INTO roles (nombre_rol, fyh_creacion, estado) VALUES 
 ('ADMINISTRADOR', NOW(), '1'), /* Rol de administrador del sistema */
@@ -21,10 +15,6 @@ INSERT INTO roles (nombre_rol, fyh_creacion, estado) VALUES
 ('SOPORTE', NOW(), '1'), /* Rol para el equipo de soporte técnico */
 ('OBSERVADOR', NOW(), '1'); /* Rol de observador, con acceso limitado */
 
-/*
- Tabla que almacena información de los usuarios del sistema.
- Cada usuario tiene un rol asignado a través de una clave foránea que referencia la tabla de roles.
- */
 
 /* Tabla de usuarios */
 CREATE TABLE usuarios (
@@ -38,6 +28,26 @@ CREATE TABLE usuarios (
     estado VARCHAR(11), /* Estado del usuario, por ejemplo 'ACTIVO' o 'INACTIVO' */
     FOREIGN KEY (rol_id) REFERENCES roles(id_rol) ON DELETE NO ACTION ON UPDATE CASCADE /* Relación con la tabla roles */
 ) ENGINE=InnoDB;
+
+CREATE TABLE registro_actividad (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    status ENUM('exitoso', 'fallido') NOT NULL,
+    ip VARCHAR(45) NOT NULL,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+
+CREATE TABLE login_attempts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    intentos INT DEFAULT 0,
+    intentos_fallidos INT DEFAULT 0,
+    bloqueo_activado BOOLEAN DEFAULT FALSE,
+    marca_tiempo TIMESTAMP NULL DEFAULT NULL,
+    UNIQUE (email)
+) ENGINE=InnoDB;
+
 
 
 /* Tabla de configuración de instituciones */
