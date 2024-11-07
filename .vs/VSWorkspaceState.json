@@ -1,11 +1,12 @@
 {
   "ExpandedNodes": [
     "",
-    "\\app",
+    "\\admin\\verificar",
     "\\app\\controllers",
     "\\app\\controllers\\materias",
-    "\\database"
+    "\\app\\controllers\\roles",
+    "\\portal\\materias"
   ],
-  "SelectedNode": "\\app\\controllers\\materias\\upload.php",
+  "SelectedNode": "\\database",
   "PreviewInSolutionExplorer": false
 }

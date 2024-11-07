@@ -73,7 +73,7 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <a href="<?= APP_URL; ?>/admin/profesores" class="btn btn-secondary">Volver</a>
+                                        <a href="<?= APP_URL; ?>/portal/profesores" class="btn btn-secondary">Volver</a>
                                     </div>
                                 </div>
                             </div>

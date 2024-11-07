@@ -1,7 +1,6 @@
 <?php
 include('../../app/config.php');
 
-
 $teacher_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$teacher_id) {
     echo "ID de profesor inválido.";
@@ -13,6 +12,12 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
 include('../../app/controllers/programas/listado_de_programas.php');
 include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
 include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.php');
+
+// Calcular las horas totales asignadas
+$total_hours = 0;
+foreach ($materias_asignadas as $materia_asignada) {
+    $total_hours += isset($materia_asignada['weekly_hours']) ? $materia_asignada['weekly_hours'] : 0;
+}
 ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -111,7 +116,7 @@ include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.ph
                                 <!-- Contador de horas -->
                                 <div class="row">
                                     <div class="col-md-12 text-center">
-                                        <h4>Horas semanales totales: <span id="total_hours">0</span></h4>
+                                        <h4>Horas semanales totales: <span id="total_hours"><?= $total_hours; ?></span></h4>
                                     </div>
                                 </div>
 
@@ -154,7 +159,7 @@ include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.ph
                                 <div class="row" style="margin-top:20px;">
                                     <div class="col-md-12">
                                         <button type="submit" class="btn btn-primary">Actualizar</button>
-                                        <a href="<?= APP_URL; ?>/admin/profesores" class="btn btn-secondary">Cancelar</a>
+                                        <a href="<?= APP_URL; ?>/portal/profesores" class="btn btn-secondary">Cancelar</a>
                                     </div>
                                 </div>
                             </form>

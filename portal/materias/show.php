@@ -9,7 +9,7 @@ if (!$subject_id) {
 
 include('../../app/config.php');
 include('../../layout/parte1.php');
-include('../../app/controllers/datos_de_materias.php');
+include('../../app/controllers/materias/datos_de_materias.php');
 
 ?>
 
@@ -89,7 +89,7 @@ include('../../app/controllers/datos_de_materias.php');
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <a href="<?= APP_URL; ?>/admin/materias" class="btn btn-secondary">Volver</a>
+                                        <a href="<?= APP_URL; ?>/portal/materias" class="btn btn-secondary">Volver</a>
                                     </div>
                                 </div>
                             </div>

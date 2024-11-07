@@ -209,37 +209,6 @@ CREATE TABLE classrooms (
 ) ENGINE=InnoDB;
 
 
-/* Tabla de grupos */
-CREATE TABLE `groups` (
-    group_id INT AUTO_INCREMENT PRIMARY KEY,       /* ID único del grupo */
-    group_name VARCHAR(255) NOT NULL,              /* Nombre del grupo */
-    program_id INT,                                /* ID del programa al que pertenece el grupo */
-    term_id INT,                                   /* ID del cuatrimestre en el que está el grupo */
-    volume INT,                                    /* Número de estudiantes en el grupo */
-    turn_id INT,                                   /* ID del turno al que pertenece el grupo */
-    classroom_assigned INT DEFAULT NULL,           /* ID del salón asignado (puede ser nulo si no está asignado) */
-    fyh_creacion DATETIME NULL,                    /* Fecha y hora de creación del grupo */
-    fyh_actualizacion DATETIME NULL,               /* Fecha y hora de la última actualización del grupo */
-    estado VARCHAR(11),                            /* Estado del grupo, por ejemplo 'ACTIVO' o 'INACTIVO' */
-    FOREIGN KEY (program_id) REFERENCES programs(program_id),       /* Relación con la tabla de programas */
-    FOREIGN KEY (term_id) REFERENCES terms(term_id),                /* Relación con la tabla de cuatrimestres */
-    FOREIGN KEY (turn_id) REFERENCES shifts(shift_id),              /* Relación con la tabla de turnos */
-    FOREIGN KEY (classroom_assigned) REFERENCES classrooms(classroom_id) /* Relación con la tabla de salones */
-) ENGINE=InnoDB;
-
-
-/* Tabla de profesores */
-CREATE TABLE teachers (
-    teacher_id INT AUTO_INCREMENT PRIMARY KEY,  /* ID único del profesor */
-    teacher_name VARCHAR(100) NOT NULL,         /* Nombre del profesor */
-    fyh_creacion DATETIME NULL,                  /* Fecha y hora de creación */
-    fyh_actualizacion DATETIME NULL,             /* Fecha y hora de última actualización */
-    estado VARCHAR(11),                          /* Estado del profesor, por ejemplo 'ACTIVO' o 'INACTIVO' */
-    program_id INT,                              /* ID del programa de adscripción */
-    CONSTRAINT fk_program FOREIGN KEY (program_id) REFERENCES programs(program_id)  /* Clave foránea a la tabla programs */
-) ENGINE=InnoDB;
-
-
 /* Tabla de Laboratorios */
 CREATE TABLE labs (
     lab_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -286,6 +255,39 @@ INSERT INTO labs (lab_name, description, fyh_creacion) VALUES
 ('LABORATORIO DE TEÑIDO Y ESTAMPADO', 'Espacio para prácticas de teñido y estampado en textiles.', NOW()),
 ('LABORATORIO DE TERMODINÁMICA', 'Laboratorio para estudios en principios termodinámicos.', NOW()),
 ('LABORATORIO QUIMICA ANALITICA', 'Espacio para análisis químico y técnicas de laboratorio.', NOW());
+
+
+/* Tabla de grupos */
+CREATE TABLE `groups` (
+    group_id INT AUTO_INCREMENT PRIMARY KEY,       /* ID único del grupo */
+    group_name VARCHAR(255) NOT NULL,              /* Nombre del grupo */
+    program_id INT,                                /* ID del programa al que pertenece el grupo */
+    term_id INT,                                   /* ID del cuatrimestre en el que está el grupo */
+    volume INT,                                    /* Número de estudiantes en el grupo */
+    turn_id INT,                                   /* ID del turno al que pertenece el grupo */
+    classroom_assigned INT DEFAULT NULL,           /* ID del salón asignado (puede ser nulo si no está asignado) */
+    lab_assigned INT DEFAULT NULL,                 /* ID del laboratorio asignado (puede ser nulo si no está asignado) */
+    fyh_creacion DATETIME NULL,                    /* Fecha y hora de creación del grupo */
+    fyh_actualizacion DATETIME NULL,               /* Fecha y hora de la última actualización del grupo */
+    estado VARCHAR(11),                            /* Estado del grupo, por ejemplo 'ACTIVO' o 'INACTIVO' */
+    FOREIGN KEY (program_id) REFERENCES programs(program_id),       /* Relación con la tabla de programas */
+    FOREIGN KEY (term_id) REFERENCES terms(term_id),                /* Relación con la tabla de cuatrimestres */
+    FOREIGN KEY (turn_id) REFERENCES shifts(shift_id),              /* Relación con la tabla de turnos */
+    FOREIGN KEY (classroom_assigned) REFERENCES classrooms(classroom_id), /* Relación con la tabla de salones */
+    FOREIGN KEY (lab_assigned) REFERENCES labs(lab_id)              /* Relación con la tabla de laboratorios */
+) ENGINE=InnoDB;
+
+
+/* Tabla de profesores */
+CREATE TABLE teachers (
+    teacher_id INT AUTO_INCREMENT PRIMARY KEY,  /* ID único del profesor */
+    teacher_name VARCHAR(100) NOT NULL,         /* Nombre del profesor */
+    fyh_creacion DATETIME NULL,                  /* Fecha y hora de creación */
+    fyh_actualizacion DATETIME NULL,             /* Fecha y hora de última actualización */
+    estado VARCHAR(11),                          /* Estado del profesor, por ejemplo 'ACTIVO' o 'INACTIVO' */
+    program_id INT,                              /* ID del programa de adscripción */
+    CONSTRAINT fk_program FOREIGN KEY (program_id) REFERENCES programs(program_id)  /* Clave foránea a la tabla programs */
+) ENGINE=InnoDB;
 
 
 /* Tabla de Materias */
