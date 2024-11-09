@@ -1,10 +1,6 @@
 <?php
 include_once('../../../app/config.php');
 
-
-ob_start();
-session_start();
-
 try {
     /* Limpiar las asignaciones previas de salones */
     $sql_limpiar = "UPDATE `groups` SET classroom_assigned = NULL";
@@ -39,9 +35,8 @@ try {
         /* Intentar asignar un salón que cumpla con la capacidad del grupo */
         foreach ($salones_disponibles as $salon) {
             if ($salon['capacity'] >= $capacidad_grupo) {
-                // Concatenar el nombre del salón y el edificio como "classroom_name (último_dígito_del_edificio)"
                 $salon_identificador = $salon['classroom_name'] . ' (' . substr($salon['building'], -1) . ')';
-                
+
                 /* Verificar si el salón ya está ocupado por otro grupo del mismo turno */
                 $salon_ocupado = false;
                 foreach ($grupos_con_salones as $grupo_asignado) {
@@ -80,7 +75,6 @@ try {
     /* Guardar las asignaciones en la base de datos */
     foreach ($grupos_con_salones as $grupo_con_salon) {
         if ($grupo_con_salon['salon_asignado'] !== 'No disponible') {
-            // Obtener el ID del salón correspondiente para actualizar la relación correctamente
             $classroom_id_query = "SELECT classroom_id FROM classrooms WHERE CONCAT(classroom_name, ' (', SUBSTRING(building, -1), ')') = :salon_asignado LIMIT 1";
             $stmt_classroom_id = $pdo->prepare($classroom_id_query);
             $stmt_classroom_id->execute([':salon_asignado' => $grupo_con_salon['salon_asignado']]);
@@ -97,17 +91,22 @@ try {
         }
     }
 
-    /* Mensaje de éxito en la sesión */
+    
+    session_start();
     $_SESSION['mensaje'] = "Asignación de salones completada exitosamente.";
     $_SESSION['icono'] = "success";
+    session_write_close();
+
+    header('Location: ' . APP_URL . "/portal/autoSalones/index.php");
+    exit();
 
 } catch (Exception $e) {
-    /* Mensaje de error en caso de falla */
+    
+    session_start();
     $_SESSION['mensaje'] = "No se pudo completar la asignación de salones. Contacte al área de IT.";
     $_SESSION['icono'] = "error";
-}
+    session_write_close();
 
-/* Enviar todos los encabezados */
-ob_end_clean();
-header('Location: ' . APP_URL . "/portal/autoSalones/index.php");
-exit();
+    header('Location: ' . APP_URL . "/portal/autoSalones/index.php");
+    exit();
+}

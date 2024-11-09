@@ -6,8 +6,9 @@ include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
 include('../../app/controllers/programas/listado_de_programas.php');
 include('../../app/controllers/laboratorios/listado_de_laboratorios.php');
 
-// Función para obtener los laboratorios asignados a una materia
-function obtenerLaboratoriosAsignados($pdo, $subject_id) {
+/* Función para obtener los laboratorios asignados a una materia */
+function obtenerLaboratoriosAsignados($pdo, $subject_id)
+{
     $stmt = $pdo->prepare('
         SELECT labs.lab_name 
         FROM subject_labs 
@@ -49,13 +50,7 @@ function obtenerLaboratoriosAsignados($pdo, $subject_id) {
                         </div>
 
                         <div class="card-body">
-                            <?php if (isset($_SESSION['mensaje'])): ?>
-                                <div class="alert alert-<?= $_SESSION['icono'] == 'success' ? 'success' : 'danger'; ?>">
-                                    <i class="<?= $_SESSION['icono'] == 'success' ? 'bi bi-check-circle' : 'bi bi-exclamation-triangle'; ?>"></i> <?= $_SESSION['mensaje']; ?>
-                                </div>
-                                <?php unset($_SESSION['mensaje']); ?>
-                            <?php endif; ?>
-
+                            <!-- Tabla de materias -->
                             <table id="example1" class="table table-striped table-bordered table-hover table-sm">
                                 <thead>
                                     <tr>

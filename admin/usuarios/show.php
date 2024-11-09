@@ -3,6 +3,7 @@
 $id_usuario = $_GET['id'];
 
 include ('../../app/config.php');
+include('../../app/helpers/verificar_admin.php');
 include ('../../admin/layout/parte1.php');
 include ('../../app/controllers/usuarios/datos_del_usuario.php');
 ?>
@@ -46,12 +47,7 @@ include ('../../app/controllers/usuarios/datos_del_usuario.php');
                       </div>
                     </div>
                     <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                          <label for="">Password</label>
-                          <p><?=$password;?></p>
-                        </div>
-                      </div>
+                    
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="">Fecha y Hora de creación</label>

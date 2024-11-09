@@ -5,12 +5,39 @@ if (isset($_FILES['file'])) {
     $file = $_FILES['file']['tmp_name'];
 
     if ($_FILES['file']['error'] !== UPLOAD_ERR_OK) {
-        echo "Error al cargar el archivo.";
+        session_start();
+        $_SESSION['mensaje'] = "Error al cargar el archivo.";
+        $_SESSION['icono'] = "error";
+        header('Location:' . APP_URL . "/portal/grupos");
         die();
     }
 
     $errores = [];
 
+    /* Validación de formato: Verificar si el archivo tiene el número correcto de columnas sin tomar datos */
+    if (($handle = fopen($file, 'r')) !== FALSE) {
+        /* Leer solo la primera fila para validar el número de columnas */
+        $firstRow = fgetcsv($handle, 1000, ',');
+
+        /* Verificamos que tenga exactamente 9 columnas */
+        if ($firstRow === false || count($firstRow) !== 9) {
+            fclose($handle);
+            session_start();
+            $_SESSION['mensaje'] = "El archivo no tiene el formato adecuado. Asegúrate de que tenga las columnas correctas.";
+            $_SESSION['icono'] = "error";
+            header('Location:' . APP_URL . "/portal/grupos");
+            die();
+        }
+        fclose($handle);
+    } else {
+        session_start();
+        $_SESSION['mensaje'] = "No se pudo abrir el archivo.";
+        $_SESSION['icono'] = "error";
+        header('Location:' . APP_URL . "/portal/grupos");
+        die();
+    }
+
+    /* Si el archivo pasó la validación, procedemos a procesarlo */
     if (($handle = fopen($file, 'r')) !== FALSE) {
         $row = 0;
         while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
@@ -19,6 +46,7 @@ if (isset($_FILES['file'])) {
                 continue;
             }
 
+            $area = trim($data[1]);
             $abreviatura = trim($data[2]);
             $program_name = trim(mb_strtoupper($data[3]));
             $nivel_educativo = trim($data[4]);
@@ -30,35 +58,30 @@ if (isset($_FILES['file'])) {
             $group_name = mb_strtoupper("{$abreviatura}-{$term_number}{$group_suffix}", 'UTF-8');
 
             /* Buscar el programa educativo */
-            $stmt_program = $pdo->prepare('SELECT program_id FROM programs WHERE program_name = :program_name');
+            $stmt_program = $pdo->prepare('SELECT program_id, area FROM programs WHERE program_name = :program_name');
             $stmt_program->bindParam(':program_name', $program_name);
             $stmt_program->execute();
             $program = $stmt_program->fetch(PDO::FETCH_ASSOC);
 
-            if (!$program) {
-                $errores[] = "Error: Programa no encontrado: " . $program_name;
-                continue;
-            }
-            $program_id = $program['program_id'];
+            /* Asignar program_id y área, o NULL si no se encuentra el programa o no coincide el área */
+            $program_id = $program ? $program['program_id'] : NULL;
+            $area_value = ($program && $area === $program['area']) ? $area : NULL;
 
             /* Buscar el turno */
             $stmt_turn = $pdo->prepare('SELECT shift_id FROM shifts WHERE shift_name = :turn_name');
             $stmt_turn->bindParam(':turn_name', $turn_name);
             $stmt_turn->execute();
             $turn = $stmt_turn->fetch(PDO::FETCH_ASSOC);
-            if (!$turn) {
-                $errores[] = "Error: Turno no encontrado para el nombre: " . $turn_name;
-                continue;
-            }
-            $turn_id = $turn['shift_id'];
+            $turn_id = $turn ? $turn['shift_id'] : NULL;
 
             /* Insertar grupo */
             $sentencia_grupo = $pdo->prepare('INSERT INTO `groups` 
-                (group_name, program_id, term_id, volume, turn_id, fyh_creacion, estado) 
-                VALUES (:group_name, :program_id, :term_id, :volume, :turn_id, NOW(), "1")');
+                (group_name, program_id, area, term_id, volume, turn_id, fyh_creacion, estado) 
+                VALUES (:group_name, :program_id, :area, :term_id, :volume, :turn_id, NOW(), "1")');
 
             $sentencia_grupo->bindParam(':group_name', $group_name);
             $sentencia_grupo->bindParam(':program_id', $program_id);
+            $sentencia_grupo->bindParam(':area', $area_value);
             $sentencia_grupo->bindParam(':term_id', $term_number);
             $sentencia_grupo->bindParam(':volume', $volume);
             $sentencia_grupo->bindParam(':turn_id', $turn_id);
@@ -103,9 +126,10 @@ if (isset($_FILES['file'])) {
 
         header('Location:' . APP_URL . "/portal/grupos");
         die();
-    } else {
-        echo "No se pudo abrir el archivo.";
     }
 } else {
-    echo "No se ha seleccionado ningún archivo.";
+    session_start();
+    $_SESSION['mensaje'] = "No se ha seleccionado ningún archivo.";
+    $_SESSION['icono'] = "error";
+    header('Location:' . APP_URL . "/portal/grupos");
 }

@@ -1,7 +1,7 @@
 <?php
 include('../../app/config.php');
 include('../../layout/parte1.php');
-include('../../app/controllers/grupos/listado_grupos_salones.php'); // Obtiene los datos de grupos y salones
+include('../../app/controllers/grupos/listado_grupos_salones.php');
 ?>
 
 <!-- Content Wrapper -->

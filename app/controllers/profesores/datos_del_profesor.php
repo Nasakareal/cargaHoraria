@@ -1,9 +1,11 @@
 <?php
 
-/* Consulta para obtener los datos del profesor, incluyendo el nombre, programa y cuatrimestre */
+/* Consulta para obtener los datos del profesor, incluyendo el nombre, programa, área y clasificación */
 $sql_teacher = "
     SELECT 
         t.teacher_name AS nombres, 
+        t.area AS area,
+        t.clasificacion AS clasificacion,
         p.program_name AS programa,
         c.term_name AS cuatrimestre
     FROM 
@@ -25,6 +27,8 @@ $teacher = $query_teacher->fetch(PDO::FETCH_ASSOC);
 /* Si el profesor existe, asignamos las variables para el formulario */
 if ($teacher) {
     $nombres = $teacher['nombres'];
+    $area = $teacher['area'] ?? 'No asignado';
+    $clasificacion = $teacher['clasificacion'] ?? 'No asignado';
     $programa = $teacher['programa'] ?? 'No asignado';
     $cuatrimestre = $teacher['cuatrimestre'] ?? 'No asignado';
 }

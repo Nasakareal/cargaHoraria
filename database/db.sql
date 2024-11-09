@@ -1,20 +1,19 @@
  /* Tabla de roles */
 CREATE TABLE roles (
-    id_rol INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, /* ID único para cada rol */
-    nombre_rol VARCHAR(255) NOT NULL UNIQUE, /* Nombre único del rol */
-    fyh_creacion DATETIME NULL, /* Fecha y hora de creación del rol */
-    fyh_actualizacion DATETIME NULL, /* Fecha y hora de la última actualización del rol */
-    estado VARCHAR(11) /* Estado del rol, por ejemplo 'ACTIVO' o 'INACTIVO' */
+    id_rol INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nombre_rol VARCHAR(255) NOT NULL UNIQUE,
+    fyh_creacion DATETIME NULL,
+    fyh_actualizacion DATETIME NULL,
+    estado VARCHAR(11)
 ) ENGINE=InnoDB;
 
 /* Insertar roles */
 INSERT INTO roles (nombre_rol, fyh_creacion, estado) VALUES 
-('ADMINISTRADOR', NOW(), '1'), /* Rol de administrador del sistema */
-('SUB-DIRECTOR ACADEMICO', NOW(), '1'), /* Rol de sub-director académico */
-('ADMINISTRATIVO', NOW(), '1'), /* Rol de personal administrativo */
-('SOPORTE', NOW(), '1'), /* Rol para el equipo de soporte técnico */
-('OBSERVADOR', NOW(), '1'); /* Rol de observador, con acceso limitado */
-
+('ADMINISTRADOR', NOW(), '1'),
+('SUB-DIRECTOR ACADEMICO', NOW(), '1'),
+('ADMINISTRATIVO', NOW(), '1'),
+('SOPORTE', NOW(), '1'),
+('OBSERVADOR', NOW(), '1');
 
 /* Tabla de usuarios */
 CREATE TABLE usuarios (
@@ -37,7 +36,6 @@ CREATE TABLE registro_actividad (
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
-
 CREATE TABLE login_attempts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL,
@@ -48,6 +46,58 @@ CREATE TABLE login_attempts (
     UNIQUE (email)
 ) ENGINE=InnoDB;
 
+/* Tabla de Permisos */
+CREATE TABLE permisos (
+    id_permiso INT AUTO_INCREMENT PRIMARY KEY,          /* ID único del permiso */
+    nombre_permiso VARCHAR(100) NOT NULL UNIQUE,         /* Nombre único del permiso */
+    descripcion VARCHAR(255) NOT NULL,                   /* Descripción del permiso */
+    fyh_creacion DATETIME DEFAULT NOW(),                 /* Fecha y hora de creación */
+    estado VARCHAR(11) DEFAULT '1'                       /* Estado del permiso, 'ACTIVO' o 'INACTIVO' */
+) ENGINE=InnoDB;
+
+INSERT INTO permisos (nombre_permiso, descripcion, fyh_creacion, estado) VALUES
+('admin_access', 'ACCESO COMPLETO AL PANEL DE ADMINISTRACIÓN', NOW(), '1'),
+('user_manage', 'PERMISO PARA GESTIONAR USUARIOS', NOW(), '1'),
+('role_manage', 'PERMISO PARA GESTIONAR ROLES Y PERMISOS DE USUARIOS', NOW(), '1'),
+('schedule_manage', 'PERMISO PARA GESTIONAR Y ASIGNAR HORARIOS DE CLASES', NOW(), '1'),
+('classroom_assign', 'PERMISO PARA ASIGNAR SALONES A GRUPOS', NOW(), '1'),
+('group_view', 'VER GRUPOS Y SU INFORMACIÓN', NOW(), '1'),
+('group_edit', 'EDITAR GRUPOS Y SUS ASIGNACIONES', NOW(), '1'),
+('subject_view', 'VER LISTA DE MATERIAS', NOW(), '1'),
+('subject_edit', 'EDITAR LISTA DE MATERIAS Y SUS ASIGNACIONES', NOW(), '1'),
+('teacher_assign', 'ASIGNAR PROFESORES A MATERIAS Y GRUPOS', NOW(), '1');
+
+
+/* Tabla de Relación Permisos-Usuarios */
+CREATE TABLE permisos_roles (
+    id_permiso_rol INT AUTO_INCREMENT PRIMARY KEY,
+    id_rol INT NOT NULL,
+    id_permiso INT NOT NULL,
+    fyh_creacion DATETIME DEFAULT NOW(),
+    FOREIGN KEY (id_rol) REFERENCES roles(id_rol) ON DELETE CASCADE,
+    FOREIGN KEY (id_permiso) REFERENCES permisos(id_permiso) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+
+/* Permisos para ADMINISTRADOR (id_rol = 1) */
+INSERT INTO permisos_roles (id_rol, id_permiso)
+SELECT 1, id_permiso FROM permisos;
+
+/* Permisos para SUB-DIRECTOR ACADEMICO (id_rol = 2) */
+INSERT INTO permisos_roles (id_rol, id_permiso)
+SELECT 2, id_permiso FROM permisos WHERE nombre_permiso IN ('schedule_manage', 'group_view', 'subject_view', 'teacher_assign');
+
+/* Permisos para ADMINISTRATIVO (id_rol = 3) */
+INSERT INTO permisos_roles (id_rol, id_permiso)
+SELECT 3, id_permiso FROM permisos WHERE nombre_permiso IN ('user_manage', 'group_view', 'subject_view');
+
+/* Permisos para SOPORTE (id_rol = 4) */
+INSERT INTO permisos_roles (id_rol, id_permiso)
+SELECT 4, id_permiso FROM permisos WHERE nombre_permiso IN ('admin_access', 'user_manage');
+
+/* Permisos para OBSERVADOR (id_rol = 5) */
+INSERT INTO permisos_roles (id_rol, id_permiso)
+SELECT 5, id_permiso FROM permisos WHERE nombre_permiso IN ('group_view', 'subject_view');
 
 
 /* Tabla de configuración de instituciones */
@@ -64,74 +114,64 @@ CREATE TABLE configuracion_instituciones (
     estado VARCHAR(11) /* Estado de la institución, por ejemplo 'ACTIVO' o 'INACTIVO' */
 ) ENGINE=InnoDB;
 
-/*
- Inserta los datos de ejemplo para la institución registrada en el sistema.
- */
 
 /* Insertar datos de la institución */
 INSERT INTO configuracion_instituciones (nombre_institucion, logo, direccion, telefono, celular, correo, fyh_creacion, estado) 
 VALUES ('Universidad Tecnológica de Morelia', 'https://ut-morelia.edu.mx/wp-content/uploads/2022/05/Logo-UTM-Claro.png', 'Av. Vicepresidente Pino Suarez No. 750, Col. Ciudad Industrial, C.P. 58200, Morelia, Michoacán', '4431135900', '524431135900', 'informacion@ut-morelia.edu.mx', '2023-12-28 20:29:10', '1');
 
-/*
- Tabla que almacena los programas académicos ofrecidos por la institución.
- */
 
 /* Tabla de programas */
 CREATE TABLE programs (
-    program_id INT AUTO_INCREMENT PRIMARY KEY,   /* ID único del programa */
-    program_name VARCHAR(255) NOT NULL,          /* Nombre del programa */
-    fyh_creacion DATETIME NULL,                   /* Fecha y hora de creación del programa */
-    fyh_actualizacion DATETIME NULL,              /* Fecha y hora de la última actualización del programa */
-    estado VARCHAR(11)                           /* Estado del programa, por ejemplo 'ACTIVO' o 'INACTIVO' */
+    program_id INT AUTO_INCREMENT PRIMARY KEY,     /* ID único del programa */
+    program_name VARCHAR(255) NOT NULL,            /* Nombre del programa */
+    area VARCHAR(255) NOT NULL,                    /* Área del programa */
+    fyh_creacion DATETIME NULL,                    /* Fecha y hora de creación del programa */
+    fyh_actualizacion DATETIME NULL,               /* Fecha y hora de la última actualización del programa */
+    estado VARCHAR(11)                             /* Estado del programa, por ejemplo 'ACTIVO' o 'INACTIVO' */
 ) ENGINE=InnoDB;
 
-/*
- Inserta los programas académicos disponibles en la institución.
- */
+CREATE INDEX idx_area ON programs(area);
 
 /* Insertar datos de ejemplo en programas */
-INSERT INTO programs (program_name, fyh_creacion, estado) VALUES 
-('ASESOR FINANCIERO', NOW(), '1'),
-('ASESOR FINANCIERO COOPERATIVO', NOW(), '1'),
-('DISEÑO Y MODA INDUSTRIAL', NOW(), '1'),
-('ENERGÍAS RENOVABLES', NOW(), '1'),
-('DISEÑO Y MODA INDUSTRIAL AREA PRODUCCIÓN', NOW(), '1'),
-('DISEÑO TEXTIL Y MODA AREA PRODUCCIÓN', NOW(), '1'),
-('ENERGÍAS RENOVABLES AREA TURBOENERGIA', NOW(), '1'),
-('ENERGÍA Y DESARROLLO SOSTENIBLE AREA TURBO ENERGÍA', NOW(), '1'),
-('ENERGIAS RENOVABLES AREA ENERGIA SOLAR', NOW(), '1'),
-('ENERGÍA Y DESARROLLO SOSTENIBLE AREA ENERGÍA SOLAR', NOW(), '1'),
-('ENERGÍA Y DESARROLLO SOSTENIBLE AREA TURBO SOLAR', NOW(), '1'),
-('MANTENIMIENTO INDUSTRIAL', NOW(), '1'),
-('MANTENIMIENTO AREA INDUSTRIAL', NOW(), '1'),
-('MECATRÓNICA', NOW(), '1'),
-('MECATRÓNICA AREA AUTOMATIZACIÓN', NOW(), '1'),
-('MECATRÓNICA AREA DE AUTOMATIZACIÓN', NOW(), '1'),
-('TECNOLOGÍAS DE LA INFORMACIÓN', NOW(), '1'),
-('TECNOLOGÍAS DE LA INFORMACIÓN ÁREA DESARROLLO DE SOFTWARE MULTIPLATAFORMA', NOW(), '1'),
-('TECNOLOGÍAS DE LA INFORMACIÓN ÁREA ENTORNOS VIRTUALES Y NEGOCIOS DIGITALES', NOW(), '1'),
-('QUÍMICA ÁREA BIOTECNOLOGÍA', NOW(), '1'),
-('INGENIERÍA EN BIOTECNOLOGÍA', NOW(), '1'),
-('BIOTECNOLOGÍA', NOW(), '1'),
-('GASTRONOMÍA', NOW(), '1'),
-('LICENCIATURA EN ENFERMERÍA', NOW(), '1'),
-('INGENIERÍA EN DESARROLLO Y GESTIÓN DE SOFTWARE', NOW(), '1'),
-('INGENIERÍA EN DISEÑO TEXTIL Y MODA', NOW(), '1'),
-('INGENIERÍA EN ENERGÍAS RENOVABLES', NOW(), '1'),
-('INGENIERÍA EN ENTORNOS VIRTUALES Y NEGOCIOS DIGITALES', NOW(), '1'),
-('INGENIERÍA EN MANTENIMIENTO INDUSTRIAL', NOW(), '1'),
-('INGENIERÍA EN MECATRÓNICA', NOW(), '1'),
-('ELECTROMOVILIDAD', NOW(), '1'),
-('LICENCIATURA EN GASTRONOMÍA', NOW(), '1'),
-('TECNOLOGÍAS DE LA INFORMACIÓN E INNOVACIÓN DIGITAL', NOW(), '1'),
-('TECNOLOGÍAS DE LA INFORMACIÓN E INNOVACIÓN DIGITAL ÁREA ENTORNOS VIRTUALES Y NEGOCIOS DIGITALES', NOW(), '1'),
-('TECNOLOGÍAS DE LA INFORMACIÓN INGENIERÍA EN DESARROLLO Y GESTIÓN DE SOFTWARE', NOW(), '1'),
-('ENERGÍAS RENOVABLES AREA CALIDAD Y AHORRO DE ENERGIA', NOW(), '1'),
-('MAESTRÍA EN INGENIERÍA APLICADA EN LA INNOVACIÓN TECNOLÓGICA', NOW(), '1');
+INSERT INTO programs (program_name, area, fyh_creacion, estado) VALUES 
+('ASESOR FINANCIERO', NULL, NOW(), '1'),
+('ASESOR FINANCIERO COOPERATIVO', NULL, NOW(), '1'),
+('DISEÑO Y MODA INDUSTRIAL', 'DISEÑO Y MODA', NOW(), '1'),
+('ENERGÍAS RENOVABLES', 'ENERGÍAS RENOVABLES', NOW(), '1'),
+('DISEÑO Y MODA INDUSTRIAL AREA PRODUCCIÓN', 'DISEÑO Y MODA', NOW(), '1'),
+('DISEÑO TEXTIL Y MODA AREA PRODUCCIÓN', 'DISEÑO TEXTIL', NOW(), '1'),
+('ENERGÍAS RENOVABLES AREA TURBOENERGIA', 'ENERGÍAS RENOVABLES', NOW(), '1'),
+('ENERGÍA Y DESARROLLO SOSTENIBLE AREA TURBO ENERGÍA', 'ENERGÍA Y DESARROLLO SOSTENIBLE', NOW(), '1'),
+('ENERGIAS RENOVABLES AREA ENERGIA SOLAR', 'ENERGÍAS RENOVABLES', NOW(), '1'),
+('ENERGÍA Y DESARROLLO SOSTENIBLE AREA ENERGÍA SOLAR', 'ENERGÍA Y DESARROLLO SOSTENIBLE', NOW(), '1'),
+('ENERGÍA Y DESARROLLO SOSTENIBLE AREA TURBO SOLAR', 'ENERGÍA Y DESARROLLO SOSTENIBLE', NOW(), '1'),
+('MANTENIMIENTO INDUSTRIAL', 'MANTENIMIENTO', NOW(), '1'),
+('MANTENIMIENTO AREA INDUSTRIAL', 'MANTENIMIENTO', NOW(), '1'),
+('MECATRÓNICA', 'MECATRÓNICA', NOW(), '1'),
+('MECATRÓNICA AREA AUTOMATIZACIÓN', 'MECATRÓNICA', NOW(), '1'),
+('MECATRÓNICA AREA DE AUTOMATIZACIÓN', 'MECATRÓNICA', NOW(), '1'),
+('TECNOLOGÍAS DE LA INFORMACIÓN', 'TECNOLOGÍAS DE LA INFORMACIÓN', NOW(), '1'),
+('TECNOLOGÍAS DE LA INFORMACIÓN ÁREA DESARROLLO DE SOFTWARE MULTIPLATAFORMA', 'TECNOLOGÍAS DE LA INFORMACIÓN', NOW(), '1'),
+('TECNOLOGÍAS DE LA INFORMACIÓN ÁREA ENTORNOS VIRTUALES Y NEGOCIOS DIGITALES', 'TECNOLOGÍAS DE LA INFORMACIÓN', NOW(), '1'),
+('QUÍMICA ÁREA BIOTECNOLOGÍA', 'QUÍMICA', NOW(), '1'),
+('INGENIERÍA EN BIOTECNOLOGÍA', 'BIOTECNOLOGÍA', NOW(), '1'),
+('BIOTECNOLOGÍA', 'BIOTECNOLOGÍA', NOW(), '1'),
+('GASTRONOMÍA', NULL, NOW(), '1'),
+('LICENCIATURA EN ENFERMERÍA', NULL, NOW(), '1'),
+('INGENIERÍA EN DESARROLLO Y GESTIÓN DE SOFTWARE', 'DESARROLLO Y GESTIÓN DE SOFTWARE', NOW(), '1'),
+('INGENIERÍA EN DISEÑO TEXTIL Y MODA', 'DISEÑO TEXTIL Y MODA', NOW(), '1'),
+('INGENIERÍA EN ENERGÍAS RENOVABLES', 'ENERGÍAS RENOVABLES', NOW(), '1'),
+('INGENIERÍA EN ENTORNOS VIRTUALES Y NEGOCIOS DIGITALES', 'ENTORNOS VIRTUALES', NOW(), '1'),
+('INGENIERÍA EN MANTENIMIENTO INDUSTRIAL', 'MANTENIMIENTO', NOW(), '1'),
+('INGENIERÍA EN MECATRÓNICA', 'MECATRÓNICA', NOW(), '1'),
+('ELECTROMOVILIDAD', NULL, NOW(), '1'),
+('LICENCIATURA EN GASTRONOMÍA', 'GASTRONOMÍA', NOW(), '1'),
+('TECNOLOGÍAS DE LA INFORMACIÓN E INNOVACIÓN DIGITAL', 'TECNOLOGÍAS DE LA INFORMACIÓN', NOW(), '1'),
+('TECNOLOGÍAS DE LA INFORMACIÓN E INNOVACIÓN DIGITAL ÁREA ENTORNOS VIRTUALES Y NEGOCIOS DIGITALES', 'TECNOLOGÍAS DE LA INFORMACIÓN', NOW(), '1'),
+('TECNOLOGÍAS DE LA INFORMACIÓN INGENIERÍA EN DESARROLLO Y GESTIÓN DE SOFTWARE', 'DESARROLLO Y GESTIÓN DE SOFTWARE', NOW(), '1'),
+('ENERGÍAS RENOVABLES AREA CALIDAD Y AHORRO DE ENERGIA', 'ENERGÍAS RENOVABLES', NOW(), '1'),
+('MAESTRÍA EN INGENIERÍA APLICADA EN LA INNOVACIÓN TECNOLÓGICA', 'INGENIERÍA APLICADA', NOW(), '1');
 
-/*
- Tabla que almacena los cuatrimestres dentro de los programas académicos.
- */
 
 /* Tabla de cuatrimestres */
 CREATE TABLE terms (
@@ -142,9 +182,6 @@ CREATE TABLE terms (
     estado VARCHAR(11)
 ) ENGINE=InnoDB;
 
-/*
- Inserta los cuatrimestres disponibles.
- */
 
 /* Insertar datos de ejemplo en cuatrimestres */
 INSERT INTO terms (term_name, fyh_creacion, estado) VALUES 
@@ -169,9 +206,6 @@ INSERT INTO terms (term_name, fyh_creacion, estado) VALUES
 ('19', NOW(), '1'),
 ('20', NOW(), '1');
 
-/*
- Tabla que almacena los turnos disponibles para los grupos.
- */
 
 /* Tabla de turnos */
 CREATE TABLE shifts (
@@ -183,9 +217,6 @@ CREATE TABLE shifts (
     estado VARCHAR(11)
 ) ENGINE=InnoDB;
 
-/*
- Inserta los turnos disponibles para los grupos.
- */
 
 /* Insertar turnos */
 INSERT INTO shifts (shift_name, schedule_details, fyh_creacion, estado) 
@@ -194,7 +225,6 @@ VALUES
 ('VESPERTINO', 'LUNES A VIERNES de 12:00 A 20:00', NOW(), '1'),
 ('MIXTO', 'VIERNES DE 16:00 A 20:00 Y SÁBADO DE 7:00 A 18:00', NOW(), '1'),
 ('ZINAPÉCUARO', 'VIERNES DE 16:00 A 20:00 Y SÁBADO DE 7:00 A 18:00', NOW(), '1');
-
 
 /* Tabla de salones */
 CREATE TABLE classrooms (
@@ -207,7 +237,6 @@ CREATE TABLE classrooms (
     fyh_actualizacion DATETIME NULL,
     estado VARCHAR(11)
 ) ENGINE=InnoDB;
-
 
 /* Tabla de Laboratorios */
 CREATE TABLE labs (
@@ -256,12 +285,12 @@ INSERT INTO labs (lab_name, description, fyh_creacion) VALUES
 ('LABORATORIO DE TERMODINÁMICA', 'Laboratorio para estudios en principios termodinámicos.', NOW()),
 ('LABORATORIO QUIMICA ANALITICA', 'Espacio para análisis químico y técnicas de laboratorio.', NOW());
 
-
 /* Tabla de grupos */
 CREATE TABLE `groups` (
     group_id INT AUTO_INCREMENT PRIMARY KEY,       /* ID único del grupo */
     group_name VARCHAR(255) NOT NULL,              /* Nombre del grupo */
     program_id INT,                                /* ID del programa al que pertenece el grupo */
+    area VARCHAR(255),                             /* Área del programa al que pertenece el grupo */
     term_id INT,                                   /* ID del cuatrimestre en el que está el grupo */
     volume INT,                                    /* Número de estudiantes en el grupo */
     turn_id INT,                                   /* ID del turno al que pertenece el grupo */
@@ -270,24 +299,34 @@ CREATE TABLE `groups` (
     fyh_creacion DATETIME NULL,                    /* Fecha y hora de creación del grupo */
     fyh_actualizacion DATETIME NULL,               /* Fecha y hora de la última actualización del grupo */
     estado VARCHAR(11),                            /* Estado del grupo, por ejemplo 'ACTIVO' o 'INACTIVO' */
-    FOREIGN KEY (program_id) REFERENCES programs(program_id),       /* Relación con la tabla de programas */
-    FOREIGN KEY (term_id) REFERENCES terms(term_id),                /* Relación con la tabla de cuatrimestres */
-    FOREIGN KEY (turn_id) REFERENCES shifts(shift_id),              /* Relación con la tabla de turnos */
+    FOREIGN KEY (program_id) REFERENCES programs(program_id),  /* Relación con la tabla de programas */
+    FOREIGN KEY (area) REFERENCES programs(area),              /* Relación con la columna area en programs */
+    FOREIGN KEY (term_id) REFERENCES terms(term_id),           /* Relación con la tabla de cuatrimestres */
+    FOREIGN KEY (turn_id) REFERENCES shifts(shift_id),         /* Relación con la tabla de turnos */
     FOREIGN KEY (classroom_assigned) REFERENCES classrooms(classroom_id), /* Relación con la tabla de salones */
-    FOREIGN KEY (lab_assigned) REFERENCES labs(lab_id)              /* Relación con la tabla de laboratorios */
+    FOREIGN KEY (lab_assigned) REFERENCES labs(lab_id)         /* Relación con la tabla de laboratorios */
 ) ENGINE=InnoDB;
 
 
 /* Tabla de profesores */
 CREATE TABLE teachers (
-    teacher_id INT AUTO_INCREMENT PRIMARY KEY,  /* ID único del profesor */
-    teacher_name VARCHAR(100) NOT NULL,         /* Nombre del profesor */
-    fyh_creacion DATETIME NULL,                  /* Fecha y hora de creación */
-    fyh_actualizacion DATETIME NULL,             /* Fecha y hora de última actualización */
-    estado VARCHAR(11),                          /* Estado del profesor, por ejemplo 'ACTIVO' o 'INACTIVO' */
-    program_id INT,                              /* ID del programa de adscripción */
-    CONSTRAINT fk_program FOREIGN KEY (program_id) REFERENCES programs(program_id)  /* Clave foránea a la tabla programs */
+    teacher_id INT AUTO_INCREMENT PRIMARY KEY,       /* ID único del profesor */
+    teacher_name VARCHAR(100) NOT NULL,              /* Nombre completo del profesor */
+    puesto VARCHAR(100),                             /* Puesto del profesor */
+    hours INT DEFAULT 0,                             /* Horas asignadas al profesor para enseñar */
+    specialization_area VARCHAR(255),                /* Área de especialización del profesor */
+    specialization_program_id INT,                   /* ID del programa de especialización asignado */
+    program_id INT,                                  /* ID del programa de adscripción */
+    area VARCHAR(255),                               /* Área del programa de adscripción */
+    clasificacion VARCHAR(100),                      /* Clasificación del profesor */
+    fyh_creacion DATETIME NULL,                      /* Fecha y hora de creación */
+    fyh_actualizacion DATETIME NULL,                 /* Fecha y hora de última actualización */
+    estado VARCHAR(11),                              /* Estado del profesor, por ejemplo 'ACTIVO' o 'INACTIVO' */
+    FOREIGN KEY (program_id) REFERENCES programs(program_id),             /* Relación con el programa de adscripción */
+    FOREIGN KEY (specialization_program_id) REFERENCES programs(program_id), /* Relación con el programa de especialización */
+    FOREIGN KEY (area) REFERENCES programs(area)                           /* Relación con la columna area en programs */
 ) ENGINE=InnoDB;
+
 
 
 /* Tabla de Materias */
@@ -410,7 +449,6 @@ CREATE TABLE schedules (
     FOREIGN KEY (classroom_id) REFERENCES classrooms(classroom_id) ON DELETE CASCADE,
     FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
-
 
 
 /* Tabla relación de programas cuatrimestres y materias */

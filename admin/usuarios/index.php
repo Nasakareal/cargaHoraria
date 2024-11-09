@@ -1,12 +1,12 @@
 <?php
 include ('../../app/config.php');
-include('../../admin/verificar/verificar_admin.php');
+include('../../app/helpers/verificar_admin.php');
 include ('../../admin/layout/parte1.php');
 include ('../../app/controllers/usuarios/listado_de_usuarios.php');
 ?>
 
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
     <br>
     <div class="content">
       <div class="container">
@@ -22,11 +22,10 @@ include ('../../app/controllers/usuarios/listado_de_usuarios.php');
                         <div class="card-tools">
                             <a href="create.php" class="btn btn-primary"><i class="bi bi-plus-square"> Crear nuevo usuario</i></a>
                         </div>
-
                     </div>
 
                     <div class="card-body">
-                    <table id="example1" class= "table table-striped table-bordered table-hover table-sm">
+                    <table id="example1" class="table table-striped table-bordered table-hover table-sm">
             <thead>
                 <tr>
                     <th><center>Número</center></th>
@@ -45,17 +44,21 @@ include ('../../app/controllers/usuarios/listado_de_usuarios.php');
                     $id_usuario = $usuario['id_usuario']; 
                     $contador_usuarios++; ?>
                 <tr>
-                    <td style ="text-align: center"><?=$contador_usuarios;?></td>
+                    <td style="text-align: center"><?=$contador_usuarios;?></td>
                     <td><?=$usuario['nombres'];?></td>
                     <td><?=$usuario['nombre_rol'];?></td>
                     <td><?=$usuario['email'];?></td>
                     <td><?=$usuario['fyh_creacion'];?></td>
                     <td><?=$usuario['estado'];?></td>
                     
-                    <td style ="text-align: center">
+                    <td style="text-align: center">
                     <div class="btn-group" role="group" aria-label="Basic example">
                         <a href="show.php?id=<?=$id_usuario;?>" type="button" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>
                         <a href="edit.php?id=<?=$id_usuario;?>" type="button" class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></a>
+                        
+                        <!-- Botón de permisos -->
+                        <a href="permissions.php?id=<?=$id_usuario;?>" type="button" class="btn btn-warning btn-sm"><i class="bi bi-card-checklist"></i></a>
+
                         <form action="<?=APP_URL;?>/app/controllers/usuarios/delete.php" onclick="preguntar<?=$id_usuario;?>(event)" method="post" id="miFormulario<?=$id_usuario;?>">
                           <input type="text" name="id_usuario" value="<?=$id_usuario;?>" hidden>
                           <button type="submit" class="btn btn-danger btn-sm" style="border-radius: 0px 5px 5px 0px"><i class="bi bi-trash"></i></button>
@@ -77,11 +80,11 @@ include ('../../app/controllers/usuarios/listado_de_usuarios.php');
                             if (result.isConfirmed) { 
                               var form=$('#miFormulario<?=$id_usuario;?>');
                               form.submit();
-        }
-    });
-    return false;
-}
-</script>
+                            }
+                          });
+                          return false;
+                          }
+                        </script>
                     </div>
                     </td>
                 </tr>
@@ -91,23 +94,16 @@ include ('../../app/controllers/usuarios/listado_de_usuarios.php');
             </tbody>
           </table>
                     </div>
-
                 </div>
             </div>
-
         </div>
-        <!-- /.row -->
-      </div><!-- /.container-fluid -->
+      </div>
     </div>
-    <!-- /.content -->
-  </div>
-  <!-- /.content-wrapper -->
+</div>
 
 <?php 
-  
 include ('../../admin/layout/parte2.php');
 include ('../../layout/mensajes.php');
-  
 ?>
 
 <script>
@@ -118,7 +114,7 @@ include ('../../layout/mensajes.php');
               "emptyTable": "No hay información",
               "info": "Mostrando _START_ a _END_ de _TOTAL_ Usuarios",
               "infoEmpty": "Mostrando 0 a 0 de 0 Usuarios",
-              "infoFiltered": "(Filtrado de _Max_ total Usuarios)",
+              "infoFiltered": "(Filtrado de _MAX_ total Usuarios)",
               "infoPostFix": "",
               "thousands": ",",
               "lengthMenu": "Mostrar _MENU_ Usuarios",

@@ -2,14 +2,15 @@
 header('Content-Type: text/html; charset=utf-8');
 
 include('../../app/config.php');
-include('../../admin/verificar/verificar_admin.php');
+include('../../app/helpers/verificar_admin.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/grupos/listado_de_grupos.php');
 include('../../app/controllers/materias/listado_de_materias.php');
+include('../../app/controllers/profesores/listado_de_profesores.php'); // Asegúrate de tener este archivo para contar los profesores
 
-// Contador de grupos y materias
 $total_groups = count($groups);
-$total_subjects = count($subjects); // Suponiendo que $subjects es el array que contiene las materias
+$total_subjects = count($subjects);
+$total_teachers = count($teachers); // Contar el total de profesores
 ?>
 
 <div class="content-wrapper">
@@ -58,6 +59,20 @@ $total_subjects = count($subjects); // Suponiendo que $subjects es el array que 
                                             <form action="../../app/controllers/vaciados/vaciar_materias.php" method="post" id="formVaciarMaterias">
                                                 <button type="button" class="btn btn-danger" onclick="confirmarVaciado('formVaciarMaterias', 'Materias')">
                                                     <i class="bi bi-trash"></i> Vaciar Tabla de Materias
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Fila para Profesores -->
+                                    <tr>
+                                        <td class="text-center">3</td>
+                                        <td class="text-center">Profesores</td>
+                                        <td class="text-center"><?= $total_teachers; ?></td>
+                                        <td class="text-center">
+                                            <form action="../../app/controllers/vaciados/vaciar_profesores.php" method="post" id="formVaciarProfesores">
+                                                <button type="button" class="btn btn-danger" onclick="confirmarVaciado('formVaciarProfesores', 'Profesores')">
+                                                    <i class="bi bi-trash"></i> Vaciar Tabla de Profesores
                                                 </button>
                                             </form>
                                         </td>

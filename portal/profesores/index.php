@@ -44,7 +44,6 @@ include('../../app/controllers/profesores/listado_de_profesores.php');
                                         <th><center>Materias</center></th>
                                         <th><center>Horas Semanales</center></th>
                                         <th><center>Programas</center></th>
-                                        <th><center>Cuatrimestres</center></th>
                                         <th><center>Acciones</center></th>
                                     </tr>
                                 </thead>
@@ -61,7 +60,6 @@ include('../../app/controllers/profesores/listado_de_profesores.php');
                                         <td><center><?= $teacher['materias']; ?></center></td>
                                         <td><center><?= $teacher['horas_semanales']; ?></center></td>
                                         <td><center><?= $teacher['programas']; ?></center></td>
-                                        <td><center><?= $teacher['cuatrimestres']; ?></center></td>
                                         
                                         <td style="text-align: center">
                                             <div class="btn-group" role="group" aria-label="Basic example">
@@ -72,8 +70,8 @@ include('../../app/controllers/profesores/listado_de_profesores.php');
                                                     <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
                                                 </form>
                                                 <!-- Botón para asignar horario al profesor con estilo gris -->
-                                                <a href="asignar_horario_profesor.php?teacher_id=<?= $teacher_id; ?>" class="btn btn-secondary btn-sm" style="background-color: #d3d3d3; color: #555;">
-                                                    <i class="bi bi-calendar2-week"></i>
+                                                <a href="asignar_horario_profesor.php?teacher_id=<?= $teacher_id; ?>" class="btn btn-secondary btn-sm" style="background-color: #fd7e14;">
+                                                    <i class="bi bi-journal-text"></i>
                                                 </a>
                                             </div>
                                         </td>

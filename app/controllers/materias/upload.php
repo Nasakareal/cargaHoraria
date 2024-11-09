@@ -5,14 +5,41 @@ if (isset($_FILES['file'])) {
     $file = $_FILES['file']['tmp_name'];
 
     if ($_FILES['file']['error'] !== UPLOAD_ERR_OK) {
-        echo "Error al cargar el archivo.";
+        session_start();
+        $_SESSION['mensaje'] = "Error al cargar el archivo.";
+        $_SESSION['icono'] = "error";
+        header('Location:' . APP_URL . "/portal/materias");
         die();
     }
 
     $errores = [];  /* Array para acumular los errores */
 
+    /* Validación de formato: Verificar si el archivo tiene el número correcto de columnas sin tomar datos */
     if (($handle = fopen($file, 'r')) !== FALSE) {
-        $row = 0;  /* Contador para las filas */
+        /* Leer solo la primera fila para validar el número de columnas */
+        $firstRow = fgetcsv($handle, 1000, ',');
+
+        /* Verificamos que tenga exactamente 16 columnas */
+        if ($firstRow === false || count($firstRow) !== 16) {
+            fclose($handle);
+            session_start();
+            $_SESSION['mensaje'] = "El archivo no tiene el formato adecuado. Asegúrate de que tenga las columnas correctas.";
+            $_SESSION['icono'] = "error";
+            header('Location:' . APP_URL . "/portal/materias");
+            die();
+        }
+        fclose($handle);
+    } else {
+        session_start();
+        $_SESSION['mensaje'] = "No se pudo abrir el archivo.";
+        $_SESSION['icono'] = "error";
+        header('Location:' . APP_URL . "/portal/materias");
+        die();
+    }
+
+    /* Si el archivo pasó la validación, procedemos a procesarlo */
+    if (($handle = fopen($file, 'r')) !== FALSE) {
+        $row = 0;
         while (($data = fgetcsv($handle, 1000, ',')) !== FALSE) {
             $row++;
 
@@ -125,9 +152,10 @@ if (isset($_FILES['file'])) {
 
         header('Location:' . APP_URL . "/portal/materias");
         die();
-    } else {
-        echo "No se pudo abrir el archivo.";
     }
 } else {
-    echo "No se ha seleccionado ningún archivo.";
+    session_start();
+    $_SESSION['mensaje'] = "No se ha seleccionado ningún archivo.";
+    $_SESSION['icono'] = "error";
+    header('Location:' . APP_URL . "/portal/materias");
 }

@@ -3,13 +3,14 @@
 $id_usuario = $_GET['id'];
 
 include ('../../app/config.php');
+include('../../app/helpers/verificar_admin.php');
 include ('../../admin/layout/parte1.php');
 include ('../../app/controllers/usuarios/datos_del_usuario.php');
 include ('../../app/controllers/roles/listado_de_roles.php');
 ?>
 
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
     <br>
     <div class="content">
       <div class="container">
@@ -65,6 +66,7 @@ include ('../../app/controllers/roles/listado_de_roles.php');
                         <div class="form-group">
                           <label for="">Password</label>
                           <input type="password" name="password" class="form-control">
+                          <small class="text-muted">Deje en blanco si no desea cambiar la contraseña</small>
                         </div>
                       </div>
                       <div class="col-md-4">
@@ -88,16 +90,10 @@ include ('../../app/controllers/roles/listado_de_roles.php');
                 </div>
             </div>
         </div>
-        <!-- /.row -->
-      </div><!-- /.container-fluid -->
+      </div>
     </div>
-    <!-- /.content -->
-  </div>
-  <!-- /.content-wrapper -->
-
+</div>
 <?php 
-  
 include ('../../admin/layout/parte2.php');
 include ('../../layout/mensajes.php');
-  
 ?>

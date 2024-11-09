@@ -1,12 +1,15 @@
 {
   "ExpandedNodes": [
     "",
-    "\\admin\\verificar",
+    "\\admin",
+    "\\app",
     "\\app\\controllers",
-    "\\app\\controllers\\materias",
-    "\\app\\controllers\\roles",
-    "\\portal\\materias"
+    "\\app\\controllers\\autoSalones",
+    "\\app\\controllers\\profesores",
+    "\\database",
+    "\\portal",
+    "\\portal\\profesores"
   ],
-  "SelectedNode": "\\database",
+  "SelectedNode": "\\portal\\profesores\\edit.php",
   "PreviewInSolutionExplorer": false
 }
