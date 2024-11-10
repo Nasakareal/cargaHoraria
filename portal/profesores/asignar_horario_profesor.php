@@ -15,12 +15,6 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
 include('../../app/controllers/programas/listado_de_programas.php');
 include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
 include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.php');
-
-// Calcular las horas totales asignadas
-$total_hours = 0;
-foreach ($materias_asignadas as $materia_asignada) {
-    $total_hours += isset($materia_asignada['weekly_hours']) ? $materia_asignada['weekly_hours'] : 0;
-}
 ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -38,19 +32,11 @@ foreach ($materias_asignadas as $materia_asignada) {
                         </div>
                         <div class="card-body">
                             <!-- Formulario con método POST y acción que apunta a `update.php` -->
-                            <form action="<?= APP_URL; ?>/app/controllers/profesores/update.php" method="post">
+                            <form action="<?= APP_URL; ?>/app/controllers/profesores/update_subjects.php" method="post">
                                 <input type="hidden" name="teacher_id" value="<?= htmlspecialchars($teacher_id); ?>">
 
-                                <!-- Datos del profesor -->
+                                <!-- Programa -->
                                 <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="">Nombres del profesor</label>
-                                            <input type="text" name="nombres" value="<?= htmlspecialchars($nombres); ?>" class="form-control" required>
-                                        </div>
-                                    </div>
-
-                                    <!-- Programa -->
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="">Programa</label>
@@ -77,6 +63,16 @@ foreach ($materias_asignadas as $materia_asignada) {
                                                     </option>
                                                 <?php endforeach; ?>
                                             </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Total de horas asignadas -->
+                                <div class="row" style="margin-top: 20px;">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="total_hours">Total de horas asignadas</label>
+                                            <input type="text" id="total_hours" name="total_hours" class="form-control" value="0" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -113,13 +109,6 @@ foreach ($materias_asignadas as $materia_asignada) {
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
-                                    </div>
-                                </div>
-
-                                <!-- Contador de horas -->
-                                <div class="row">
-                                    <div class="col-md-12 text-center">
-                                        <h4>Horas semanales totales: <span id="total_hours"><?= $total_hours; ?></span></h4>
                                     </div>
                                 </div>
 
@@ -183,18 +172,6 @@ include('../../layout/mensajes.php');
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
-    /* Función para actualizar el contador de horas */
-    function updateTotalHours() {
-        let totalHours = 0;
-        $('#materias_asignadas option').each(function() {
-            totalHours += parseInt($(this).data('hours') || 0);
-        });
-        $('#total_hours').text(totalHours);
-    }
-
-    /* Actualizar horas al cargar la página */
-    updateTotalHours();
-
     /* Seleccionar todas las opciones en 'materias_asignadas' y 'grupos_asignados' al cargar la página */
     $('#materias_asignadas option').prop('selected', true);
     $('#grupos_asignados option').prop('selected', true);
@@ -222,7 +199,6 @@ $(document).ready(function() {
                 },
                 success: function(response) {
                     $('#materias_disponibles').html(response);
-                    updateTotalHours();
                 },
                 error: function() {
                     console.log('Error en la solicitud de materias');
@@ -259,18 +235,18 @@ $(document).ready(function() {
         $('#materias_disponibles option:selected').each(function() {
             $(this).appendTo('#materias_asignadas');
         });
+        calcularTotalHoras();
         /* Seleccionar todas las opciones en 'materias_asignadas' */
         $('#materias_asignadas option').prop('selected', true);
-        updateTotalHours();
     });
 
     $('#remove_subject').click(function() {
         $('#materias_asignadas option:selected').each(function() {
             $(this).appendTo('#materias_disponibles');
         });
+        calcularTotalHoras();
         /* Seleccionar todas las opciones en 'materias_asignadas' */
         $('#materias_asignadas option').prop('selected', true);
-        updateTotalHours();
     });
 
     /* Eventos para mover grupos entre listas */
@@ -295,5 +271,17 @@ $(document).ready(function() {
         $('#materias_asignadas option').prop('selected', true);
         $('#grupos_asignados option').prop('selected', true);
     });
+
+    /* Función para calcular el total de horas asignadas */
+    function calcularTotalHoras() {
+        var totalHoras = 0;
+        $('#materias_asignadas option').each(function() {
+            totalHoras += parseInt($(this).data('hours'));
+        });
+        $('#total_hours').val(totalHoras);
+    }
+
+    /* Inicializar el cálculo de horas al cargar la página */
+    calcularTotalHoras();
 });
 </script>

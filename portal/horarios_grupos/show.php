@@ -18,7 +18,9 @@ function obtenerHorarioGrupo($group_id, $pdo)
                         sa.end_time AS end, 
                         s.subject_name, 
                         s.lab_hours,          /* Añadimos lab_hours para saber si es laboratorio */
-                        sh.shift_name
+                        sh.shift_name,
+                        r.classroom_name AS room_name, /* Nombre del salón */
+                        t.teacher_name         /* Nombre del profesor asignado */
                      FROM 
                         schedule_assignments sa
                      JOIN 
@@ -27,6 +29,10 @@ function obtenerHorarioGrupo($group_id, $pdo)
                         `groups` g ON sa.group_id = g.group_id
                      JOIN 
                         shifts sh ON g.turn_id = sh.shift_id
+                     LEFT JOIN 
+                        classrooms r ON sa.classroom_id = r.classroom_id
+                     LEFT JOIN 
+                        teachers t ON sa.teacher_id = t.teacher_id
                      WHERE 
                         sa.group_id = :group_id
                      ORDER BY sa.schedule_day, sa.start_time";
@@ -82,6 +88,8 @@ foreach ($horarios as $horario) {
     $end_time = strtotime($horario['end']);
     $dia = $horario['day'];
     $materia = $horario['subject_name'];
+    $salon = $horario['room_name'] ?? 'Sin salón';
+    $profesor = $horario['teacher_name'] ?? 'Sin profesor';
 
     /* Determinar si es Aula o Laboratorio */
     $tipo_espacio = ($horario['lab_hours'] > 0) ? 'Laboratorio' : 'Aula';
@@ -93,7 +101,7 @@ foreach ($horarios as $horario) {
         /* Verificar si el bloque horario y el día están en el horario definido */
         if (in_array($hora, $horas) && in_array($dia, $dias)) {
             /* Asignar la materia a la celda correspondiente solo si está vacía */
-            $tabla_horarios[$hora][$dia] .= htmlspecialchars($materia) . " - " . htmlspecialchars($tipo_espacio) . "<br>";
+            $tabla_horarios[$hora][$dia] .= htmlspecialchars($materia) . " - " . htmlspecialchars($tipo_espacio) . " - " . htmlspecialchars($salon) . " - " . htmlspecialchars($profesor) . "<br>";
         }
     }
 }
@@ -166,24 +174,6 @@ include('../../layout/mensajes.php');
     $(function () {
         $("#example1").DataTable({
             "pageLength": 10,
-            "language": {
-                "emptyTable": "No hay información",
-                "info": "Mostrando _START_ a _END_ de _TOTAL_ Materias",
-                "infoEmpty": "Mostrando 0 a 0 de 0 Materias",
-                "infoFiltered": "(Filtrado de _MAX_ total Materias)",
-                "thousands": ",",
-                "lengthMenu": "Mostrar _MENU_ Materias",
-                "loadingRecord": "Cargando...",
-                "processing": "Procesando...",
-                "search": "Buscador:",
-                "zeroRecords": "Sin resultados encontrados",
-                "paginate": {
-                    "first": "Primero",
-                    "last": "Último",
-                    "next": "Siguiente",
-                    "previous": "Anterior"
-                }
-            },
             "responsive": true, 
             "lengthChange": true, 
             "autoWidth": false,
