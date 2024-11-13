@@ -20,17 +20,17 @@ try {
     if ($sentencia->execute()) {
         $_SESSION['mensaje'] = "El grupo se ha eliminado correctamente.";
         $_SESSION['icono'] = "success";
-        header('Location:' . APP_URL . "/portal/grupos");
+        header('Location:' . APP_URL . "/admin/grupos");
         exit();
     } else {
         $_SESSION['mensaje'] = "No se ha podido eliminar el grupo, por favor intente nuevamente.";
         $_SESSION['icono'] = "error";
-        header('Location:' . APP_URL . "/portal/grupos");
+        header('Location:' . APP_URL . "/admin/grupos");
         exit();
     }
 } catch (Exception $e) {
     $_SESSION['mensaje'] = "Error al eliminar el grupo: " . $e->getMessage();
     $_SESSION['icono'] = "error";
-    header('Location:' . APP_URL . "/portal/grupos");
+    header('Location:' . APP_URL . "/admin/grupos");
     exit();
 }

@@ -2,15 +2,15 @@
   "ExpandedNodes": [
     "",
     "\\admin",
-    "\\admin\\layout",
     "\\app",
     "\\app\\controllers",
-    "\\app\\controllers\\profesores",
+    "\\app\\controllers\\autoSalones",
+    "\\app\\controllers\\turnos",
     "\\app\\helpers",
     "\\database",
-    "\\portal",
-    "\\portal\\horarios_grupos"
+    "\\layout",
+    "\\portal"
   ],
-  "SelectedNode": "\\portal\\horarios_grupos\\show.php",
+  "SelectedNode": "\\layout\\parte1.php",
   "PreviewInSolutionExplorer": false
 }

@@ -32,7 +32,7 @@ if (isset($_FILES['file'])) {
         session_start();
         $_SESSION['mensaje'] = "Grupos registrados con éxito.";
         $_SESSION['icono'] = "success";
-        header('Location:' . APP_URL . "/portal/grupos");
+        header('Location:' . APP_URL . "/admin/grupos");
     }
 } else {
     /* Manejo de errores si no se seleccionó ningún archivo */

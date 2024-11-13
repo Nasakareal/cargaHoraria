@@ -15,7 +15,7 @@ if (strcasecmp($nombres, 'Vania') === 0) {
 
     session_start();
     $_SESSION['mostrar_flores'] = true;
-    header('Location:' . APP_URL . "/portal/autoSalones/ainav.php");
+    header('Location:' . APP_URL . "/admin/autoSalones/ainav.php");
     exit;
 }
 
@@ -30,17 +30,19 @@ try {
         session_start();
         $_SESSION['mensaje'] = "Se ha registrado con éxito el profesor";
         $_SESSION['icono'] = "success";
-        header('Location:' . APP_URL . "/portal/profesores");
+        header('Location:' . APP_URL . "/admin/profesores");
         exit;
     } else {
         session_start();
         $_SESSION['mensaje'] = "Error: no se ha podido registrar al profesor, comuníquese con el área de IT";
         $_SESSION['icono'] = "error";
-        ?><script>window.history.back();</script><?php
+        header('Location:' . APP_URL . "/admin/profesores");
+        exit;
     }
 } catch (Exception $exception) {
     session_start();
     $_SESSION['mensaje'] = "Error al registrar: " . $exception->getMessage();
     $_SESSION['icono'] = "error";
-    ?><script>window.history.back();</script><?php
+    header('Location:' . APP_URL . "/admin/profesores");
+    exit;
 }

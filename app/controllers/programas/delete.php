@@ -11,10 +11,10 @@ if ($sentencia->execute()) {
     session_start();
     $_SESSION['mensaje'] = "Se ha eliminado el programa";
     $_SESSION['icono'] = "success";
-    header('Location: ' . APP_URL . "/portal/programas");
+    header('Location: ' . APP_URL . "/admin/programas");
 } else {
     session_start();
     $_SESSION['mensaje'] = "No se ha podido eliminar el programa, comun�quese con el �rea de IT";
     $_SESSION['icono'] = "error";
-    header('Location: ' . APP_URL . "/portal/programas");
+    header('Location: ' . APP_URL . "/admin/programas");
 }

@@ -59,7 +59,7 @@ function asignarBloqueHorario($pdo, $subject, $group, $dia, $start_time, $end_ti
     ]);
 
     if ($check_availability->fetchColumn() > 0) {
-        return false; // Bloque no disponible
+        return false; /* Bloque no disponible */
     }
 
     $sql_insert = "INSERT INTO schedule_assignments 
@@ -77,7 +77,7 @@ function asignarBloqueHorario($pdo, $subject, $group, $dia, $start_time, $end_ti
         ':tipo_espacio' => $tipo_espacio
     ]);
 
-    return true; // Bloque asignado exitosamente
+    return true; /* Bloque asignado exitosamente */
 }
 
 function distribuirMateriasEnSemana($pdo, $group, $subjects, $horario_turno, $dias_turno)
@@ -85,11 +85,11 @@ function distribuirMateriasEnSemana($pdo, $group, $subjects, $horario_turno, $di
     $inicio_turno = strtotime(array_keys($horario_turno)[0]);
     $fin_turno = strtotime(array_values($horario_turno)[0]);
 
-    // Distribuir materias equitativamente durante la semana
+    /* Distribuir materias equitativamente durante la semana */
     foreach ($dias_turno as $dia) {
         $inicio_actual = $inicio_turno;
         $materias_pendientes = $subjects;
-        shuffle($materias_pendientes); // Mezclar materias para evitar siempre la misma asignación primero
+        shuffle($materias_pendientes);
 
         while (!empty($materias_pendientes) && $inicio_actual < $fin_turno) {
             $asignacion_realizada = false;
@@ -103,7 +103,7 @@ function distribuirMateriasEnSemana($pdo, $group, $subjects, $horario_turno, $di
                     $profesor_id = null;
                 }
 
-                // Asignación de horas en Aula
+                /* Asignación de horas en Aula */
                 if ($horas_restantes_aula > 0) {
                     $horas_a_asignar = min($horas_restantes_aula, $max_horas_aula);
                     $fin_bloque = strtotime("+{$horas_a_asignar} hours", $inicio_actual);

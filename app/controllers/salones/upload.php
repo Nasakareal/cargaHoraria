@@ -47,7 +47,7 @@ if (isset($_FILES['file'])) {
         session_start();
         $_SESSION['mensaje'] = "Salones registrados con éxito.";
         $_SESSION['icono'] = "success";
-        header('Location:' . APP_URL . "/portal/salones");
+        header('Location:' . APP_URL . "/admin/salones");
         die();
     } else {
         echo "No se pudo abrir el archivo.";

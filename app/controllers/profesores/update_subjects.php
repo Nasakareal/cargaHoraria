@@ -175,13 +175,13 @@ try {
     session_start();
     $_SESSION['mensaje'] = "Se ha actualizado con éxito";
     $_SESSION['icono'] = "success";
-    header('Location: ' . APP_URL . "/portal/profesores");
+    header('Location: ' . APP_URL . "/admin/profesores");
     exit;
 } catch (Exception $exception) {
     $pdo->rollBack();
     session_start();
     $_SESSION['mensaje'] = "Ocurrió un error: " . $exception->getMessage();
     $_SESSION['icono'] = "error";
-    header('Location: ' . APP_URL . "/portal/profesores");
+    header('Location: ' . APP_URL . "/admin/profesores");
     exit;
 }

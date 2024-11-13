@@ -8,7 +8,7 @@ if (isset($_FILES['file'])) {
         session_start();
         $_SESSION['mensaje'] = "Error al cargar el archivo.";
         $_SESSION['icono'] = "error";
-        header('Location:' . APP_URL . "/portal/materias");
+        header('Location:' . APP_URL . "/admin/materias");
         die();
     }
 
@@ -25,7 +25,7 @@ if (isset($_FILES['file'])) {
             session_start();
             $_SESSION['mensaje'] = "El archivo no tiene el formato adecuado. Asegúrate de que tenga las columnas correctas.";
             $_SESSION['icono'] = "error";
-            header('Location:' . APP_URL . "/portal/materias");
+            header('Location:' . APP_URL . "/admin/materias");
             die();
         }
         fclose($handle);
@@ -33,7 +33,7 @@ if (isset($_FILES['file'])) {
         session_start();
         $_SESSION['mensaje'] = "No se pudo abrir el archivo.";
         $_SESSION['icono'] = "error";
-        header('Location:' . APP_URL . "/portal/materias");
+        header('Location:' . APP_URL . "/admin/materias");
         die();
     }
 
@@ -150,12 +150,12 @@ if (isset($_FILES['file'])) {
             $_SESSION['icono'] = "success";
         }
 
-        header('Location:' . APP_URL . "/portal/materias");
+        header('Location:' . APP_URL . "/admin/materias");
         die();
     }
 } else {
     session_start();
     $_SESSION['mensaje'] = "No se ha seleccionado ningún archivo.";
     $_SESSION['icono'] = "error";
-    header('Location:' . APP_URL . "/portal/materias");
+    header('Location:' . APP_URL . "/admin/materias");
 }

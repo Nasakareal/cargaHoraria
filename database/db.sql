@@ -13,6 +13,7 @@ INSERT INTO roles (nombre_rol, fyh_creacion, estado) VALUES
 ('SUB-DIRECTOR ACADEMICO', NOW(), '1'),
 ('ADMINISTRATIVO', NOW(), '1'),
 ('SOPORTE', NOW(), '1'),
+('COMISIONES INTERNAS', NOW(), '1'),
 ('OBSERVADOR', NOW(), '1');
 
 /* Tabla de usuarios */

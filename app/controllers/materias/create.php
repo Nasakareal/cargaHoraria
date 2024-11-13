@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($query->fetchColumn() > 0) {
         $_SESSION['mensaje'] = "La materia \"$subject_name\" ya existe en la base de datos.";
         $_SESSION['icono'] = "error";
-        header('Location: ' . APP_URL . "/portal/materias");
+        header('Location: ' . APP_URL . "/admin/materias");
         exit;
     } else {
         /* Inserta la nueva materia */
@@ -31,19 +31,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 session_start();
                 $_SESSION['mensaje'] = "Se ha registrado la materia";
                 $_SESSION['icono'] = "success";
-                header('Location:' .APP_URL."/portal/materias");
+                header('Location:' .APP_URL."/admin/materias");
                 exit;
             } else {
                 session_start();
                 $_SESSION['mensaje'] = "Error: no se ha podido registrar la materia, comuníquese con el área de IT";
                 $_SESSION['icono'] = "error";
-                ?><script>window.history.back();</script><?php
+                header('Location: ' . APP_URL . "/admin/materias");
             }
         } catch (Exception $exception) {
             session_start();
             $_SESSION['mensaje'] = "Error al registrar: " . $exception->getMessage();
             $_SESSION['icono'] = "error";
-            ?><script>window.history.back();</script><?php
+            header('Location: ' . APP_URL . "/admin/materias");
         }
     }
 }

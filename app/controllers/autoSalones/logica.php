@@ -97,7 +97,7 @@ try {
     $_SESSION['icono'] = "success";
     session_write_close();
 
-    header('Location: ' . APP_URL . "/portal/autoSalones/index.php");
+    header('Location: ' . APP_URL . "/admin/autoSalones/index.php");
     exit();
 
 } catch (Exception $e) {
@@ -107,6 +107,6 @@ try {
     $_SESSION['icono'] = "error";
     session_write_close();
 
-    header('Location: ' . APP_URL . "/portal/autoSalones/index.php");
+    header('Location: ' . APP_URL . "/admin/autoSalones/index.php");
     exit();
 }

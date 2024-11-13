@@ -18,7 +18,7 @@ if (empty($group_name) || empty($program_id) || empty($term_id) || empty($year) 
     session_start();
     $_SESSION['mensaje'] = "Todos los campos son obligatorios.";
     $_SESSION['icono'] = "error";
-    header('Location:' . APP_URL . "/portal/grupos/edit.php?id=" . $group_id);
+    header('Location:' . APP_URL . "/admin/grupos/edit.php?id=" . $group_id);
     exit();
 }
 
@@ -86,7 +86,7 @@ try {
     session_start();
     $_SESSION['mensaje'] = "El grupo ha sido actualizado correctamente.";
     $_SESSION['icono'] = "success";
-    header('Location:' . APP_URL . "/portal/grupos");
+    header('Location:' . APP_URL . "/admin/grupos");
     exit();
 
 } catch (Exception $e) {
@@ -95,6 +95,6 @@ try {
     session_start();
     $_SESSION['mensaje'] = "Error al actualizar el grupo: " . $e->getMessage();
     $_SESSION['icono'] = "error";
-    header('Location:' . APP_URL . "/portal/grupos/edit.php?id=" . $group_id);
+    header('Location:' . APP_URL . "/admin/grupos/edit.php?id=" . $group_id);
     exit();
 }

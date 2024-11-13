@@ -16,7 +16,7 @@ if ($contador > 0) {
     session_start();
     $_SESSION['mensaje'] = "Este salón está asociado a grupos, no se puede eliminar.";
     $_SESSION['icono'] = "error";
-    header('Location:' . APP_URL . "/portal/salones");
+    header('Location:' . APP_URL . "/admin/salones");
     exit;
 } else {
     $sentencia = $pdo->prepare("DELETE FROM `classrooms` WHERE classroom_id = :classroom_id");
@@ -27,20 +27,20 @@ if ($contador > 0) {
             session_start();
             $_SESSION['mensaje'] = "Se ha eliminado el salón correctamente.";
             $_SESSION['icono'] = "success";
-            header('Location:' . APP_URL . "/portal/salones");
+            header('Location:' . APP_URL . "/admin/salones");
             exit;
         } else {
             session_start();
             $_SESSION['mensaje'] = "No se ha podido eliminar el salón, comuníquese con el área de IT.";
             $_SESSION['icono'] = "error";
-            header('Location:' . APP_URL . "/portal/salones");
+            header('Location:' . APP_URL . "/admin/salones");
             exit;
         }
     } catch (Exception $e) {
         session_start();
         $_SESSION['mensaje'] = "Error al eliminar el salón: " . $e->getMessage();
         $_SESSION['icono'] = "error";
-        header('Location:' . APP_URL . "/portal/salones");
+        header('Location:' . APP_URL . "/admin/salones");
         exit;
     }
 }

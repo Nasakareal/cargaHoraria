@@ -6,11 +6,11 @@ include('../../app/helpers/verificar_admin.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/grupos/listado_de_grupos.php');
 include('../../app/controllers/materias/listado_de_materias.php');
-include('../../app/controllers/profesores/listado_de_profesores.php'); // Asegúrate de tener este archivo para contar los profesores
+include('../../app/controllers/profesores/listado_de_profesores.php');
 
 $total_groups = count($groups);
 $total_subjects = count($subjects);
-$total_teachers = count($teachers); // Contar el total de profesores
+$total_teachers = count($teachers);
 ?>
 
 <div class="content-wrapper">
