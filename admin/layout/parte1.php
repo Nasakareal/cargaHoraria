@@ -78,7 +78,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       </li>
       <li class="nav-item">
         <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
-          <i class="fas fa-th-large"></i>
+          <i class="bi bi-chat-right-dots"></i>
           
         </a>
         

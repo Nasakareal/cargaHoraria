@@ -2,15 +2,15 @@
   "ExpandedNodes": [
     "",
     "\\admin",
+    "\\admin\\configuraciones",
+    "\\admin\\layout",
+    "\\admin\\profesores",
     "\\app",
     "\\app\\controllers",
-    "\\app\\controllers\\autoSalones",
-    "\\app\\controllers\\turnos",
-    "\\app\\helpers",
-    "\\database",
-    "\\layout",
-    "\\portal"
+    "\\app\\controllers\\materias",
+    "\\app\\controllers\\vaciados",
+    "\\public"
   ],
-  "SelectedNode": "\\layout\\parte1.php",
+  "SelectedNode": "\\admin\\profesores\\index.php",
   "PreviewInSolutionExplorer": false
 }

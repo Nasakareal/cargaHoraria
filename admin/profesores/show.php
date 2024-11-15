@@ -36,6 +36,22 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
                                     </div>
                                 </div>
 
+                                <!-- Clasificación (Categoría) -->
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">Clasificación</label>
+                                        <p><?= $clasificacion ?? 'No asignado'; ?></p> 
+                                    </div>
+                                </div>
+
+                                <!-- Área -->
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">Área</label>
+                                        <p><?= $area ?? 'No asignado'; ?></p> 
+                                    </div>
+                                </div>
+
                                 <!-- Materias -->
                                 <div class="col-md-4">
                                     <div class="form-group">
@@ -52,19 +68,19 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
                                     </div>
                                 </div>
 
+                                <!-- Programas -->
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="">Programa</label>
+                                        <p><?= $programa_adscripcion ?? 'No asignado'; ?></p>
+                                    </div>
+                                </div>
+
                                 <!-- Programa de Adscripción -->
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Programa de Adscripción</label>
-                                        <p><?= $programa ?? 'No asignado'; ?></p>
-                                    </div>
-                                </div>
-
-                                <!-- Cuatrimestre -->
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="">Cuatrimestre</label>
-                                        <p><?= $cuatrimestre ?? 'No asignado'; ?></p>
+                                        <p><?= $programa_especializacion ?? 'No asignado'; ?></p>
                                     </div>
                                 </div>
                             </div>
