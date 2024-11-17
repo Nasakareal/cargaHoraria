@@ -2,6 +2,7 @@
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/profesores/listado_de_profesores.php');
+include('../../app/controllers/relacion_profesor_programa_cuatrimestre/listado_de_relacion.php');
 ?>
 
 <!-- Content Wrapper. Contains page content -->

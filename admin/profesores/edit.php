@@ -11,9 +11,9 @@ include('../../admin/layout/parte1.php');
 include('../../app/controllers/profesores/datos_del_profesor.php');
 include('../../app/controllers/programas/listado_de_programas.php');
 
-/* Inicializar variables para evitar errores de 'undefined variable' */
 $clasificacion = isset($clasificacion) ? $clasificacion : '';
 $specialization_program_id = isset($specialization_program_id) ? $specialization_program_id : '';
+$programa_adscripcion_id = isset($program_id) ? $program_id : null; // Programa de Adscripción actual
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -60,15 +60,31 @@ $specialization_program_id = isset($specialization_program_id) ? $specialization
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="">Programa de Adscripción</label>
-                                            <select name="programa_id" id="programa_id" class="form-control" required>
+                                            <label for="programa_adscripcion">Programa de Adscripción</label>
+                                            <select name="programa_adscripcion" id="programa_adscripcion" class="form-control">
                                                 <option value="">Seleccione un programa</option>
                                                 <?php foreach ($programs as $program): ?>
-                                                    <option value="<?= $program['program_id']; ?>" <?= ($specialization_program_id == $program['program_id']) ? 'selected' : ''; ?>>
+                                                    <option value="<?= $program['program_id']; ?>" <?= ($programa_adscripcion_id == $program['program_id']) ? 'selected' : ''; ?>>
                                                         <?= htmlspecialchars($program['program_name']); ?>
                                                     </option>
                                                 <?php endforeach; ?>
                                             </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Programas -->
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label for="programas">Programas</label>
+                                            <div id="programas">
+                                                <?php foreach ($programs as $program): ?>
+                                                    <div>
+                                                        <input type="checkbox" name="programas[]" value="<?= $program['program_id']; ?>" id="programa_<?= $program['program_id']; ?>" <?= ($programa_adscripcion_id ? 'disabled' : ''); ?>>
+                                                        <label for="programa_<?= $program['program_id']; ?>"><?= htmlspecialchars($program['program_name']); ?></label>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            </div>
+                                            <small class="text-muted">Seleccione múltiples programas si no hay programa de adscripción.</small>
                                         </div>
                                     </div>
                                 </div>
@@ -88,6 +104,26 @@ $specialization_program_id = isset($specialization_program_id) ? $specialization
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const programaAdscripcion = document.getElementById('programa_adscripcion');
+        const checkboxes = document.querySelectorAll('#programas input[type="checkbox"]');
+
+        function toggleCheckboxes() {
+            const disabled = programaAdscripcion.value !== '';
+            checkboxes.forEach(checkbox => {
+                checkbox.disabled = disabled;
+                if (disabled) checkbox.checked = false; 
+            });
+        }
+
+        programaAdscripcion.addEventListener('change', toggleCheckboxes);
+
+        // Ejecutar al cargar la página
+        toggleCheckboxes();
+    });
+</script>
 
 <?php
 include('../../admin/layout/parte2.php');

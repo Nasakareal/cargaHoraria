@@ -35,46 +35,39 @@ include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.ph
                             <form action="<?= APP_URL; ?>/app/controllers/profesores/update_subjects.php" method="post">
                                 <input type="hidden" name="teacher_id" value="<?= htmlspecialchars($teacher_id); ?>">
 
-                                <!-- Programa -->
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="">Programa</label>
-                                            <select name="programa_id" id="programa_id" class="form-control" required>
-                                                <option value="">Seleccione un programa</option>
-                                                <?php foreach ($programs as $program): ?>
-                                                    <option value="<?= $program['program_id']; ?>" <?= ($programa_id == $program['program_id']) ? 'selected' : ''; ?>>
-                                                        <?= htmlspecialchars($program['program_name']); ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <!-- Cuatrimestre -->
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="">Cuatrimestre</label>
-                                            <select name="cuatrimestre_id" id="cuatrimestre_id" class="form-control" required>
-                                                <option value="">Seleccione un cuatrimestre</option>
-                                                <?php foreach ($terms as $term): ?>
-                                                    <option value="<?= $term['term_id']; ?>" <?= ($cuatrimestre_id == $term['term_id']) ? 'selected' : ''; ?>>
-                                                        <?= htmlspecialchars($term['term_name']); ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
+                                
 
                                 <!-- Total de horas asignadas -->
                                 <div class="row" style="margin-top: 20px;">
-                                    <div class="col-md-4">
+                                    <div class="col-md-5">
                                         <div class="form-group">
                                             <label for="total_hours">Total de horas asignadas</label>
                                             <input type="text" id="total_hours" name="total_hours" class="form-control" value="0" readonly>
                                         </div>
                                     </div>
+
+<!-- Grupos disponibles -->
+<div class="col-md-5">
+    <label for="grupos_disponibles">Grupos disponibles</label>
+    <div class="input-group">
+        <select id="grupos_disponibles" name="grupos_disponibles" class="form-control">
+            <?php
+            include('../../app/controllers/relacion_profesor_grupos/grupos_disponibles.php');
+            ?>
+        </select>
+        <button id="confirm_group" class="btn btn-primary" type="button">Seleccionar Grupo</button>
+    </div>
+</div>
+
+
+
+
+
+                                </div>
+
+                                <!-- Grupos disponibles y asignados -->
+                                <div class="row">
+                                    
                                 </div>
 
                                 <!-- Materias disponibles y asignadas -->
@@ -112,41 +105,7 @@ include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.ph
                                     </div>
                                 </div>
 
-                                <!-- Grupos disponibles y asignados -->
-                                <div class="row">
-                                    <!-- Grupos disponibles -->
-                                    <div class="col-md-5">
-                                        <label for="">Grupos disponibles</label>
-                                        <select id="grupos_disponibles" class="form-control" multiple style="height:200px;">
-                                            <?php foreach ($grupos_disponibles as $grupo): ?>
-                                                <?php if (!in_array($grupo['group_id'], array_column($grupos_asignados, 'group_id'))): ?>
-                                                    <option value="<?= $grupo['group_id']; ?>">
-                                                        <?= htmlspecialchars($grupo['group_name']); ?>
-                                                    </option>
-                                                <?php endif; ?>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-
-                                    <!-- Botones para agregar y quitar grupos -->
-                                    <div class="col-md-2 text-center" style="margin-top: 80px;">
-                                        <button type="button" id="add_group" class="btn btn-primary btn-block">Agregar &gt;&gt;</button>
-                                        <button type="button" id="remove_group" class="btn btn-primary btn-block">&lt;&lt; Quitar</button>
-                                    </div>
-
-                                    <!-- Grupos asignados -->
-                                    <div class="col-md-5">
-                                        <label for="">Grupos asignados</label>
-                                        <select id="grupos_asignados" name="grupos_asignados[]" class="form-control" multiple style="height:200px;">
-                                            <?php foreach ($grupos_asignados as $grupo_asignado): ?>
-                                                <option value="<?= $grupo_asignado['group_id']; ?>" selected>
-                                                    <?= htmlspecialchars($grupo_asignado['group_name']); ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                </div>
-
+                                
                                 <!-- Botón de actualización -->
                                 <div class="row" style="margin-top:20px;">
                                     <div class="col-md-12">

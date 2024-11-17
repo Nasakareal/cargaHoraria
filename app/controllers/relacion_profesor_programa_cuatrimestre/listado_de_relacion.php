@@ -1,18 +1,30 @@
 <?php
-$sql_relacion = "SELECT 
-                    pt.program_id, 
-                    pt.term_id, 
-                    p.program_name, 
-                    t.term_name 
-                FROM 
-                    teacher_program_term pt 
-                JOIN 
-                    programs p ON pt.program_id = p.program_id 
-                JOIN 
-                    terms t ON pt.term_id = t.term_id 
-                WHERE 
-                    pt.teacher_id = :teacher_id";
+$sql_teachers = "
+    SELECT 
+        t.teacher_id,
+        t.teacher_name AS profesor,
+        COALESCE(pa.program_name, 'Sin programa de adscripción') AS programa_adscripcion,
+        GROUP_CONCAT(DISTINCT ptt.program_name SEPARATOR ', ') AS programas,
+        GROUP_CONCAT(DISTINCT tm.term_name SEPARATOR ', ') AS cuatrimestres,
+        GROUP_CONCAT(DISTINCT s.subject_name SEPARATOR ', ') AS materias,
+        t.hours AS horas_semanales
+    FROM
+        teachers t
+    LEFT JOIN
+        programs pa ON t.specialization_program_id = pa.program_id
+    LEFT JOIN
+        teacher_program_term tpt ON t.teacher_id = tpt.teacher_id
+    LEFT JOIN
+        programs ptt ON tpt.program_id = ptt.program_id
+    LEFT JOIN
+        terms tm ON tpt.term_id = tm.term_id
+    LEFT JOIN
+        teacher_subjects ts ON t.teacher_id = ts.teacher_id
+    LEFT JOIN
+        subjects s ON ts.subject_id = s.subject_id
+    GROUP BY
+        t.teacher_id";
 
-$query_relacion = $pdo->prepare($sql_relacion);
-$query_relacion->execute(['teacher_id' => $teacher_id]);
-$relacion_programas_cuatrimestres = $query_relacion->fetchAll(PDO::FETCH_ASSOC);
+$query_teachers = $pdo->prepare($sql_teachers);
+$query_teachers->execute();
+$teachers = $query_teachers->fetchAll(PDO::FETCH_ASSOC);

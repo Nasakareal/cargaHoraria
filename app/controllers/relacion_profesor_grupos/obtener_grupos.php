@@ -1,45 +1,41 @@
 <?php
-include('../../../app/config.php');
+include('../../config.php');
 
-
-if (!$pdo) {
-    echo "<option>Error en la conexión a la base de datos</option>";
-    exit;
-}
-
-/* Obtener el programa y cuatrimestre desde la solicitud POST */
+// Obtener el programa y cuatrimestre desde la solicitud POST
 $programa_id = filter_input(INPUT_POST, 'programa_id', FILTER_VALIDATE_INT);
-$cuatrimestre_id = filter_input(INPUT_POST, 'cuatrimestre_id', FILTER_VALIDATE_INT);
 
-/* Validar los datos recibidos */
-if (!$programa_id || !$cuatrimestre_id) {
-    echo "<option value=''>Programa o cuatrimestre no válido</option>";
+// Verificar que se haya recibido el programa
+if (!$programa_id) {
+    echo "<option value=''>Programa no válido</option>";
+    error_log("Error: Programa no válido o no recibido");
     exit;
 }
 
-/* Consulta SQL para obtener los grupos */
-$query = "SELECT g.group_id, g.group_name 
-          FROM `groups` g
-          WHERE g.program_id = :programa_id AND g.term_id = :cuatrimestre_id AND g.estado = '1'";
+// Consulta para obtener los grupos del programa seleccionado
+$sql = "
+    SELECT g.group_id, g.group_name
+    FROM `groups` g
+    WHERE g.program_id = :programa_id
+    AND g.estado = '1'
+";
 
-$statement = $pdo->prepare($query);
+try {
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':programa_id' => $programa_id]);
 
-/* Ejecutar la consulta */
-if ($statement->execute([':programa_id' => $programa_id, ':cuatrimestre_id' => $cuatrimestre_id])) {
-    $grupos = $statement->fetchAll(PDO::FETCH_ASSOC);
+    $grupos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    /* Verificar si se encontraron grupos */
-    if ($grupos) {
-        /* Generar opciones para cada grupo encontrado */
+    // Verificar si se encontraron grupos
+    if (empty($grupos)) {
+        echo "<option value=''>No se encontraron grupos disponibles para este programa</option>";
+        error_log("No se encontraron grupos para el programa_id: " . $programa_id);
+    } else {
+        // Generar las opciones del select
         foreach ($grupos as $grupo) {
             echo "<option value='" . htmlspecialchars($grupo['group_id']) . "'>" . htmlspecialchars($grupo['group_name']) . "</option>";
         }
-    } else {
-        /* Si no hay grupos que coincidan con los criterios */
-        echo "<option value=''>No hay grupos disponibles para este programa y cuatrimestre</option>";
     }
-} else {
-    
-    $errorInfo = $statement->errorInfo();
-    echo "<option>Error en la consulta de grupos: {$errorInfo[2]}</option>";
+} catch (PDOException $e) {
+    echo "<option value=''>Error en la consulta de grupos</option>";
+    error_log("Error en la consulta: " . $e->getMessage());
 }

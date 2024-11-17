@@ -1,64 +1,51 @@
 <?php
-include('../../config.php');
+include_once($_SERVER['DOCUMENT_ROOT'] . '/sistemaGestionEscolar/app/config.php');
 
-/* Obtener los datos del POST */
-$programa_id = filter_input(INPUT_POST, 'programa_id', FILTER_VALIDATE_INT);
-$cuatrimestre_id = filter_input(INPUT_POST, 'cuatrimestre_id', FILTER_VALIDATE_INT);
+// Obtener el ID del grupo desde la solicitud POST
+$group_id = filter_input(INPUT_POST, 'group_id', FILTER_VALIDATE_INT);
 
-/* Obtener los IDs de materias ya asignadas */
-$assigned_subjects = filter_input(INPUT_POST, 'assigned_subjects', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
-if (!$assigned_subjects) {
-    $assigned_subjects = [];
-} else {
-    /* Asegurarse de que todos los IDs sean numéricos */
-    $assigned_subjects = array_filter($assigned_subjects, 'is_numeric');
-}
-
-/* Verificar que se reciban correctamente los IDs de programa y cuatrimestre */
-if (!$programa_id || !$cuatrimestre_id) {
-    echo "ID de programa o cuatrimestre no válidos.";
+// Verificar que se haya recibido un grupo válido
+if (!$group_id) {
+    echo "<option value=''>Grupo no válido</option>";
+    error_log("Error: Grupo no válido o no recibido");
     exit;
 }
 
-/* Base de la consulta SQL */
+// Consulta para obtener las materias del grupo que aún no tienen profesor asignado
 $sql = "
-    SELECT s.subject_id, s.subject_name, s.weekly_hours
-    FROM subjects s
-    INNER JOIN program_term_subjects pts ON s.subject_id = pts.subject_id
-    WHERE pts.program_id = :programa_id AND pts.term_id = :cuatrimestre_id
+    SELECT 
+        s.subject_id, 
+        s.subject_name, 
+        s.weekly_hours 
+    FROM 
+        group_subjects gs
+    JOIN 
+        subjects s ON gs.subject_id = s.subject_id
+    LEFT JOIN 
+        teacher_subjects ts ON s.subject_id = ts.subject_id
+    WHERE 
+        gs.group_id = :group_id 
+        AND gs.estado = '1'
+        AND ts.teacher_id IS NULL
 ";
 
-$params = [':programa_id' => $programa_id, ':cuatrimestre_id' => $cuatrimestre_id];
-
-/* Excluir las materias ya asignadas */
-if (!empty($assigned_subjects)) {
-    $placeholders = [];
-    foreach ($assigned_subjects as $index => $subject_id) {
-        $key = ":subject_id_$index";
-        $placeholders[] = $key;
-        $params[$key] = $subject_id;
-    }
-    $placeholders_str = implode(',', $placeholders);
-    $sql .= " AND s.subject_id NOT IN ($placeholders_str)";
-}
-
 try {
-    /* Preparar y ejecutar la consulta */
     $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
+    $stmt->execute([':group_id' => $group_id]);
 
-    /* Obtener las materias disponibles */
-    $materias_disponibles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $materias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    /* Verificar si se obtuvieron resultados */
-    if (empty($materias_disponibles)) {
-        echo "No se encontraron materias.";
+    // Verificar si se encontraron materias
+    if (empty($materias)) {
+        echo "<option value=''>No hay materias disponibles para este grupo</option>";
+        error_log("No se encontraron materias disponibles para el group_id: " . $group_id);
     } else {
-        /* Generar las opciones */
-        foreach ($materias_disponibles as $materia) {
-            echo '<option value="' . $materia['subject_id'] . '" data-hours="' . $materia['weekly_hours'] . '">' . htmlspecialchars($materia['subject_name']) . '</option>';
+        // Generar las opciones del select
+        foreach ($materias as $materia) {
+            echo "<option value='" . htmlspecialchars($materia['subject_id']) . "' data-hours='" . htmlspecialchars($materia['weekly_hours']) . "'>" . htmlspecialchars($materia['subject_name']) . "</option>";
         }
     }
 } catch (PDOException $e) {
-    echo "Error en la consulta: " . $e->getMessage();
+    echo "<option value=''>Error en la consulta de materias</option>";
+    error_log("Error en la consulta: " . $e->getMessage());
 }

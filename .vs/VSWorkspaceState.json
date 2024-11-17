@@ -1,16 +1,16 @@
 {
   "ExpandedNodes": [
     "",
-    "\\admin",
-    "\\admin\\configuraciones",
-    "\\admin\\layout",
-    "\\admin\\profesores",
     "\\app",
     "\\app\\controllers",
-    "\\app\\controllers\\materias",
-    "\\app\\controllers\\vaciados",
-    "\\public"
+    "\\app\\controllers\\profesores",
+    "\\app\\controllers\\relacion_materia_cuatrimestre_programa",
+    "\\app\\controllers\\relacion_profesor_grupos",
+    "\\app\\controllers\\relacion_profesor_materias",
+    "\\app\\controllers\\relacion_profesor_programa_cuatrimestre",
+    "\\app\\helpers",
+    "\\database"
   ],
-  "SelectedNode": "\\admin\\profesores\\index.php",
+  "SelectedNode": "\\admin\\profesores\\asignar_horario_profesor.php",
   "PreviewInSolutionExplorer": false
 }
