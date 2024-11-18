@@ -23,18 +23,36 @@ $programs = $sentencia->fetchAll(PDO::FETCH_ASSOC);
                             <h3 class="card-title">Programas registrados</h3>
                             <br>
                             <div class="card-tools d-flex">
-                                <a href="create.php" class="btn btn-primary me-2">
-                                    <i class="bi bi-plus-square"></i> Agregar nuevo programa
-                                </a>
+                            <?php if (isset($_SESSION['sesion_rol']) && $_SESSION['sesion_rol'] == 1): ?>
+    <!-- Botón habilitado para administradores -->
+    <a href="create.php" class="btn btn-primary me-2">
+        <i class="bi bi-plus-square"></i> Agregar nuevo programa
+    </a>
 
-                                <!-- Agregar programas desde archivo -->
-                                <form action="<?= APP_URL; ?>/app/controllers/programas/upload.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center">
-                                    <div class="form-group me-2">
-                                        <label for="file" class="d-none">Selecciona un archivo CSV:</label>
-                                        <input type="file" name="file" accept=".csv, .xlsx" required>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Cargar Programas</button>
-                                </form>
+    <!-- Formulario habilitado para administradores -->
+    <form action="<?= APP_URL; ?>/app/controllers/programas/upload.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center">
+        <div class="form-group me-2">
+            <label for="file" class="d-none">Selecciona un archivo CSV:</label>
+            <input type="file" name="file" accept=".csv, .xlsx" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Cargar Programas</button>
+    </form>
+<?php else: ?>
+    <!-- Botón deshabilitado para otros roles -->
+    <a href="#" class="btn btn-primary me-2 disabled" aria-disabled="true" title="Solo disponible para administradores">
+        <i class="bi bi-plus-square"></i> Agregar nuevo programa
+    </a>
+
+    <!-- Formulario deshabilitado para otros roles -->
+    <form class="d-flex align-items-center">
+        <div class="form-group me-2">
+            <label for="file" class="d-none">Selecciona un archivo CSV:</label>
+            <input type="file" name="file" accept=".csv, .xlsx" disabled>
+        </div>
+        <button type="button" class="btn btn-primary disabled" aria-disabled="true" title="Solo disponible para administradores">Cargar Programas</button>
+    </form>
+<?php endif; ?>
+
                             </div>
                         </div>
 
@@ -71,7 +89,7 @@ $programs = $sentencia->fetchAll(PDO::FETCH_ASSOC);
                                                         event.preventDefault();
                                                         Swal.fire({
                                                             title: 'Eliminar Programa',
-                                                            text: '�Desea eliminar este Programa?',
+                                                            text: '¿Desea eliminar este Programa?',
                                                             icon: 'question',
                                                             showDenyButton: true,
                                                             confirmButtonText: 'Eliminar',
@@ -116,7 +134,7 @@ include('../../layout/mensajes.php');
         $("#example1").DataTable({
             "pageLength": 5,
             "language": {
-                "emptyTable": "No hay informaci�n",
+                "emptyTable": "No hay información",
                 "info": "Mostrando _START_ a _END_ de _TOTAL_ Programas",
                 "infoEmpty": "Mostrando 0 a 0 de 0 Programas",
                 "infoFiltered": "(Filtrado de _Max_ total Programas)",

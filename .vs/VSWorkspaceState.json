@@ -11,6 +11,6 @@
     "\\app\\helpers",
     "\\database"
   ],
-  "SelectedNode": "\\admin\\profesores\\asignar_horario_profesor.php",
+  "SelectedNode": "\\app\\helpers\\verificar_admin.php",
   "PreviewInSolutionExplorer": false
 }

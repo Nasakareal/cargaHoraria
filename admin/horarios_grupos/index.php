@@ -27,10 +27,17 @@ $groups = $stmt_groups->fetchAll(PDO::FETCH_ASSOC);
                             <h3 class="card-title">Grupos registrados</h3>
 
                             <div class="card-tools">
-                                <!-- Botón para asignar horario -->
-                                <a href="index.php?accion=generar_horario" class="btn btn-secondary">
-                                    <i class="bi bi-arrow-repeat"></i> Asignar Horario
-                                </a>
+<!-- Botón para asignar horario -->
+<?php if (isset($_SESSION['sesion_rol']) && $_SESSION['sesion_rol'] == 1): ?>
+    <a href="index.php?accion=generar_horario" class="btn btn-primary">
+        <i class="bi bi-arrow-repeat"></i> Asignar Horario
+    </a>
+<?php else: ?>
+    <a href="#" class="btn btn-secondary disabled" tabindex="-1" aria-disabled="true">
+        <i class="bi bi-arrow-repeat"></i> Asignar Horario
+    </a>
+<?php endif; ?>
+
                             </div>
                         </div>
                         <div class="card-body">

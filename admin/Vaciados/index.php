@@ -89,6 +89,7 @@ $total_teachers = count($teachers);
 
 <?php
 include('../../admin/layout/parte2.php');
+include('../../admin/layout/mensajes.php');
 ?>
 
 <script>

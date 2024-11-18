@@ -19,11 +19,22 @@ include('../../app/controllers/grupos/listado_grupos_salones.php');
                         <div class="card-header">
                             <h3 class="card-title">Grupos registrados</h3>
                             <div class="card-tools d-flex">
-                                <form action="../../app/controllers/autoSalones/logica.php" method="POST" style="display:inline;">
-                                    <button type="submit" name="auto-assign" class="btn btn-secondary">
-                                        <i class="bi bi-arrow-repeat"></i> Asignar Salones
-                                    </button>
-                                </form>
+                            <?php if (isset($_SESSION['sesion_rol']) && $_SESSION['sesion_rol'] == 1): ?>
+    <!-- Formulario habilitado para administradores -->
+    <form action="../../app/controllers/autoSalones/logica.php" method="POST" style="display:inline;">
+        <button type="submit" name="auto-assign" class="btn btn-primary">
+            <i class="bi bi-arrow-repeat"></i> Asignar Salones
+        </button>
+    </form>
+<?php else: ?>
+    <!-- Formulario deshabilitado para otros roles -->
+    <form style="display:inline;">
+        <button type="button" class="btn btn-primary disabled" aria-disabled="true" title="Solo disponible para administradores">
+            <i class="bi bi-arrow-repeat"></i> Asignar Salones
+        </button>
+    </form>
+<?php endif; ?>
+
                             </div>
                         </div>
 

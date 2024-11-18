@@ -7,8 +7,16 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Verificar si el usuario es admin
+if (!isset($_SESSION['sesion_rol']) || $_SESSION['sesion_rol'] != 1) {
+    $_SESSION['mensaje'] = "No tienes permisos para eliminar grupos. Solo los administradores pueden realizar esta acción.";
+    $_SESSION['icono'] = "error";
+    header('Location:' . APP_URL . "/admin/grupos");
+    exit();
+}
+
 try {
-    /* Eliminar los registros relacionados en la tabla `educational_levels */`
+    /* Eliminar los registros relacionados en la tabla `educational_levels` */
     $sentencia_niveles = $pdo->prepare("DELETE FROM `educational_levels` WHERE group_id = :group_id");
     $sentencia_niveles->bindParam(':group_id', $group_id);
     $sentencia_niveles->execute();

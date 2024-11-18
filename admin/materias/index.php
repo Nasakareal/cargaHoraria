@@ -38,14 +38,34 @@ function obtenerLaboratoriosAsignados($pdo, $subject_id)
                             <h3 class="card-title">Materias registradas</h3>
                             <br>
                             <div class="card-tools">
-                                <a href="create.php" class="btn btn-primary"><i class="bi bi-plus-square"></i> Añadir nueva materia</a>
-                                <form action="<?= APP_URL; ?>/app/controllers/materias/upload.php" method="post" enctype="multipart/form-data" class="d-inline">
-                                    <div class="form-group d-inline">
-                                        <label for="file" class="sr-only">Selecciona un archivo CSV:</label>
-                                        <input type="file" name="file" accept=".csv, .xlsx" required class="form-control-file d-inline" style="display: inline-block; width: auto;">
-                                    </div>
-                                    <button type="submit" class="btn btn-primary d-inline">Cargar Materias</button>
-                                </form>
+                            <?php if (isset($_SESSION['sesion_rol']) && $_SESSION['sesion_rol'] == 1): ?>
+    <!-- Botón habilitado para administradores -->
+    <a href="create.php" class="btn btn-primary"><i class="bi bi-plus-square"></i> Añadir nueva materia</a>
+
+    <!-- Formulario habilitado para administradores -->
+    <form action="<?= APP_URL; ?>/app/controllers/materias/upload.php" method="post" enctype="multipart/form-data" class="d-inline">
+        <div class="form-group d-inline">
+            <label for="file" class="sr-only">Selecciona un archivo CSV:</label>
+            <input type="file" name="file" accept=".csv, .xlsx" required class="form-control-file d-inline" style="display: inline-block; width: auto;">
+        </div>
+        <button type="submit" class="btn btn-primary d-inline">Cargar Materias</button>
+    </form>
+<?php else: ?>
+    <!-- Botón deshabilitado para otros roles -->
+    <a href="#" class="btn btn-primary disabled" aria-disabled="true" title="Solo disponible para administradores">
+        <i class="bi bi-plus-square"></i> Añadir nueva materia
+    </a>
+
+    <!-- Formulario deshabilitado para otros roles -->
+    <form class="d-inline">
+        <div class="form-group d-inline">
+            <label for="file" class="sr-only">Selecciona un archivo CSV:</label>
+            <input type="file" name="file" accept=".csv, .xlsx" disabled class="form-control-file d-inline" style="display: inline-block; width: auto;">
+        </div>
+        <button type="button" class="btn btn-primary d-inline disabled" aria-disabled="true" title="Solo disponible para administradores">Cargar Materias</button>
+    </form>
+<?php endif; ?>
+
                             </div>
                         </div>
 

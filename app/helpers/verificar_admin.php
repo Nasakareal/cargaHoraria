@@ -1,5 +1,5 @@
 <?php
-include_once($_SERVER['DOCUMENT_ROOT'] . '/sistemaGestionEscolar/app/config.php');
+include_once($_SERVER['DOCUMENT_ROOT'] . '/cargaHoraria/app/config.php');
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

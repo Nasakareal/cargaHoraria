@@ -31,11 +31,10 @@ include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.ph
                             <h3 class="card-title">Llene los datos</h3>
                         </div>
                         <div class="card-body">
-                            <!-- Formulario con método POST y acción que apunta a `update.php` -->
+                            <!-- Formulario con método POST y acción que apunta a `update_subjects.php` -->
                             <form action="<?= APP_URL; ?>/app/controllers/profesores/update_subjects.php" method="post">
                                 <input type="hidden" name="teacher_id" value="<?= htmlspecialchars($teacher_id); ?>">
-
-                                
+                                <input type="hidden" id="grupos_asignados" name="grupos_asignados[]" value=""> <!-- Campo oculto para los grupos -->
 
                                 <!-- Total de horas asignadas -->
                                 <div class="row" style="margin-top: 20px;">
@@ -46,66 +45,43 @@ include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.ph
                                         </div>
                                     </div>
 
-<!-- Grupos disponibles -->
-<div class="col-md-5">
-    <label for="grupos_disponibles">Grupos disponibles</label>
-    <div class="input-group">
-        <select id="grupos_disponibles" name="grupos_disponibles" class="form-control">
-            <?php
-            include('../../app/controllers/relacion_profesor_grupos/grupos_disponibles.php');
-            ?>
-        </select>
-        <button id="confirm_group" class="btn btn-primary" type="button">Seleccionar Grupo</button>
-    </div>
-</div>
-
-
-
-
-
-                                </div>
-
-                                <!-- Grupos disponibles y asignados -->
-                                <div class="row">
-                                    
+                                    <!-- Grupos disponibles -->
+                                    <div class="col-md-5">
+                                        <label for="grupos_disponibles">Grupos disponibles</label>
+                                        <div class="input-group">
+                                            <select id="grupos_disponibles" name="grupos_disponibles" class="form-control">
+                                                <?php include('../../app/controllers/relacion_profesor_grupos/grupos_disponibles.php'); ?>
+                                            </select>
+                                            <button id="confirm_group" class="btn btn-primary" type="button">Seleccionar Grupo</button>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Materias disponibles y asignadas -->
                                 <div class="row">
                                     <!-- Materias disponibles -->
                                     <div class="col-md-5">
-                                        <label for="">Materias disponibles</label>
-                                        <select id="materias_disponibles" class="form-control" multiple style="height:200px;">
-                                            <?php foreach ($materias_disponibles as $materia): ?>
-                                                <?php if (!in_array($materia['subject_id'], array_column($materias_asignadas, 'subject_id'))): ?>
-                                                    <option value="<?= $materia['subject_id']; ?>" data-hours="<?= isset($materia['weekly_hours']) ? $materia['weekly_hours'] : 0; ?>">
-                                                        <?= htmlspecialchars($materia['subject_name']); ?>
-                                                    </option>
-                                                <?php endif; ?>
-                                            <?php endforeach; ?>
-                                        </select>
+                                        <label for="materias_disponibles">Materias disponibles</label>
+                                        <select id="materias_disponibles" class="form-control" multiple style="height:200px;"></select>
                                     </div>
 
                                     <!-- Botones para agregar y quitar materias -->
                                     <div class="col-md-2 text-center" style="margin-top: 80px;">
                                         <button type="button" id="add_subject" class="btn btn-primary btn-block">Agregar &gt;&gt;</button>
-                                        <button type="button" id="remove_subject" class="btn btn-primary btn-block">&lt;&lt; Quitar</button>
+                                        <?php if (isset($_SESSION['sesion_rol']) && $_SESSION['sesion_rol'] == 1): ?>
+                                            <button type="button" id="remove_subject" class="btn btn-primary btn-block">&lt;&lt; Quitar</button>
+                                        <?php else: ?>
+                                            <button type="button" id="remove_subject" class="btn btn-primary btn-block" disabled>&lt;&lt; Quitar</button>
+                                        <?php endif; ?>
                                     </div>
 
                                     <!-- Materias asignadas -->
                                     <div class="col-md-5">
-                                        <label for="">Materias asignadas</label>
-                                        <select id="materias_asignadas" name="materias_asignadas[]" class="form-control" multiple style="height:200px;">
-                                            <?php foreach ($materias_asignadas as $materia_asignada): ?>
-                                                <option value="<?= $materia_asignada['subject_id']; ?>" data-hours="<?= isset($materia_asignada['weekly_hours']) ? $materia_asignada['weekly_hours'] : 0; ?>" selected>
-                                                    <?= htmlspecialchars($materia_asignada['subject_name']); ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
+                                        <label for="materias_asignadas">Materias asignadas</label>
+                                        <select id="materias_asignadas" name="materias_asignadas[]" class="form-control" multiple style="height:200px;"></select>
                                     </div>
                                 </div>
 
-                                
                                 <!-- Botón de actualización -->
                                 <div class="row" style="margin-top:20px;">
                                     <div class="col-md-12">

@@ -1,5 +1,5 @@
 <?php
-include_once($_SERVER['DOCUMENT_ROOT'] . '/sistemaGestionEscolar/app/config.php');
+include_once($_SERVER['DOCUMENT_ROOT'] . '/cargaHoraria/app/config.php');
 
 // Obtener el ID del grupo desde la solicitud POST
 $group_id = filter_input(INPUT_POST, 'group_id', FILTER_VALIDATE_INT);
@@ -26,7 +26,7 @@ $sql = "
     WHERE 
         gs.group_id = :group_id 
         AND gs.estado = '1'
-        AND ts.teacher_id IS NULL
+        AND (ts.teacher_id IS NULL OR ts.teacher_id = 0)
 ";
 
 try {

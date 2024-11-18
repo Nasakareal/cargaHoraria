@@ -8,7 +8,19 @@ if (!$subject_id) {
     $_SESSION['mensaje'] = "ID de materia inválido.";
     $_SESSION['icono'] = "error";
     header('Location: ' . APP_URL . "/admin/materias");
-    exit;
+    exit();
+}
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+/* Verificar si el usuario es admin */
+if (!isset($_SESSION['sesion_rol']) || $_SESSION['sesion_rol'] != 1) {
+    $_SESSION['mensaje'] = "No tienes permisos para eliminar materias. Solo los administradores pueden realizar esta acción.";
+    $_SESSION['icono'] = "error";
+    header('Location: ' . APP_URL . "/admin/materias");
+    exit();
 }
 
 try {
@@ -16,17 +28,15 @@ try {
     $sentencia->bindParam(':subject_id', $subject_id);
 
     if ($sentencia->execute()) {
-        session_start();
-        $_SESSION['mensaje'] = "Se ha eliminado la materia";
+        $_SESSION['mensaje'] = "Se ha eliminado la materia.";
         $_SESSION['icono'] = "success";
     } else {
         throw new Exception("Error al eliminar la materia.");
     }
 } catch (Exception $e) {
-    session_start();
     $_SESSION['mensaje'] = "No se ha podido eliminar la materia, comuníquese con el área de IT: " . $e->getMessage();
     $_SESSION['icono'] = "error";
 }
 
 header('Location: ' . APP_URL . "/admin/materias");
-exit;
+exit();

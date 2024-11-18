@@ -2,10 +2,10 @@
 define ('SERVIDOR','localhost');
 define ('USUARIO','root');
 define ('PASSWORD','');
-define ('BD','sistemaGestionEscolar');
+define ('BD','cargaHoraria');
 
 define ('APP_NAME','Sistema De Carga Horaria');
-define ('APP_URL','http://localhost/sistemaGestionEscolar');
+define ('APP_URL','http://localhost/cargaHoraria');
 define ('KEY_API_MAPS','');
 
 $servidor = "mysql:dbname=" . BD . ";host=" . SERVIDOR . ";charset=utf8mb4";
