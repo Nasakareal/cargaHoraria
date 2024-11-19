@@ -1,4 +1,4 @@
-<?php
+-<?php
 
 header('Content-Type: text/html; charset=utf-8');
 
@@ -30,21 +30,21 @@ include('../../app/controllers/niveles/listado_de_niveles.php');
             <i class="bi bi-plus-square"></i> Agregar nuevo Grupo
         </a>
 
-        <!-- Añadir grupos desde archivo -->
-        <form action="<?= APP_URL; ?>/app/controllers/grupos/upload.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center">
-            <div class="form-group me-2">
-                <label for="file" class="d-none">Selecciona un archivo CSV:</label>
-                <?php if (isset($_SESSION['sesion_rol']) && $_SESSION['sesion_rol'] == 1): ?>
-                    <input type="file" name="file" accept=".csv, .xlsx" required>
-                    <button type="submit" class="btn btn-primary">Cargar Grupos</button>
-                <?php else: ?>
-                    <input type="file" name="file" accept=".csv, .xlsx" disabled>
-                    <button type="button" class="btn btn-primary disabled" aria-disabled="true" title="Solo disponible para administradores">Cargar Grupos</button>
-                <?php endif; ?>
-            </div>
-        </form>
-    </div>
-</div>
+                                <!-- Añadir grupos desde archivo -->
+                                <form action="<?= APP_URL; ?>/app/controllers/grupos/upload.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center">
+                                    <div class="form-group me-2">
+                                        <label for="file" class="d-none">Selecciona un archivo CSV:</label>
+                                        <?php if (isset($_SESSION['sesion_rol']) && $_SESSION['sesion_rol'] == 1): ?>
+                                            <input type="file" name="file" accept=".csv, .xlsx" required>
+                                            <button type="submit" class="btn btn-primary">Cargar Grupos</button>
+                                        <?php else: ?>
+                                            <input type="file" name="file" accept=".csv, .xlsx" disabled>
+                                            <button type="button" class="btn btn-primary disabled" aria-disabled="true" title="Solo disponible para administradores">Cargar Grupos</button>
+                                        <?php endif; ?>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
 
 
                         <div class="card-body">
