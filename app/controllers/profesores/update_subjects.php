@@ -5,7 +5,6 @@ include('../../../app/config.php');
 $teacher_id = $_POST['teacher_id'];
 $materia_ids = isset($_POST['materias_asignadas']) ? $_POST['materias_asignadas'] : [];
 $grupo_ids = isset($_POST['grupos_asignados']) ? array_filter($_POST['grupos_asignados']) : []; // Filtrar valores vacíos
-$total_hours = isset($_POST['total_hours']) ? $_POST['total_hours'] : 0;
 $fechaHora = date('Y-m-d H:i:s');
 
 try {
@@ -52,6 +51,15 @@ try {
             $sentencia_eliminar->execute(array_merge([$teacher_id], $grupo_ids, [$materia_actual]));
         }
     }
+
+    // Calcular horas totales a partir de las materias seleccionadas
+    $sentencia_horas_materias = $pdo->prepare("
+        SELECT SUM(s.weekly_hours) AS total_hours
+        FROM subjects s
+        WHERE s.subject_id IN (" . implode(',', array_fill(0, count($materia_ids), '?')) . ")
+    ");
+    $sentencia_horas_materias->execute($materia_ids);
+    $total_hours = (int) $sentencia_horas_materias->fetchColumn();
 
     // Actualizar las horas totales del profesor
     $sentencia_actualizar_horas = $pdo->prepare("

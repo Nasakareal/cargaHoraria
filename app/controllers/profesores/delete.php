@@ -2,20 +2,22 @@
 
 include('../../../app/config.php');
 
+/* Validar que se reciba el ID del profesor */
 $teacher_id = filter_input(INPUT_POST, 'teacher_id', FILTER_VALIDATE_INT);
 if (!$teacher_id) {
     session_start();
-    $_SESSION['mensaje'] = "ID de profesor inválido.";
+    $_SESSION['mensaje'] = "ID de profesor inválido. Por favor, intenta nuevamente.";
     $_SESSION['icono'] = "error";
     header('Location: ' . APP_URL . "/admin/profesores");
     exit();
 }
 
+/* Iniciar sesión si no está iniciada */
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-/* Verificar si el usuario es admin */
+/* Verificar permisos de administrador */
 if (!isset($_SESSION['sesion_rol']) || $_SESSION['sesion_rol'] != 1) {
     $_SESSION['mensaje'] = "No tienes permisos para eliminar profesores. Solo los administradores pueden realizar esta acción.";
     $_SESSION['icono'] = "error";
@@ -24,19 +26,34 @@ if (!isset($_SESSION['sesion_rol']) || $_SESSION['sesion_rol'] != 1) {
 }
 
 try {
-    $sentencia = $pdo->prepare("DELETE FROM teachers WHERE teacher_id = :teacher_id");
-    $sentencia->bindParam(':teacher_id', $teacher_id);
+    /* Iniciar una transacción */
+    $pdo->beginTransaction();
 
-    if ($sentencia->execute()) {
-        $_SESSION['mensaje'] = "Se ha eliminado el profesor.";
+    /* Eliminar los registros relacionados en la tabla 'teacher_program_term' */
+    $deleteRelated = $pdo->prepare("DELETE FROM teacher_program_term WHERE teacher_id = :teacher_id");
+    $deleteRelated->bindParam(':teacher_id', $teacher_id);
+    $deleteRelated->execute();
+
+    /* Ahora eliminar el profesor */
+    $deleteTeacher = $pdo->prepare("DELETE FROM teachers WHERE teacher_id = :teacher_id");
+    $deleteTeacher->bindParam(':teacher_id', $teacher_id);
+
+    if ($deleteTeacher->execute()) {
+        $_SESSION['mensaje'] = "El profesor y sus registros relacionados han sido eliminados correctamente.";
         $_SESSION['icono'] = "success";
     } else {
-        throw new Exception("No se ha podido eliminar el profesor.");
+        throw new Exception("No se pudo eliminar el profesor. Intenta nuevamente.");
     }
+
+    /* Confirmar la transacción */
+    $pdo->commit();
 } catch (Exception $e) {
+    /* Revertir la transacción en caso de error */
+    $pdo->rollBack();
     $_SESSION['mensaje'] = "Error al eliminar el profesor: " . $e->getMessage();
     $_SESSION['icono'] = "error";
 }
 
+/* Redirigir al índice de profesores */
 header('Location: ' . APP_URL . "/admin/profesores");
 exit();

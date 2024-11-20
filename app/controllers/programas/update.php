@@ -1,70 +1,48 @@
 <?php
-
 include('../../../app/config.php');
 
-$teacher_id = $_POST['teacher_id'];
-$nombres = $_POST['nombres'];
-$programa_id = $_POST['programa_id'];
-$cuatrimestre_id = $_POST['cuatrimestre_id'];
-$materia_ids = $_POST['materias_asignadas'];
-$fechaHora = date('Y-m-d H:i:s');
+// Iniciar sesión si no ha sido iniciada
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Validar que se reciban los datos requeridos
+if (!isset($_POST['program_id'], $_POST['program_name']) || empty($_POST['program_id']) || empty(trim($_POST['program_name']))) {
+    $_SESSION['mensaje'] = "Datos incompletos. Verifique que el nombre del programa esté presente.";
+    $_SESSION['icono'] = "error";
+    header('Location: ' . APP_URL . '/admin/programas');
+    exit();
+}
+
+// Obtener los datos del formulario
+$program_id = $_POST['program_id'];
+$program_name = trim(mb_strtoupper($_POST['program_name'])); // Convertir a mayúsculas
+$fechaHora = date('Y-m-d H:i:s'); // Fecha de actualización
 
 try {
-    $pdo->beginTransaction();
-
-    /* Actualizar el nombre, es_local, programa y cuatrimestre del profesor */
-    $sentencia_profesor = $pdo->prepare("
-        UPDATE teachers 
-        SET teacher_name = :nombres, 
+    // Preparar la consulta para actualizar el programa
+    $query = $pdo->prepare("
+        UPDATE programs 
+        SET program_name = :program_name, 
             fyh_actualizacion = :fyh_actualizacion 
-        WHERE teacher_id = :teacher_id");
-    $sentencia_profesor->bindParam(':nombres', $nombres);
-    $sentencia_profesor->bindParam(':es_local', $es_local);
-    $sentencia_profesor->bindParam(':fyh_actualizacion', $fechaHora);
-    $sentencia_profesor->bindParam(':teacher_id', $teacher_id);
-    $sentencia_profesor->execute();
+        WHERE program_id = :program_id
+    ");
+    $query->bindParam(':program_name', $program_name);
+    $query->bindParam(':fyh_actualizacion', $fechaHora);
+    $query->bindParam(':program_id', $program_id);
 
-    /* Actualizar el programa y cuatrimestre del profesor */
-    $sentencia_programa_cuatrimestre = $pdo->prepare("
-        UPDATE teacher_program_term 
-        SET program_id = :programa_id, 
-            term_id = :cuatrimestre_id, 
-            fyh_actualizacion = :fyh_actualizacion 
-        WHERE teacher_id = :teacher_id");
-    $sentencia_programa_cuatrimestre->bindParam(':programa_id', $programa_id);
-    $sentencia_programa_cuatrimestre->bindParam(':cuatrimestre_id', $cuatrimestre_id);
-    $sentencia_programa_cuatrimestre->bindParam(':fyh_actualizacion', $fechaHora);
-    $sentencia_programa_cuatrimestre->bindParam(':teacher_id', $teacher_id);
-    $sentencia_programa_cuatrimestre->execute();
-
-    /* Eliminar todas las materias existentes para el profesor */
-    $sentencia_eliminar = $pdo->prepare("DELETE FROM teacher_subjects WHERE teacher_id = :teacher_id");
-    $sentencia_eliminar->bindParam(':teacher_id', $teacher_id);
-    $sentencia_eliminar->execute();
-
-    /* Insertar nuevas materias */
-    foreach ($materia_ids as $materia_id) {
-        $sentencia_insertar = $pdo->prepare("INSERT INTO teacher_subjects (teacher_id, subject_id, fyh_creacion, fyh_actualizacion)
-            VALUES (:teacher_id, :subject_id, :fyh_creacion, :fyh_actualizacion)");
-        $sentencia_insertar->bindParam(':teacher_id', $teacher_id);
-        $sentencia_insertar->bindParam(':subject_id', $materia_id);
-        $sentencia_insertar->bindParam(':fyh_creacion', $fechaHora);
-        $sentencia_insertar->bindParam(':fyh_actualizacion', $fechaHora);
-        $sentencia_insertar->execute();
+    // Ejecutar la consulta
+    if ($query->execute()) {
+        $_SESSION['mensaje'] = "El programa se actualizó correctamente.";
+        $_SESSION['icono'] = "success";
+    } else {
+        throw new Exception("No se pudo actualizar el programa. Intente nuevamente.");
     }
-
-    $pdo->commit();
-
-    session_start();
-    $_SESSION['mensaje'] = "Se ha actualizado con éxito";
-    $_SESSION['icono'] = "success";
-    header('Location: ' . APP_URL . "/admin/profesores");
-    exit;
-} catch (Exception $exception) {
-    $pdo->rollBack();
-    session_start();
-    $_SESSION['mensaje'] = "Ocurrió un error: " . $exception->getMessage();
+} catch (Exception $e) {
+    $_SESSION['mensaje'] = "Error: " . $e->getMessage();
     $_SESSION['icono'] = "error";
-    header('Location: ' . APP_URL . "/admin/profesores");
-    exit;
 }
+
+// Redirigir de vuelta a la lista de programas
+header('Location: ' . APP_URL . '/admin/programas');
+exit();

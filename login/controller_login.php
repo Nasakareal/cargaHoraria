@@ -1,5 +1,5 @@
 <?php
-include ('../app/config.php');
+include('../app/config.php');
 
 session_start();
 
@@ -34,7 +34,7 @@ if ($registro_intento) {
     if ($bloqueoActivado && $tiempoRestante > 0) {
         $_SESSION['tiempo_restante'] = round($tiempoRestante / 60);
         $_SESSION['mensaje'] = "Demasiados intentos fallidos. Intente de nuevo en {$_SESSION['tiempo_restante']} minutos.";
-        header('Location:'.APP_URL."/login");
+        header('Location:' . APP_URL . "/login");
         exit();
     } elseif ($bloqueoActivado && $tiempoRestante <= 0) {
         /* Reinicia el bloqueo si ha expirado el tiempo de espera */
@@ -60,7 +60,7 @@ $usuario = $query->fetch(PDO::FETCH_ASSOC);
 
 if ($usuario) {
     $password_tabla = $usuario['password'];
-    
+
     /* Verifica la contraseña ingresada */
     if (password_verify($password, $password_tabla)) {
         /* Restablece el contador de intentos en login_attempts si el inicio de sesión es exitoso */
@@ -79,18 +79,19 @@ if ($usuario) {
         $_SESSION['sesion_nombre_usuario'] = $usuario['nombres'];
 
         registrarActividad($pdo, $email, 'exitoso');
-        
+
         /* Redirige según el rol del usuario */
-        if ($usuario['rol_id'] == 1) {
-            header('Location:'.APP_URL."/admin");
+        if ($usuario['rol_id'] == 5 || $usuario['rol_id'] == 6) {
+            header('Location:' . APP_URL . "/portal");
         } else {
-            header('Location:'.APP_URL."/portal");
+            header('Location:' . APP_URL . "/admin");
         }
+        exit();
     } else {
         /* Incrementa el contador de intentos fallidos en login_attempts */
         $intentos = $registro_intento['intentos'] + 1;
         $intentosFallidos = $registro_intento['intentos_fallidos'] + 1;
-        $bloqueoActivado = ($intentos % $intentosMaximos === 0); 
+        $bloqueoActivado = ($intentos % $intentosMaximos === 0);
 
         $sql = "UPDATE login_attempts SET intentos = :intentos, intentos_fallidos = :intentos_fallidos, bloqueo_activado = :bloqueo_activado, marca_tiempo = NOW() WHERE email = :email";
         $query = $pdo->prepare($sql);
@@ -102,10 +103,10 @@ if ($usuario) {
 
         $_SESSION['intentos_restantes'] = $intentosMaximos - ($intentos % $intentosMaximos);
         $_SESSION['mensaje'] = "La contraseña es incorrecta, quedan {$_SESSION['intentos_restantes']} intentos.";
-        
+
         registrarActividad($pdo, $email, 'fallido');
-        
-        header('Location:'.APP_URL."/login");
+
+        header('Location:' . APP_URL . "/login");
     }
 } else {
     /* Si el usuario no existe, cuenta como intento fallido */
@@ -123,10 +124,11 @@ if ($usuario) {
 
     $_SESSION['intentos_restantes'] = $intentosMaximos - ($intentos % $intentosMaximos);
     $_SESSION['mensaje'] = "El usuario no existe o está inactivo, quedan {$_SESSION['intentos_restantes']} intentos.";
-    header('Location:'.APP_URL."/login");
+    header('Location:' . APP_URL . "/login");
 }
 
-function registrarActividad($pdo, $email, $status) {
+function registrarActividad($pdo, $email, $status)
+{
     $sql = "INSERT INTO registro_actividad (email, status, ip, fecha) VALUES (:email, :status, :ip, NOW())";
     $query = $pdo->prepare($sql);
     $query->execute([

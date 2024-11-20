@@ -1,7 +1,7 @@
 <?php
 define ('SERVIDOR','localhost');
-define ('USUARIO','root');
-define ('PASSWORD','');
+define ('USUARIO','jaggerjack');
+define ('PASSWORD','IAMTHELobosolitario117$');
 define ('BD','cargaHoraria');
 
 define ('APP_NAME','Sistema De Carga Horaria');

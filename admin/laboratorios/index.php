@@ -24,36 +24,15 @@ include('../../app/controllers/laboratorios/listado_de_laboratorios.php');
                             <br>
                             <div class="card-tools d-flex">
                             <?php if (isset($_SESSION['sesion_rol']) && $_SESSION['sesion_rol'] == 1): ?>
-    <a href="create.php" class="btn btn-primary me-2">
-        <i class="bi bi-plus-square"></i> Agregar nuevo Laboratorio
-    </a>
-<?php else: ?>
-    <a href="#" class="btn btn-primary me-2 disabled" aria-disabled="true" title="Solo disponible para administradores">
-        <i class="bi bi-plus-square"></i> Agregar nuevo Laboratorio
-    </a>
-<?php endif; ?>
+                                <a href="create.php" class="btn btn-primary me-2">
+                                    <i class="bi bi-plus-square"></i> Agregar nuevo Laboratorio
+                                </a>
+                            <?php else: ?>
+                                <a href="#" class="btn btn-primary me-2 disabled" aria-disabled="true" title="Solo disponible para administradores">
+                                    <i class="bi bi-plus-square"></i> Agregar nuevo Laboratorio
+                                </a>
+                            <?php endif; ?>
 
-
-                                <!-- Añadir laboratorios desde archivo -->
-                                <?php if (isset($_SESSION['sesion_rol']) && $_SESSION['sesion_rol'] == 1): ?>
-    <!-- Formulario habilitado para administradores -->
-    <form action="<?= APP_URL; ?>/app/controllers/labs/upload.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center">
-        <div class="form-group me-2">
-            <label for="file" class="d-none">Selecciona un archivo CSV:</label>
-            <input type="file" name="file" accept=".csv, .xlsx" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Cargar Laboratorios</button>
-    </form>
-<?php else: ?>
-    <!-- Formulario deshabilitado para otros usuarios -->
-    <form class="d-flex align-items-center">
-        <div class="form-group me-2">
-            <label for="file" class="d-none">Selecciona un archivo CSV:</label>
-            <input type="file" name="file" accept=".csv, .xlsx" disabled>
-        </div>
-        <button type="button" class="btn btn-primary disabled" aria-disabled="true" title="Solo disponible para administradores">Cargar Laboratorios</button>
-    </form>
-<?php endif; ?>
 
                             </div>
                         </div>
@@ -83,7 +62,7 @@ include('../../app/controllers/laboratorios/listado_de_laboratorios.php');
                                                 <div class="btn-group" role="group" aria-label="Basic example">
                                                     <a href="show.php?id=<?= $lab_id; ?>" type="button" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>
                                                     <a href="edit.php?id=<?= $lab_id; ?>" type="button" class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></a>
-                                                    <form action="<?= APP_URL; ?>/app/controllers/labs/delete.php" onclick="preguntar<?= $lab_id; ?>(event)" method="post" id="miFormulario<?= $lab_id; ?>">
+                                                    <form action="<?= APP_URL; ?>/app/controllers/laboratorios/delete.php" onclick="preguntar<?= $lab_id; ?>(event)" method="post" id="miFormulario<?= $lab_id; ?>">
                                                         <input type="text" name="lab_id" value="<?= $lab_id; ?>" hidden>
                                                         <button type="submit" class="btn btn-danger btn-sm" style="border-radius: 0px 5px 5px 0px"><i class="bi bi-trash"></i></button>
                                                     </form>

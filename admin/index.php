@@ -1,6 +1,5 @@
 <?php
 include('../app/config.php');
-include('../app/helpers/verificar_admin.php');
 include('../admin/layout/parte1.php');
 include('../app/controllers/materias/obtener_materias.php');
 include('../app/controllers/materias/programas_no_asignados.php');

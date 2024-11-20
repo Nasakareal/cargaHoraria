@@ -14,8 +14,11 @@ include('../../admin/layout/parte1.php');
 include('../../app/controllers/profesores/datos_del_profesor.php');
 include('../../app/controllers/programas/listado_de_programas.php');
 include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
+
+/* Incluir el archivo que carga las materias disponibles y asignadas */
 include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.php');
 ?>
+
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <br>
@@ -41,7 +44,7 @@ include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.ph
                                     <div class="col-md-5">
                                         <div class="form-group">
                                             <label for="total_hours">Total de horas asignadas</label>
-                                            <input type="text" id="total_hours" name="total_hours" class="form-control" value="0" readonly>
+                                            <input type="text" id="total_hours" name="total_hours" class="form-control" readonly>
                                         </div>
                                     </div>
 
@@ -62,7 +65,13 @@ include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.ph
                                     <!-- Materias disponibles -->
                                     <div class="col-md-5">
                                         <label for="materias_disponibles">Materias disponibles</label>
-                                        <select id="materias_disponibles" class="form-control" multiple style="height:200px;"></select>
+                                        <select id="materias_disponibles" class="form-control" multiple style="height:200px;">
+                                            <?php foreach ($materias_disponibles as $materia): ?>
+                                                <option value="<?= htmlspecialchars($materia['subject_id']); ?>">
+                                                    <?= htmlspecialchars($materia['subject_name']); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
                                     </div>
 
                                     <!-- Botones para agregar y quitar materias -->
@@ -78,7 +87,13 @@ include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.ph
                                     <!-- Materias asignadas -->
                                     <div class="col-md-5">
                                         <label for="materias_asignadas">Materias asignadas</label>
-                                        <select id="materias_asignadas" name="materias_asignadas[]" class="form-control" multiple style="height:200px;"></select>
+                                        <select id="materias_asignadas" name="materias_asignadas[]" class="form-control" multiple style="height:200px;">
+                                            <?php foreach ($materias_asignadas as $materia): ?>
+                                                <option value="<?= htmlspecialchars($materia['subject_id']); ?>">
+                                                    <?= htmlspecialchars($materia['subject_name']); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
                                     </div>
                                 </div>
 

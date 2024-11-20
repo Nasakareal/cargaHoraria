@@ -21,30 +21,30 @@ include('../../app/controllers/relacion_profesor_programa_cuatrimestre/listado_d
                             <br>
                             <div class="card-tools d-flex flex-column flex-md-row">
                                 <!-- Botón para agregar nuevo profesor  -->
-<a href="create.php" class="btn btn-primary me-2 mb-2 mb-md-0">
-    <i class="bi bi-plus-square"></i> Añadir nuevo profesor
-</a>
+                                    <a href="create.php" class="btn btn-primary me-2 mb-2 mb-md-0">
+                                        <i class="bi bi-plus-square"></i> Añadir nuevo profesor
+                                    </a>
 
-<!-- Formulario para cargar profesores desde archivo (solo para administradores) -->
-<?php if (isset($_SESSION['sesion_rol']) && $_SESSION['sesion_rol'] == 1): ?>
-    <!-- Formulario habilitado para administradores -->
-    <form action="<?= APP_URL; ?>/app/controllers/profesores/upload.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center">
-        <div class="form-group me-2">
-            <label for="file" class="d-none">Selecciona un archivo CSV:</label>
-            <input type="file" name="file" accept=".csv, .xlsx" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Cargar Profesores</button>
-    </form>
-<?php else: ?>
-    <!-- Formulario deshabilitado para otros roles -->
-    <form class="d-flex align-items-center">
-        <div class="form-group me-2">
-            <label for="file" class="d-none">Selecciona un archivo CSV:</label>
-            <input type="file" name="file" accept=".csv, .xlsx" disabled>
-        </div>
-        <button type="button" class="btn btn-primary disabled" aria-disabled="true" title="Solo disponible para administradores">Cargar Profesores</button>
-    </form>
-<?php endif; ?>
+                                <!-- Formulario para cargar profesores desde archivo (solo para administradores) -->
+                                <?php if (isset($_SESSION['sesion_rol']) && $_SESSION['sesion_rol'] == 1): ?>
+                                <!-- Formulario habilitado para administradores -->
+                                <form action="<?= APP_URL; ?>/app/controllers/profesores/upload.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center">
+                                    <div class="form-group me-2">
+                                        <label for="file" class="d-none">Selecciona un archivo CSV:</label>
+                                        <input type="file" name="file" accept=".csv, .xlsx" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Cargar Profesores</button>
+                                 </form>
+                                <?php else: ?>
+                                <!-- Formulario deshabilitado para otros roles -->
+                                <form class="d-flex align-items-center">
+                                    <div class="form-group me-2">
+                                        <label for="file" class="d-none">Selecciona un archivo CSV:</label>
+                                        <input type="file" name="file" accept=".csv, .xlsx" disabled>
+                                    </div>
+                                    <button type="button" class="btn btn-primary disabled" aria-disabled="true" title="Solo disponible para administradores">Cargar Profesores</button>
+                                </form>
+                                <?php endif; ?>
 
                             </div>
                         </div>

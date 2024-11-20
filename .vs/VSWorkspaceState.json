@@ -2,7 +2,11 @@
   "ExpandedNodes": [
     "",
     "\\admin",
+    "\\admin\\autoSalones",
     "\\admin\\grupos",
+    "\\app",
+    "\\app\\controllers",
+    "\\app\\controllers\\autoSalones",
     "\\database"
   ],
   "SelectedNode": "\\admin\\grupos\\index.php",

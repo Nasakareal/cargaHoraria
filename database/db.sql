@@ -308,8 +308,6 @@ CREATE TABLE teachers (
     FOREIGN KEY (area) REFERENCES programs(area)                           /* Relación con la columna area en programs */
 ) ENGINE=InnoDB;
 
-
-
 /* Tabla de Materias */
 CREATE TABLE subjects (
     subject_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -540,3 +538,36 @@ CREATE TABLE group_schedule_teacher (
     FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id) ON DELETE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES subjects(subject_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
+
+
+
+
+CREATE TABLE building_areas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    building_name VARCHAR(50) NOT NULL,         /* Nombre del edificio */
+    area VARCHAR(255) NOT NULL,                 /* Área del programa */
+    planta_alta BOOLEAN NOT NULL DEFAULT 0,     /* Indicador de acceso en planta alta */
+    planta_baja BOOLEAN NOT NULL DEFAULT 0,     /* Indicador de acceso en planta baja */
+    FOREIGN KEY (area) REFERENCES programs(area) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+
+
+
+ALTER TABLE teacher_subjects ADD COLUMN group_id INT AFTER subject_id;
+on los grupos
+ALTER TABLE teacher_subjects ADD CONSTRAINT fk_group_teacher_subject
+FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+
+ALTER TABLE teacher_subjects ADD CONSTRAINT fk_group_teacher_subject
+FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+
+/* Agregar columna planta_alta y planta_baja en classrooms */
+ALTER TABLE classrooms
+ADD planta_alta BOOLEAN NOT NULL DEFAULT 0 AFTER floor,
+ADD planta_baja BOOLEAN NOT NULL DEFAULT 0 AFTER planta_alta;
