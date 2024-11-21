@@ -557,6 +557,7 @@ CREATE TABLE building_areas (
 
 ALTER TABLE teacher_subjects ADD COLUMN group_id INT AFTER subject_id;
 on los grupos
+
 ALTER TABLE teacher_subjects ADD CONSTRAINT fk_group_teacher_subject
 FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE ON UPDATE CASCADE;
 

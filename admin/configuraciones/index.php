@@ -52,7 +52,7 @@ include('../../admin/layout/parte1.php');
                   <span class="info-box-icon bg-info"><i class="bi bi-trash-fill"></i></span>
                   <div class="info-box-content">
                       <span class="info-box-text"><b>Vaciar Base de datos</b></span>
-                      <a href="<?= APP_URL; ?>/admin/vaciados" class="btn btn-primary btn-sm">Acceder</a>
+                      <a href="<?= APP_URL; ?>/admin/Vaciados" class="btn btn-primary btn-sm">Acceder</a>
                   </div>
               </div>
           </div>

@@ -47,7 +47,7 @@ $horarios = obtenerHorarioGrupo($group_id, $pdo);
 
 if (empty($horarios)) {
     echo "<p class='text-center text-muted'>No se encontraron horarios asignados para este grupo.</p>";
-    echo "<div class='text-center'><a href='../../portal/horarios_grupos' class='btn btn-secondary'>Volver</a></div>";
+    echo "<div class='text-center'><a href='../../admin/horarios_grupos' class='btn btn-secondary'>Volver</a></div>";
     include('../../layout/parte2.php');
     exit;
 }
@@ -150,7 +150,7 @@ foreach ($horarios as $horario) {
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <a href="<?= APP_URL; ?>/portal/horarios_grupos" class="btn btn-secondary">Volver</a>
+                                        <a href="<?= APP_URL; ?>/admin/horarios_grupos" class="btn btn-secondary">Volver</a>
                                     </div>
                                 </div>
                             </div>
