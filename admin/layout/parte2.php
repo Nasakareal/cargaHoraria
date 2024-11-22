@@ -100,7 +100,7 @@ function enviarMensaje() {
 <footer class="main-footer">
     <!-- To the right -->
     <div class="float-right d-none d-sm-inline">
-      Versión 1.1.1
+      Versión 1.1.2
     </div>
     <!-- Default to the left -->
     <strong>Copyright &copy; <?= $ano_actual; ?> <a href="https://ut-morelia.edu.mx/">UTM</a>.</strong> All rights reserved.

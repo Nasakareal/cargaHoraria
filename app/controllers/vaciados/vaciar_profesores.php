@@ -18,12 +18,12 @@ try {
     session_start();
     $_SESSION['mensaje'] = "La tabla de Profesores ha sido vaciada exitosamente.";
     $_SESSION['icono'] = "success";
-    header("Location: ../../../portal/profesores/index.php");
+    header("Location: ../../../admin/profesores/index.php");
 } catch (Exception $e) {
     /* Si ocurre un error, revierte la transacción */
     $pdo->rollBack();
     session_start();
     $_SESSION['mensaje'] = "Error al vaciar la tabla de profesores: " . $e->getMessage();
     $_SESSION['icono'] = "error";
-    header("Location: ../../../portal/profesores/index.php");
+    header("Location: ../../../admin/profesores/index.php");
 }

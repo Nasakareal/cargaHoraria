@@ -52,29 +52,18 @@ try {
         }
     }
 
-    /* Eliminar materias no seleccionadas en los grupos elegidos */
-    foreach ($materias_actuales_por_grupo as $grupo_id => $materias_del_grupo) {
-        foreach ($materias_del_grupo as $materia_actual) {
-            if (!in_array($materia_actual, $materia_ids)) {
-                $sentencia_eliminar = $pdo->prepare("
-                    DELETE FROM teacher_subjects 
-                    WHERE teacher_id = ? AND subject_id = ? AND group_id = ?
-                ");
-                $sentencia_eliminar->execute([$teacher_id, $materia_actual, $grupo_id]);
+    /* Obtener las horas actuales del profesor */
+    $sentencia_horas_actuales = $pdo->prepare("
+        SELECT SUM(s.weekly_hours) AS total_hours
+        FROM teacher_subjects ts
+        JOIN subjects s ON ts.subject_id = s.subject_id
+        WHERE ts.teacher_id = ?
+    ");
+    $sentencia_horas_actuales->execute([$teacher_id]);
+    $horas_actuales = (int) $sentencia_horas_actuales->fetchColumn();
 
-                /* Actualizar la tabla de horarios para remover solo la asignación del profesor */
-                $sentencia_actualizar_horarios = $pdo->prepare("
-                    UPDATE schedule_assignments 
-                    SET teacher_id = NULL, fyh_actualizacion = ?
-                    WHERE teacher_id = ? AND subject_id = ? AND group_id = ?
-                ");
-                $sentencia_actualizar_horarios->execute([$fechaHora, $teacher_id, $materia_actual, $grupo_id]);
-            }
-        }
-    }
-
-    /* Calcular horas totales solo si hay materias seleccionadas */
-    $total_hours = 0;
+    /* Calcular las horas de las nuevas materias */
+    $total_hours = $horas_actuales;
     if (!empty($materia_ids)) {
         $placeholders_materias = implode(',', array_fill(0, count($materia_ids), '?'));
         $sentencia_horas_materias = $pdo->prepare("
@@ -83,7 +72,7 @@ try {
             WHERE s.subject_id IN ($placeholders_materias)
         ");
         $sentencia_horas_materias->execute($materia_ids);
-        $total_hours = (int) $sentencia_horas_materias->fetchColumn();
+        $total_hours += (int) $sentencia_horas_materias->fetchColumn();
     }
 
     /* Actualizar las horas totales del profesor */

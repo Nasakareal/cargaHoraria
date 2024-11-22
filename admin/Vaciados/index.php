@@ -8,9 +8,13 @@ include('../../app/controllers/grupos/listado_de_grupos.php');
 include('../../app/controllers/materias/listado_de_materias.php');
 include('../../app/controllers/profesores/listado_de_profesores.php');
 
+// Variables existentes
 $total_groups = count($groups);
 $total_subjects = count($subjects);
 $total_teachers = count($teachers);
+
+
+//$total_assignments = count($result);
 ?>
 
 <div class="content-wrapper">
@@ -73,6 +77,20 @@ $total_teachers = count($teachers);
                                             <form action="../../app/controllers/vaciados/vaciar_profesores.php" method="post" id="formVaciarProfesores">
                                                 <button type="button" class="btn btn-danger" onclick="confirmarVaciado('formVaciarProfesores', 'Profesores')">
                                                     <i class="bi bi-trash"></i> Vaciar Tabla de Profesores
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Nueva fila para Asignaciones de Materias a Profesores -->
+                                    <tr>
+                                        <td class="text-center">4</td>
+                                        <td class="text-center">Asignaciones de Materias a Profesores</td>
+                                        <td class="text-center"><?= $total_assignments; ?></td>
+                                        <td class="text-center">
+                                            <form action="../../app/controllers/vaciados/vaciar_asignaciones.php" method="post" id="formVaciarAsignaciones">
+                                                <button type="button" class="btn btn-danger" onclick="confirmarVaciado('formVaciarAsignaciones', 'Asignaciones de Materias a Profesores')">
+                                                    <i class="bi bi-trash"></i> Vaciar Asignaciones
                                                 </button>
                                             </form>
                                         </td>

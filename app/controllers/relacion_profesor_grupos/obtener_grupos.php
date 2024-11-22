@@ -1,5 +1,5 @@
 <?php
-include('../../config.php');
+include_once($_SERVER['DOCUMENT_ROOT'] . '/cargaHoraria/config.php');
 
 // Obtener el programa y cuatrimestre desde la solicitud POST
 $programa_id = filter_input(INPUT_POST, 'programa_id', FILTER_VALIDATE_INT);

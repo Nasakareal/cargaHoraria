@@ -23,26 +23,64 @@ $(document).ready(function () {
         console.log("Grupo seleccionado:", group_id);
 
         if (group_id) {
-            /* Agregar el grupo al campo oculto `grupos_asignados` */
-            var gruposAsignados = $('#grupos_asignados').val().split(',').filter(Boolean);
-            if (!gruposAsignados.includes(group_id)) {
-                gruposAsignados.push(group_id);
-                $('#grupos_asignados').val(gruposAsignados.join(','));
+            // Verificar si ya hay materias asignadas
+            if ($('#materias_asignadas option').length > 0) {
+                // Si hay materias asignadas, mostrar un mensaje al usuario
+                var confirmDelete = confirm("Ya tienes materias asignadas. ¿Quieres eliminarlas antes de seleccionar otro grupo?");
+
+                // Si el usuario acepta, limpiar las materias asignadas y continuar
+                if (confirmDelete) {
+                    $('#materias_asignadas').empty(); // Limpiar materias asignadas
+                    $('#total_hours').val(0); // Resetear horas
+                    console.log("Materias asignadas eliminadas.");
+
+                    // Continuar con la selección del grupo
+                    var gruposAsignados = $('#grupos_asignados').val().split(',').filter(Boolean);
+                    if (!gruposAsignados.includes(group_id)) {
+                        gruposAsignados.push(group_id);
+                        $('#grupos_asignados').val(gruposAsignados.join(','));
+                    }
+
+                    // Realizar la solicitud AJAX para obtener materias
+                    $.ajax({
+                        url: '../../app/controllers/relacion_profesor_materias/obtener_materias.php',
+                        type: 'POST',
+                        data: { group_id: group_id },
+                        success: function (response) {
+                            console.log("Materias disponibles:", response);
+                            $('#materias_disponibles').html(response);
+                        },
+                        error: function () {
+                            console.error('Error al cargar las materias.');
+                        }
+                    });
+
+                } else {
+                    console.log("El usuario decidió no eliminar las materias.");
+                }
+            } else {
+                // Si no hay materias asignadas, proceder normalmente
+                var gruposAsignados = $('#grupos_asignados').val().split(',').filter(Boolean);
+                if (!gruposAsignados.includes(group_id)) {
+                    gruposAsignados.push(group_id);
+                    $('#grupos_asignados').val(gruposAsignados.join(','));
+                }
+
+                // Realizar la solicitud AJAX para obtener materias
+                $.ajax({
+                    url: '../../app/controllers/relacion_profesor_materias/obtener_materias.php',
+                    type: 'POST',
+                    data: { group_id: group_id },
+                    success: function (response) {
+                        console.log("Materias disponibles:", response);
+                        $('#materias_disponibles').html(response);
+                    },
+                    error: function () {
+                        console.error('Error al cargar las materias.');
+                    }
+                });
             }
 
-            /* Realizar la solicitud AJAX para obtener materias */
-            $.ajax({
-                url: '../../app/controllers/relacion_profesor_materias/obtener_materias.php',
-                type: 'POST',
-                data: { group_id: group_id },
-                success: function (response) {
-                    console.log("Materias disponibles:", response);
-                    $('#materias_disponibles').html(response);
-                },
-                error: function () {
-                    console.error('Error al cargar las materias.');
-                }
-            });
         } else {
             alert("Por favor, selecciona un grupo válido.");
         }

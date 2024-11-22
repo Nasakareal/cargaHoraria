@@ -2,13 +2,12 @@
   "ExpandedNodes": [
     "",
     "\\admin",
-    "\\admin\\autoSalones",
-    "\\admin\\grupos",
+    "\\admin\\configuraciones",
+    "\\admin\\Vaciados",
     "\\app",
     "\\app\\controllers",
-    "\\app\\controllers\\grupos",
-    "\\database"
+    "\\app\\controllers\\vaciados"
   ],
-  "SelectedNode": "\\admin\\grupos\\edit.php",
+  "SelectedNode": "\\admin\\Vaciados\\index.php",
   "PreviewInSolutionExplorer": false
 }
