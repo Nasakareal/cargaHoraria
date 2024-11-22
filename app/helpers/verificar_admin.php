@@ -7,6 +7,6 @@ if (session_status() === PHP_SESSION_NONE) {
 
 
 if (!isset($_SESSION['sesion_email']) || $_SESSION['sesion_rol'] != 1) {
-    header('Location: ' . APP_URL . '/portal');
+    header('Location: ' . APP_URL . '/admin');
     exit();
 }

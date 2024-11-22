@@ -2,13 +2,13 @@
   "ExpandedNodes": [
     "",
     "\\admin",
-    "\\admin\\horarios_grupos",
-    "\\admin\\materias",
+    "\\admin\\autoSalones",
+    "\\admin\\grupos",
     "\\app",
     "\\app\\controllers",
-    "\\app\\controllers\\horarios_grupos",
+    "\\app\\controllers\\grupos",
     "\\database"
   ],
-  "SelectedNode": "\\admin\\materias\\show.php",
+  "SelectedNode": "\\admin\\grupos\\edit.php",
   "PreviewInSolutionExplorer": false
 }

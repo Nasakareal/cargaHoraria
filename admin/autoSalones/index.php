@@ -82,7 +82,7 @@ include('../../app/controllers/grupos/listado_grupos_salones.php');
 
 <?php 
 include('../../admin/layout/parte2.php');
-include('../../layout/mensajess.php');
+include('../../layout/mensajes.php');
 ?>
 
 <script>

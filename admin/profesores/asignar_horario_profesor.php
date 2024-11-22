@@ -1,5 +1,18 @@
 <?php
 include('../../app/config.php');
+include('../../app/middleware.php');
+
+/* Verificar si el usuario tiene el permiso */
+if (!verificarPermiso($_SESSION['sesion_id_usuario'], 'teacher_assign', $pdo)) {
+    $_SESSION['mensaje'] = "No tienes permiso para asignar profesores a materias y grupos.";
+    $_SESSION['icono'] = "error";
+    ?>
+    <script>
+        history.back();
+    </script>
+    <?php
+    exit;
+}
 
 /* Obtener el ID del profesor de la URL */
 $teacher_id = filter_input(INPUT_GET, 'teacher_id', FILTER_VALIDATE_INT);
@@ -14,8 +27,6 @@ include('../../admin/layout/parte1.php');
 include('../../app/controllers/profesores/datos_del_profesor.php');
 include('../../app/controllers/programas/listado_de_programas.php');
 include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
-
-/* Incluir el archivo que carga las materias disponibles y asignadas */
 include('../../app/controllers/relacion_profesor_materias/listado_de_relacion.php');
 ?>
 

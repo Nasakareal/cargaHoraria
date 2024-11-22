@@ -1,24 +1,25 @@
 <?php
+include_once($_SERVER['DOCUMENT_ROOT'] . '/cargaHoraria/app/middleware.php');
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Información adicional basada en la sesión
+$email_sesion = $_SESSION['sesion_email'];
+$rol_id = $_SESSION['sesion_rol'];
+$nombre_sesion_usuario = $_SESSION['sesion_nombre_usuario'] ?? null;
 
-if (isset($_SESSION['sesion_email'])) {
-    $email_sesion = $_SESSION['sesion_email'];
-    $rol_id = $_SESSION['sesion_rol'];
-    $query_sesion = $pdo->prepare("SELECT * FROM usuarios WHERE email = :email AND estado = '1'");
-    $query_sesion->bindParam(':email', $email_sesion);
-    $query_sesion->execute();
+if (!$nombre_sesion_usuario) {
+    // Consulta opcional para obtener más datos si no están en la sesión
+    $query = $pdo->prepare("SELECT nombres FROM usuarios WHERE email = :email AND estado = '1'");
+    $query->bindParam(':email', $email_sesion);
+    $query->execute();
+    $usuarioData = $query->fetch(PDO::FETCH_ASSOC);
 
-    $datos_sesion_usuarios = $query_sesion->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($datos_sesion_usuarios as $datos_sesion_usuario) {
-        $nombre_sesion_usuario = $datos_sesion_usuario['nombres'];
+    if ($usuarioData) {
+        $nombre_sesion_usuario = $usuarioData['nombres'];
+        $_SESSION['sesion_nombre_usuario'] = $nombre_sesion_usuario;
+    } else {
+        header('Location: ' . APP_URL . '/login');
+        exit();
     }
-} else {
-    
-    header('Location:' . APP_URL . "/login");
-    exit();
 }
 ?>
 <!DOCTYPE html>

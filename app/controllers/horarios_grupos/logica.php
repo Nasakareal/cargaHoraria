@@ -1,6 +1,6 @@
 <?php
 
-include_once('../../app/config.php');
+include_once('../../../app/config.php');
 
 set_time_limit(100);
 $pdo->exec("DELETE FROM schedule_assignments WHERE estado = 'activo'");
@@ -397,5 +397,10 @@ foreach ($groups as $group) {
     $subjects = $subjects_by_group[$group['group_id']];
     distribuirMateriasEnSemana($pdo, $group, $subjects, $horario_turno[0], $dias_turno);
 }
+
+
+/* Redirigir al finalizar */
+header('Location:' . APP_URL . "/admin/horarios_grupos/");
+exit();
 
 ?>

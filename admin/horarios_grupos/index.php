@@ -2,10 +2,6 @@
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 
-/* Ejecutar la lógica de generación de horarios solo si se hace clic en el botón */
-if (isset($_GET['accion']) && $_GET['accion'] === 'generar_horario') {
-    include('../../app/controllers/horarios_grupos/logica.php');
-}
 
 /* Obtener todos los grupos activos para mostrarlos en la tabla, aunque no se genere el horario */
 $sql_groups = "SELECT group_id, group_name FROM `groups` WHERE estado = '1'";
@@ -27,16 +23,16 @@ $groups = $stmt_groups->fetchAll(PDO::FETCH_ASSOC);
                             <h3 class="card-title">Grupos registrados</h3>
 
                             <div class="card-tools">
-<!-- Botón para asignar horario -->
-<?php if (isset($_SESSION['sesion_rol']) && $_SESSION['sesion_rol'] == 1): ?>
-    <a href="index.php?accion=generar_horario" class="btn btn-primary">
-        <i class="bi bi-arrow-repeat"></i> Asignar Horario
-    </a>
-<?php else: ?>
-    <a href="#" class="btn btn-secondary disabled" tabindex="-1" aria-disabled="true">
-        <i class="bi bi-arrow-repeat"></i> Asignar Horario
-    </a>
-<?php endif; ?>
+                                    <!-- Botón para asignar horario -->
+                                    <?php if (isset($_SESSION['sesion_rol']) && $_SESSION['sesion_rol'] == 1): ?>
+                                        <a href="<?= APP_URL; ?>/app/controllers/horarios_grupos/logica.php" class="btn btn-primary">
+                                            <i class="bi bi-arrow-repeat"></i> Asignar Horario
+                                        </a>
+                                    <?php else: ?>
+                                         <a href="#" class="btn btn-secondary disabled" tabindex="-1" aria-disabled="true">
+                                             <i class="bi bi-arrow-repeat"></i> Asignar Horario
+                                         </a>
+                                    <?php endif; ?>
 
                             </div>
                         </div>
