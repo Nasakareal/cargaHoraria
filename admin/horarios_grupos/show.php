@@ -174,15 +174,109 @@ include('../../layout/mensajes.php');
     $(function () {
         $("#example1").DataTable({
             "pageLength": 10,
-            "responsive": true, 
-            "lengthChange": true, 
+            "responsive": true,
+            "lengthChange": true,
             "autoWidth": false,
             "dom": 'Bfrtip',
             buttons: [
                 {
                     extend: 'collection',
                     text: 'Opciones',
-                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+                    buttons: [
+                        'copy',
+                        'csv',
+                        {
+                            text: 'PDF',
+                            action: function () {
+                                // Obtener los datos visibles de la tabla
+                                let horarios = [];
+                                $("#example1 tbody tr").each(function () {
+                                    let fila = [];
+                                    $(this).find('td').each(function () {
+                                        fila.push($(this).html().trim());
+                                    });
+                                    horarios.push(fila);
+                                });
+
+                                // Enviar datos mediante POST al archivo PHP
+                                $.ajax({
+                                    url: '../../app/controllers/horarios_grupos/generar_pdf.php',
+                                    method: 'POST',
+                                    data: { horarios: horarios },
+                                    xhrFields: {
+                                        responseType: 'blob'
+                                    },
+                                    success: function (response) {
+                                        // Descargar el archivo generado como PDF
+                                        let blob = new Blob([response], { type: 'application/pdf' });
+                                        let link = document.createElement('a');
+                                        link.href = window.URL.createObjectURL(blob);
+                                        link.download = "Horario_Personalizado.pdf";
+                                        link.click();
+                                    },
+                                    error: function () {
+                                        alert('Error al generar el PDF.');
+                                    }
+                                });
+                            }
+                        },
+                        {
+                            text: 'Imprimir',
+                            action: function () {
+                                // Obtener los datos visibles de la tabla
+                                let horarios = [];
+                                $("#example1 tbody tr").each(function () {
+                                    let fila = [];
+                                    $(this).find('td').each(function () {
+                                        fila.push($(this).html().trim());
+                                    });
+                                    horarios.push(fila);
+                                });
+
+                                // Enviar los datos mediante POST y abrir la vista imprimible
+                                $.post('../../app/controllers/horarios_grupos/imprimir_horario.php', { horarios: horarios }, function (data) {
+                                    let w = window.open('');
+                                    w.document.write(data);
+                                    w.document.close();
+                                });
+                            }
+                        },
+                        {
+                            text: 'Excel',
+                            action: function () {
+                                // Obtener los datos visibles de la tabla
+                                let horarios = [];
+                                $("#example1 tbody tr").each(function () {
+                                    let fila = [];
+                                    $(this).find('td').each(function () {
+                                        fila.push($(this).html().trim());
+                                    });
+                                    horarios.push(fila);
+                                });
+
+                                // Enviar datos mediante POST al archivo PHP
+                                $.ajax({
+                                    url: '../../app/controllers/horarios_grupos/generar_horario.php',
+                                    method: 'POST',
+                                    data: { horarios: horarios },
+                                    xhrFields: {
+                                        responseType: 'blob'
+                                    },
+                                    success: function (response) {
+                                        // Descargar el archivo generado como Excel
+                                        let blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                                        let link = document.createElement('a');
+                                        link.href = window.URL.createObjectURL(blob);
+                                        link.download = "Horario_Personalizado.xlsx";
+                                        link.click();
+                                    },
+                                    error: function () {
+                                        alert('Error al generar el archivo Excel.');
+                                    }
+                                });
+                            }
+                        }
+                    ]
                 },
                 {
                     extend: 'colvis',
@@ -192,3 +286,5 @@ include('../../layout/mensajes.php');
         });
     });
 </script>
+
+
