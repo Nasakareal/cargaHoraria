@@ -27,7 +27,7 @@ include('../../admin/layout/parte1.php');
           <!-- Configuración para añadir roles -->
           <div class="col-md-4 col-sm-6 col-12">
               <div class="info-box">
-                  <span class="info-box-icon bg-info"><i class="bi bi-bookmarks"></i></span>
+                  <span class="info-box-icon bg-navy"><i class="bi bi-bookmarks"></i></span>
                   <div class="info-box-content">
                       <span class="info-box-text"><b>Roles</b></span>
                       <a href="<?= APP_URL; ?>/admin/roles" class="btn btn-primary btn-sm">Acceder</a>
@@ -38,7 +38,7 @@ include('../../admin/layout/parte1.php');
           <!-- Configuración para añadir usuarios -->
           <div class="col-md-4 col-sm-6 col-12">
               <div class="info-box">
-                  <span class="info-box-icon bg-info"><i class="bi bi-people-fill"></i></span>
+                  <span class="info-box-icon bg-orange"><i class="bi bi-people-fill"></i></span>
                   <div class="info-box-content">
                       <span class="info-box-text"><b>Usuarios</b></span>
                       <a href="<?= APP_URL; ?>/admin/usuarios" class="btn btn-primary btn-sm">Acceder</a>
@@ -49,7 +49,7 @@ include('../../admin/layout/parte1.php');
           <!-- Configuración para Vaciar Tablas -->
           <div class="col-md-4 col-sm-6 col-12">
               <div class="info-box">
-                  <span class="info-box-icon bg-info"><i class="bi bi-trash-fill"></i></span>
+                  <span class="info-box-icon bg-danger"><i class="bi bi-trash-fill"></i></span>
                   <div class="info-box-content">
                       <span class="info-box-text"><b>Vaciar Base de datos</b></span>
                       <a href="<?= APP_URL; ?>/admin/Vaciados" class="btn btn-primary btn-sm">Acceder</a>
@@ -60,7 +60,7 @@ include('../../admin/layout/parte1.php');
           <!-- Configuración para Desactivar Usuarios -->
           <div class="col-md-4 col-sm-6 col-12">
               <div class="info-box">
-                  <span class="info-box-icon bg-info"><i class="bi bi-person-x"></i></span>
+                  <span class="info-box-icon bg-warning"><i class="bi bi-person-x"></i></span>
                   <div class="info-box-content">
                       <span class="info-box-text"><b>Desactivar Usuarios</b></span>
                       <a href="<?= APP_URL; ?>/app/controllers/configuraciones/desactivar_usuarios.php" class="btn btn-primary btn-sm">Ejecutar</a>
@@ -71,7 +71,7 @@ include('../../admin/layout/parte1.php');
           <!-- Configuración para Activar Usuarios -->
           <div class="col-md-4 col-sm-6 col-12">
               <div class="info-box">
-                  <span class="info-box-icon bg-info"><i class="bi bi-person-fill-check"></i></span>
+                  <span class="info-box-icon bg-orange"><i class="bi bi-person-fill-check"></i></span>
                   <div class="info-box-content">
                       <span class="info-box-text"><b>Activar Usuarios</b></span>
                       <a href="<?= APP_URL; ?>/app/controllers/configuraciones/activar_usuarios.php" class="btn btn-primary btn-sm">Ejecutar</a>
@@ -82,13 +82,36 @@ include('../../admin/layout/parte1.php');
             <!-- Interfaz para Eliminar Materias -->
             <div class="col-md-4 col-sm-6 col-12">
                 <div class="info-box">
-                    <span class="info-box-icon bg-info"><i class="bi bi-trash-fill"></i></span>
+                    <span class="info-box-icon bg-danger"><i class="bi bi-trash-fill"></i></span>
                     <div class="info-box-content">
                         <span class="info-box-text"><b>Eliminar Materias</b></span>
-                        <a href="<?= APP_URL; ?>/admin/configuraciones/eliminar_materias_profesor" class="btn btn-primary btn-sm">Ir a Eliminar</a>
+                        <a href="<?= APP_URL; ?>/admin/configuraciones/eliminar_materias_profesor" class="btn btn-primary btn-sm">Acceder</a>
                     </div>
                 </div>
             </div>
+
+            <!-- Interfaz para Estadísticas -->
+            <div class="col-md-4 col-sm-6 col-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-success"><i class="bi bi-bar-chart-fill"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text"><b>Estadísticas</b></span>
+                        <a href="<?= APP_URL; ?>/admin/configuraciones/estadisticas" class="btn btn-primary btn-sm">Acceder</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interfaz para Calendario Escolar -->
+            <div class="col-md-4 col-sm-6 col-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-primary"><i class="bi bi-calendar2-week"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text"><b>Calendario Escolar</b></span>
+                        <a href="<?= APP_URL; ?>/admin/configuraciones/calendarios" class="btn btn-primary btn-sm">Acceder</a>
+                    </div>
+                </div>
+            </div>
+
 
 
 

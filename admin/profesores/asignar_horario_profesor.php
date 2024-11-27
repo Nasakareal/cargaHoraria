@@ -85,11 +85,7 @@ include('../../app/controllers/profesores/datos_del_profesor_en_subjects.php');
                                     <!-- Botones para agregar y quitar materias -->
                                     <div class="col-md-2 text-center" style="margin-top: 80px;">
                                         <button type="button" id="add_subject" class="btn btn-primary btn-block">Agregar &gt;&gt;</button>
-                                        <?php if (isset($_SESSION['sesion_rol']) && $_SESSION['sesion_rol'] == 1): ?>
-                                            <button type="button" id="remove_subject" class="btn btn-primary btn-block">&lt;&lt; Quitar</button>
-                                        <?php else: ?>
-                                            <button type="button" id="remove_subject" class="btn btn-primary btn-block" disabled>&lt;&lt; Quitar</button>
-                                        <?php endif; ?>
+                                        <button type="button" id="remove_subject" class="btn btn-primary btn-block">&lt;&lt; Quitar</button>
                                     </div>
 
                                     <!-- Materias asignadas -->
@@ -128,7 +124,8 @@ include('../../layout/mensajes.php');
 
 <!-- jQuery y el archivo JavaScript externo -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>$(document).ready(function () {
+<script>
+$(document).ready(function () {
     var teacher_id = $('input[name="teacher_id"]').val();
 
     /* Obtener el valor inicial de horas asignadas desde la base de datos */
@@ -232,7 +229,7 @@ include('../../layout/mensajes.php');
 
     /* Calcular el total de horas asignadas */
     function calcularTotalHoras() {
-        var totalHoras = parseInt($('#total_hours').val()) || 0;
+        var totalHoras = 0; // Inicializar total en 0
         $('#materias_asignadas option').each(function () {
             totalHoras += parseInt($(this).data('hours')) || 0;
         });
@@ -261,3 +258,4 @@ include('../../layout/mensajes.php');
     });
 });
 </script>
+

@@ -8,11 +8,11 @@ $rol_id = $_POST['rol_id'];
 $email = $_POST['email'];
 $password = $_POST['password'];
 $password_repet = $_POST['password_repet'];
-$fechaHora = date("Y-m-d H:i:s"); // Asegúrate de definir la fecha y hora actual
+$fechaHora = date("Y-m-d H:i:s");
 
-// Verificar si se desea cambiar la contraseña
+/* Verificar si se desea cambiar la contraseña */
 if ($password == "") {
-    // No se cambia la contraseña
+    /* No se cambia la contraseña */
     $sentencia = $pdo->prepare("UPDATE usuarios
         SET nombres=:nombres,
         rol_id=:rol_id,
@@ -27,7 +27,7 @@ if ($password == "") {
     $sentencia->bindParam(':id_usuario', $id_usuario);
 
 } else {
-    // Cambiar la contraseña si las contraseñas coinciden
+    /* Cambiar la contraseña si las contraseñas coinciden */
     if ($password == $password_repet) {
         $password_encriptada = password_hash($password, PASSWORD_BCRYPT); // Encriptar la nueva contraseña
 

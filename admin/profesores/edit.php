@@ -49,7 +49,7 @@ $programa_adscripcion_id = isset($program_id) ? $program_id : null; // Programa 
                                             <label for="clasificacion">Clasificación</label>
                                             <select name="clasificacion" id="clasificacion" class="form-control" required>
                                                 <option value="PTC" <?= ($clasificacion == 'PTC') ? 'selected' : ''; ?>>PTC</option>
-                                                <option value="PTA" <?= ($clasificacion == 'PTA') ? 'selected' : ''; ?>>PTA</option>
+                                                <option value="PTA" <?= ($clasificacion == 'PA') ? 'selected' : ''; ?>>PA</option>
                                                 <option value="TA" <?= ($clasificacion == 'TA') ? 'selected' : ''; ?>>TA</option>
                                             </select>
                                         </div>

@@ -13,8 +13,9 @@ $total_groups = count($groups);
 $total_subjects = count($subjects);
 $total_teachers = count($teachers);
 
-
-//$total_assignments = count($result);
+// Consulta para contar las asignaciones de materias a profesores
+$query_assignments = $pdo->query("SELECT COUNT(*) AS total FROM teacher_subjects");
+$total_assignments = $query_assignments->fetch(PDO::FETCH_ASSOC)['total'];
 ?>
 
 <div class="content-wrapper">
@@ -82,7 +83,7 @@ $total_teachers = count($teachers);
                                         </td>
                                     </tr>
 
-                                    <!-- Nueva fila para Asignaciones de Materias a Profesores -->
+                                    <!-- Fila para Asignaciones de Materias a Profesores -->
                                     <tr>
                                         <td class="text-center">4</td>
                                         <td class="text-center">Asignaciones de Materias a Profesores</td>

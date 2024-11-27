@@ -572,3 +572,15 @@ FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE ON UPDATE
 ALTER TABLE classrooms
 ADD planta_alta BOOLEAN NOT NULL DEFAULT 0 AFTER floor,
 ADD planta_baja BOOLEAN NOT NULL DEFAULT 0 AFTER planta_alta;
+
+
+
+CREATE TABLE calendario_escolar (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_cuatrimestre VARCHAR(100) NOT NULL, -- Ejemplo: "Enero-Abril 2024"
+    fecha_inicio DATE NOT NULL,
+    fecha_fin DATE NOT NULL,
+    estado ENUM('ACTIVO', 'INACTIVO') DEFAULT 'ACTIVO',
+    fyh_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fyh_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
