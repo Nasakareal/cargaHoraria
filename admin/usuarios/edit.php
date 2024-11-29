@@ -76,6 +76,19 @@ include ('../../app/controllers/roles/listado_de_roles.php');
                         </div>
                       </div>
                     </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="">Foto de perfil</label>
+                                <div>
+                                    <a href="<?= APP_URL; ?>/admin/usuarios/cambiar_foto.php?id=<?= $id_usuario; ?>" class="btn btn-success">
+                                        Cambiar foto de perfil
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+
                     <hr>
                     <div class="row">
                       <div class="col-md-12">

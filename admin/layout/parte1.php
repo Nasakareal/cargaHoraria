@@ -1,14 +1,14 @@
 <?php
 include_once($_SERVER['DOCUMENT_ROOT'] . '/cargaHoraria/app/middleware.php');
 
-// Información adicional basada en la sesión
+
 $email_sesion = $_SESSION['sesion_email'];
 $rol_id = $_SESSION['sesion_rol'];
 $nombre_sesion_usuario = $_SESSION['sesion_nombre_usuario'] ?? null;
+$foto_sesion_usuario = $_SESSION['sesion_foto_usuario'] ?? null;
 
-if (!$nombre_sesion_usuario) {
-    // Consulta opcional para obtener más datos si no están en la sesión
-    $query = $pdo->prepare("SELECT nombres FROM usuarios WHERE email = :email AND estado = '1'");
+if (!$nombre_sesion_usuario || !$foto_sesion_usuario) {
+    $query = $pdo->prepare("SELECT nombres, foto_perfil FROM usuarios WHERE email = :email AND estado = '1'");
     $query->bindParam(':email', $email_sesion);
     $query->execute();
     $usuarioData = $query->fetch(PDO::FETCH_ASSOC);
@@ -16,11 +16,16 @@ if (!$nombre_sesion_usuario) {
     if ($usuarioData) {
         $nombre_sesion_usuario = $usuarioData['nombres'];
         $_SESSION['sesion_nombre_usuario'] = $nombre_sesion_usuario;
+
+        // Guardar la foto en la sesión
+        $foto_sesion_usuario = $usuarioData['foto_perfil'] ?: 'https://cdn-icons-png.flaticon.com/512/74/74472.png'; // Imagen por defecto
+        $_SESSION['sesion_foto_usuario'] = $foto_sesion_usuario;
     } else {
         header('Location: ' . APP_URL . '/login');
         exit();
     }
 }
+
 ?>
 <!DOCTYPE html>
 <!--
@@ -107,10 +112,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="https://cdn-icons-png.flaticon.com/512/74/74472.png" class="img-circle elevation-2" alt="User Image">
+            <img src="<?= $_SESSION['sesion_foto_usuario'] ?: 'https://cdn-icons-png.flaticon.com/512/74/74472.png'; ?>" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="usuarios/show.php?id=<?= $_SESSION['sesion_id_usuario']; ?>" class="d-block"><?=$nombre_sesion_usuario;?></a>
+          <a href="<?= APP_URL; ?>/admin/usuarios/show.php?id=<?= $_SESSION['sesion_id_usuario']; ?>" class="d-block"><?= $nombre_sesion_usuario; ?></a>
         </div>
       </div>
 

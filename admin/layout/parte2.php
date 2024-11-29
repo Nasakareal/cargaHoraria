@@ -1,11 +1,12 @@
 <!-- Control Sidebar -->
-<aside class="control-sidebar control-sidebar-info" style="width: 600px;">
+<aside class="control-sidebar control-sidebar-info" style="width: 500px;">
     <div class="p-3">
         <h5>Chat de Ayuda</h5>
         <div id="chatbox" class="card card-info direct-chat direct-chat-primary">
             <div class="card-header">
-                <h3 class="card-title">Chat de Ayuda</h3>
+                <h3 class="card-title">Dalia</h3>
             </div>
+
             <!-- Contenedor de mensajes -->
             <div class="card-body direct-chat-messages" id="contenedor-mensajes" style="height: 600px; overflow-y: auto;">
                 <!-- Los mensajes aparecerán aquí -->
@@ -55,7 +56,7 @@ function enviarMensaje() {
     document.getElementById("contenedor-mensajes").scrollTop = document.getElementById("contenedor-mensajes").scrollHeight;
 
     /* Enviar mensaje al servidor */
-    fetch("../app/helpers/chatbot.php", {
+    fetch("<?= APP_URL; ?>/app/helpers/chatbot.php", {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -68,11 +69,14 @@ function enviarMensaje() {
         let botMessageId = "bot-message-text-" + Date.now();
         let botMessageHTML = `<div class="direct-chat-msg">
             <div class="direct-chat-infos clearfix">
-                <span class="direct-chat-name float-left">Dalia</span>
+                <span class="direct-chat-name float-left">
+                    <img src="<?= APP_URL; ?>/public/dist/img/Dalia-profile.jpg" alt="Dalia" class="dalia-image"> Dalia
+                </span>
             </div>
             <div class="direct-chat-text" id="${botMessageId}"></div>
         </div>`;
         document.getElementById("contenedor-mensajes").innerHTML += botMessageHTML;
+
 
         let i = 0;
         function typeMessage() {
@@ -94,13 +98,24 @@ function enviarMensaje() {
 }
 </script>
 
+<style>
+.dalia-image {
+    width: 40px;
+    height: 45px;
+    border-radius: 50%;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+</style>
+
+
 <!-- /.control-sidebar -->
 
 <!-- Main Footer -->
 <footer class="main-footer">
     <!-- To the right -->
     <div class="float-right d-none d-sm-inline">
-      Versión 1.1.3
+      Versión 1.1.4
     </div>
     <!-- Default to the left -->
     <strong>Copyright &copy; <?= $ano_actual; ?> <a href="https://ut-morelia.edu.mx/">UTM</a>.</strong> All rights reserved.

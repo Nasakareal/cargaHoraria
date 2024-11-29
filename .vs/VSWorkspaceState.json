@@ -2,15 +2,13 @@
   "ExpandedNodes": [
     "",
     "\\admin",
-    "\\admin\\configuraciones",
-    "\\admin\\configuraciones\\estadisticas",
-    "\\admin\\horarios_grupos",
-    "\\admin\\profesores",
+    "\\admin\\layout",
+    "\\admin\\usuarios",
     "\\app",
     "\\app\\controllers",
-    "\\app\\controllers\\estadisticas",
-    "\\database"
+    "\\app\\controllers\\usuarios",
+    "\\app\\helpers"
   ],
-  "SelectedNode": "\\admin\\configuraciones\\estadisticas\\index.php",
+  "SelectedNode": "\\app\\helpers\\chatbot.php",
   "PreviewInSolutionExplorer": false
 }
