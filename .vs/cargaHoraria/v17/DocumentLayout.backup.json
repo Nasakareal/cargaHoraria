@@ -1,12 +1,37 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\wamp64\\www\\cargaHoraria\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\wamp64\\www\\cargaHoraria\\app\\helpers\\chatbot.php||{3D2461EC-8045-4AA9-ABFB-812292AE795D}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\helpers\\chatbot.php||{3D2461EC-8045-4AA9-ABFB-812292AE795D}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "chatbot.php",
+              "DocumentMoniker": "C:\\wamp64\\www\\cargaHoraria\\app\\helpers\\chatbot.php",
+              "RelativeDocumentMoniker": "app\\helpers\\chatbot.php",
+              "ToolTip": "C:\\wamp64\\www\\cargaHoraria\\app\\helpers\\chatbot.php",
+              "RelativeToolTip": "app\\helpers\\chatbot.php",
+              "ViewState": "AgIAAJ8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "89320d42-7831-4f47-839a-c227d3a60919.000001|",
+              "WhenOpened": "2024-11-29T20:25:36.008Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }

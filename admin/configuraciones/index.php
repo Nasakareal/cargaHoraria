@@ -110,9 +110,18 @@ include('../../admin/layout/parte1.php');
                         <a href="<?= APP_URL; ?>/admin/configuraciones/calendarios" class="btn btn-primary btn-sm">Acceder</a>
                     </div>
                 </div>
+            </div
+
+            <!-- Interfaz para Calendario Escolar -->
+            <div class="col-md-4 col-sm-6 col-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-olive"><i class="bi bi-map"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text"><b>Mapa Escolar</b></span>
+                        <a href="<?= APP_URL; ?>/admin/configuraciones/mapa" class="btn btn-primary btn-sm">Acceder</a>
+                    </div>
+                </div>
             </div>
-
-
 
 
       </div>

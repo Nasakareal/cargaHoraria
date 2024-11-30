@@ -57,14 +57,6 @@ include('../../app/controllers/turnos/listado_de_turnos.php');
                                         </div>
                                     </div>
 
-                                    <!-- Campo para el año -->
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="year">A&ntilde;o</label>
-                                            <input type="number" name="year" class="form-control" required>
-                                        </div>
-                                    </div>
-
                                     <!-- Campo para el volumen del grupo -->
                                     <div class="col-md-4">
                                         <div class="form-group">

@@ -17,8 +17,8 @@ if (!$nombre_sesion_usuario || !$foto_sesion_usuario) {
         $nombre_sesion_usuario = $usuarioData['nombres'];
         $_SESSION['sesion_nombre_usuario'] = $nombre_sesion_usuario;
 
-        // Guardar la foto en la sesión
-        $foto_sesion_usuario = $usuarioData['foto_perfil'] ?: 'https://cdn-icons-png.flaticon.com/512/74/74472.png'; // Imagen por defecto
+        
+        $foto_sesion_usuario = $usuarioData['foto_perfil'] ?: 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
         $_SESSION['sesion_foto_usuario'] = $foto_sesion_usuario;
     } else {
         header('Location: ' . APP_URL . '/login');

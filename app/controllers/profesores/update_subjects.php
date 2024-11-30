@@ -15,40 +15,65 @@ try {
         throw new Exception("Debe seleccionar al menos un grupo para asignar materias.");
     }
 
-    /* Obtener las materias actualmente asignadas al profesor en los grupos seleccionados */
-    $placeholders = implode(',', array_fill(0, count($grupo_ids), '?'));
-    $sentencia_materias_actuales = $pdo->prepare("
-        SELECT DISTINCT ts.subject_id, ts.group_id 
-        FROM teacher_subjects ts
-        WHERE ts.teacher_id = ? AND ts.group_id IN ($placeholders)
-    ");
-    $sentencia_materias_actuales->execute(array_merge([$teacher_id], $grupo_ids));
-    $materias_actuales = $sentencia_materias_actuales->fetchAll(PDO::FETCH_ASSOC);
+    /* Validar interferencias de horarios */
+    foreach ($materia_ids as $materia_id) {
+        foreach ($grupo_ids as $grupo_id) {
+            $sentencia_interferencia = $pdo->prepare("
+                SELECT sa.schedule_id, sa.schedule_day, sa.start_time, sa.end_time, sa.group_id
+                FROM schedule_assignments sa
+                WHERE sa.teacher_id = ?
+                AND sa.schedule_day = (
+                    SELECT sa2.schedule_day 
+                    FROM schedule_assignments sa2
+                    WHERE sa2.group_id = ? AND sa2.subject_id = ?
+                    LIMIT 1
+                )
+                AND (
+                    sa.start_time < (
+                        SELECT sa2.end_time 
+                        FROM schedule_assignments sa2
+                        WHERE sa2.group_id = ? AND sa2.subject_id = ?
+                        LIMIT 1
+                    )
+                    AND sa.end_time > (
+                        SELECT sa2.start_time 
+                        FROM schedule_assignments sa2
+                        WHERE sa2.group_id = ? AND sa2.subject_id = ?
+                        LIMIT 1
+                    )
+                )
+            ");
+            $sentencia_interferencia->execute([$teacher_id, $grupo_id, $materia_id, $grupo_id, $materia_id, $grupo_id, $materia_id]);
+            $interferencia = $sentencia_interferencia->fetch(PDO::FETCH_ASSOC);
 
-    /* Crear un índice de materias por grupo para facilitar la comparación */
-    $materias_actuales_por_grupo = [];
-    foreach ($materias_actuales as $materia) {
-        $materias_actuales_por_grupo[$materia['group_id']][] = $materia['subject_id'];
+            if ($interferencia) {
+                $dia_conflicto = $interferencia['schedule_day'];
+                $hora_inicio_conflicto = $interferencia['start_time'];
+                $hora_fin_conflicto = $interferencia['end_time'];
+                $grupo_conflicto = $interferencia['group_id'];
+                throw new Exception(
+                    "Conflicto detectado: No puede asignar la materia (ID: $materia_id) al grupo (ID: $grupo_id) porque ya tiene un horario asignado en el grupo (ID: $grupo_conflicto) el día $dia_conflicto de $hora_inicio_conflicto a $hora_fin_conflicto."
+                );
+            }
+        }
     }
 
     /* Insertar materias nuevas asociadas a los grupos seleccionados */
     foreach ($grupo_ids as $grupo_id) {
         foreach ($materia_ids as $materia_id) {
-            if (!isset($materias_actuales_por_grupo[$grupo_id]) || !in_array($materia_id, $materias_actuales_por_grupo[$grupo_id])) {
-                $sentencia_insertar = $pdo->prepare("
-                    INSERT INTO teacher_subjects (teacher_id, subject_id, group_id, fyh_creacion, fyh_actualizacion) 
-                    VALUES (?, ?, ?, ?, ?)
-                ");
-                $sentencia_insertar->execute([$teacher_id, $materia_id, $grupo_id, $fechaHora, $fechaHora]);
+            $sentencia_insertar = $pdo->prepare("
+                INSERT INTO teacher_subjects (teacher_id, subject_id, group_id, fyh_creacion, fyh_actualizacion) 
+                VALUES (?, ?, ?, ?, ?)
+            ");
+            $sentencia_insertar->execute([$teacher_id, $materia_id, $grupo_id, $fechaHora, $fechaHora]);
 
-                /* Actualizar la tabla de horarios */
-                $sentencia_actualizar_horarios = $pdo->prepare("
-                    UPDATE schedule_assignments 
-                    SET teacher_id = ?, fyh_actualizacion = ?
-                    WHERE group_id = ? AND subject_id = ?
-                ");
-                $sentencia_actualizar_horarios->execute([$teacher_id, $fechaHora, $grupo_id, $materia_id]);
-            }
+            /* Actualizar la tabla de horarios */
+            $sentencia_actualizar_horarios = $pdo->prepare("
+                UPDATE schedule_assignments 
+                SET teacher_id = ?, fyh_actualizacion = ?
+                WHERE group_id = ? AND subject_id = ?
+            ");
+            $sentencia_actualizar_horarios->execute([$teacher_id, $fechaHora, $grupo_id, $materia_id]);
         }
     }
 
@@ -91,7 +116,7 @@ try {
 } catch (Exception $exception) {
     $pdo->rollBack();
     session_start();
-    $_SESSION['mensaje'] = "Ocurrió un error: " . $exception->getMessage();
+    $_SESSION['mensaje'] = $exception->getMessage();
     $_SESSION['icono'] = "error";
     error_log("Error: " . $exception->getMessage());
     header('Location: ' . APP_URL . "/admin/profesores");

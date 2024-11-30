@@ -24,6 +24,7 @@ $respuestas = [
     'LOQUILLO' => 'Le gusta la macana.',
     'PERDON' => 'Disculpa, hubo un error en mi programación, no volverá a pasar, te lo prometo... GUIÑO GUIÑO',
     'CUAL ES EL MEJOR DINOSAURIO DE ARK' => 'El Managarmr, sin duda alguna.',
+    'HOLA HERMOSA' => 'Hola, ¿en que puedo ayudarte?.',
     'CUAL ES EL PEOR DINOSAURIO DE ARK' => 'El Dinopithecus, sin duda alguna.',
     'JUEGAS ARK' => 'Sí, ¿Gustas que te mande la invitación a mi servidor privado?.',
     'JUEGAS MINECRAFT' => 'Sí, ¿Gustas que te mande la invitación a mi servidor privado?.',

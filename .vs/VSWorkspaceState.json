@@ -2,13 +2,14 @@
   "ExpandedNodes": [
     "",
     "\\admin",
-    "\\admin\\layout",
-    "\\admin\\usuarios",
+    "\\admin\\configuraciones",
+    "\\admin\\configuraciones\\eliminar_materias_profesor",
+    "\\admin\\configuraciones\\mapa",
+    "\\admin\\salones",
     "\\app",
     "\\app\\controllers",
-    "\\app\\controllers\\usuarios",
-    "\\app\\helpers"
+    "\\database"
   ],
-  "SelectedNode": "\\app\\helpers\\chatbot.php",
+  "SelectedNode": "\\admin\\configuraciones\\mapa\\detalles_edificio_a.php",
   "PreviewInSolutionExplorer": false
 }

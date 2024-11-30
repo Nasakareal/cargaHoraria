@@ -14,7 +14,7 @@ if (!verificarPermiso($_SESSION['sesion_id_usuario'], 'teacher_assign', $pdo)) {
     exit;
 }
 
-/* Obtener el ID del profesor de la URL */
+/* Obtener el ID del profesor */
 $teacher_id = filter_input(INPUT_GET, 'teacher_id', FILTER_VALIDATE_INT);
 
 /* Verificar si el ID es válido */

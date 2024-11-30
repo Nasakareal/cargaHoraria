@@ -9,15 +9,20 @@ try {
     /* Inicia la transacción */
     $pdo->beginTransaction();
 
-    /* 1. Eliminar las asignaciones de profesores en la tabla schedule_assignments */
+    /* Eliminar las asignaciones de profesores en la tabla schedule_assignments */
     $query1 = "UPDATE `schedule_assignments` SET `teacher_id` = NULL";
     $stmt1 = $pdo->prepare($query1);
     $stmt1->execute();
 
-    /* 2. Eliminar todos los registros de la tabla teacher_subjects */
+    /* Eliminar todos los registros de la tabla teacher_subjects */
     $query2 = "DELETE FROM `teacher_subjects`";
     $stmt2 = $pdo->prepare($query2);
     $stmt2->execute();
+
+    /* Reiniciar el campo `hours` en la tabla teachers a 0 */
+    $query3 = "UPDATE `teachers` SET `hours` = 0";
+    $stmt3 = $pdo->prepare($query3);
+    $stmt3->execute();
 
     /* Confirma la transacción */
     $pdo->commit();

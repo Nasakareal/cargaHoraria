@@ -2,7 +2,7 @@
 
 $sql_classrooms = "SELECT 
                     c.classroom_id,   
-                    CONCAT(c.classroom_name, '-', RIGHT(c.building, 1)) AS nombre_salon,
+                    CONCAT(RIGHT(c.building, 1), '-', c.classroom_name) AS nombre_salon,
                     c.capacity AS capacidad,
                     c.building AS edificio,
                     c.floor AS planta,
