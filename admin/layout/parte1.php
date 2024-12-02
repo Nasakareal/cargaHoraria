@@ -80,8 +80,71 @@ scratch. This page gets rid of all links and provides the needed markup only.
       
       
 
-      <!-- Notifications Dropdown Menu -->
-      
+    <!-- Notifications Dropdown Menu -->
+<li class="nav-item dropdown">
+    <a class="nav-link" data-toggle="dropdown" href="#">
+        <i class="far fa-bell"></i>
+        <span class="badge badge-warning navbar-badge" id="notification-count" style="display: none;">0</span>
+    </a>
+    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+        <span class="dropdown-header" id="notification-header">0 Notificaciones</span>
+        <div class="dropdown-divider"></div>
+        <div id="notification-list">
+            <!-- Aquí se cargarán las notificaciones dinámicamente -->
+        </div>
+        <div class="dropdown-divider"></div>
+        <a href="<?= APP_URL; ?>/admin/reportes/" class="dropdown-item dropdown-footer">Ver todas las Notificaciones</a>
+    </div>
+</li>
+
+<!-- Script para cargar notificaciones -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    fetch('/cargaHoraria/app/reports/get_reports.php')
+        .then(response => response.json())
+        .then(data => {
+            const countElement = document.getElementById('notification-count');
+            const headerElement = document.getElementById('notification-header');
+            const listElement = document.getElementById('notification-list');
+
+            /* Actualizar conteo de notificaciones */
+            if (data.length > 0) {
+                countElement.textContent = data.length;
+                countElement.style.display = 'inline'; // Mostrar el contador
+            } else {
+                countElement.style.display = 'none'; // Ocultar el contador
+            }
+
+            headerElement.textContent = `${data.length} Notificaciones`;
+
+            /* Generar lista de notificaciones */
+            let notificationHTML = '';
+            data.forEach(report => {
+                notificationHTML += `
+                <a href="/cargaHoraria/admin/reportes/show.php?id=${report.report_id}" class="dropdown-item">
+                  <i class="fas fa-file mr-2"></i> ${report.report_message}
+                  <span class="float-right text-muted text-sm">${new Date(report.created_at).toLocaleString()}</span>
+                </a>
+                <div class="dropdown-divider"></div>
+                `;
+            });
+
+            /* Insertar notificaciones en la lista */
+            listElement.innerHTML = notificationHTML || '<p class="text-center text-muted">No hay notificaciones</p>';
+        })
+        .catch(error => {
+            console.error('Error loading notifications:', error);
+            const listElement = document.getElementById('notification-list');
+            listElement.innerHTML = '<p class="text-center text-danger">Error al cargar notificaciones</p>';
+        });
+});
+</script>
+
+
+
+
+
+
       <li class="nav-item">
         <a class="nav-link" data-widget="fullscreen" href="#" role="button">
           <i class="fas fa-expand-arrows-alt"></i>
@@ -309,6 +372,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </ul>
 
           </li>
+
+
+
           <br>
           <li class="nav-item">
             <a href="<?=APP_URL;?>/login/logout.php" class="nav-link" style= "background-color: #f44336;color: black">
@@ -318,10 +384,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
               </p>
             </a>
           </li>
+<br>
+
+
 
 
 
         </ul>
+
       </nav>
       <!-- /.sidebar-menu -->
        
@@ -329,3 +399,4 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- /.sidebar -->
      
   </aside>
+

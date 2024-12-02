@@ -55,4 +55,4 @@
 
 
 <!-- Texto -->
-<text x="400" y="470" font-size="14" fill="#000000" text-anchor="middle" transform="rotate(5)">Estacionamiento</text>
+<text x="400" y="480" font-size="25" fill="#000000" text-anchor="middle" transform="rotate(5)">Estacionamiento</text>

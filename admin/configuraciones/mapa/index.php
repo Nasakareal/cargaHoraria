@@ -22,8 +22,16 @@ include('../../../admin/layout/parte1.php');
                         </div>
                         <div class="card-body">
                             <!-- Mapa SVG -->
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" style="width: 100%; height: 500px; border: 1px solid #ccc;">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -650 1400 1200" style="width: 100%; height: 500px; border: 1px solid #ccc;">
                                 <!-- Incluir áreas específicas desde archivos externos -->
+                                <a href="detalles_edificio_d.php" style="cursor: pointer;"><?php include('edificio_d.php'); ?></a>
+                                <?php include('auditorio.php'); ?>
+                                <a href="detalles_edificio_b.php" style="cursor: pointer;"><?php include('edificio_b.php'); ?></a>
+                                <?php include('cafeteria.php'); ?>
+                                <?php include('Laboratorio_P2.php'); ?>
+                                <?php include('Laboratorio_P1.php'); ?>
+                                <?php include('explanada.php'); ?>
+                                <?php include('administracion.php'); ?>
                                 <?php include('cancha_futbol.php'); ?>
                                 <?php include('estacionamiento.php'); ?>
                                 <a href="detalles_edificio_a.php" style="cursor: pointer;"><?php include('edificio_a.php'); ?></a>

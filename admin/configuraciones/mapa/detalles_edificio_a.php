@@ -21,7 +21,7 @@ include('../../../admin/layout/parte1.php');
                         </div>
                         <div class="card-body">
                             <!-- Mapa SVG -->
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" style="width: 100%; height: 500px; border: 1px solid #ccc;">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -50 500 300" style="width: 100%; height: 500px; border: 1px solid #ccc;">
                                 <!-- Incluir salones del Edificio A -->
                                 <?php include('salones_edificio_a.php'); ?>
                             </svg>

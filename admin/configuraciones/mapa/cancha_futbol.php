@@ -3,7 +3,7 @@
 
 <!-- Líneas de la Cancha -->
 <!-- Línea central -->
-<line x1="150" y1="100" x2="150" y2="400" stroke="#fff" stroke-width="2" transform="rotate(5)" />
+<line x1="50" y1="250" x2="1600" y2="200" stroke="#fff" stroke-width="2" transform="rotate(5)" />
 
 <!-- Círculo central -->
 <circle cx="150" cy="250" r="20" fill="none" stroke="#fff" stroke-width="2" transform="rotate(5)" />
@@ -30,4 +30,4 @@
 <line x1="80" y1="400" x2="220" y2="400" stroke="#fff" stroke-width="4" transform="rotate(5)" />
 
 <!-- Texto -->
-<text x="150" y="408" font-size="14" fill="#000000" text-anchor="middle" transform="rotate(5)">Cancha de Fútbol</text>
+<text x="150" y="416" font-size="25" fill="#000000" text-anchor="middle" transform="rotate(5)">Cancha de Fútbol</text>
