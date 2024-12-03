@@ -50,32 +50,39 @@ $porcentaje_no_cubiertas = 100 - $porcentaje_cubiertas;
             </div>
 
             <!-- Listado de Grupos con Materias No Asignadas -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title text-center">Grupos con Materias Sin Profesor</h3>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-center"><strong>Total de Grupos Faltantes:</strong> <?php echo $total_grupos; ?></p>
-                        <p class="text-center"><strong>Total de Materias Faltantes:</strong> <?php echo $materias_no_cubiertas; ?></p>
+<div class="col-md-6">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title text-center">Grupos con Materias Sin Profesor</h3>
+        </div>
+        <div class="card-body">
+            <p class="text-center"><strong>Total de Grupos Faltantes:</strong> <?php echo $total_grupos; ?></p>
+            <p class="text-center"><strong>Total de Materias Faltantes:</strong> <?php echo $materias_no_cubiertas; ?></p>
 
-                        <?php if (!empty($grupos_materias_faltantes)): ?>
-                            <ul class="list-group">
-                                <?php foreach ($grupos_materias_faltantes as $grupo): ?>
-                                    <li class="list-group-item">
-                                        <strong><?php echo htmlspecialchars($grupo['grupo']); ?>:</strong><br>
-                                        <strong>Materias Sin Profesor:</strong> <?php echo htmlspecialchars($grupo['materias_faltantes']); ?><br>
-                                        <strong>Total Materias:</strong> <?php echo $grupo['total_materias']; ?><br>
-                                        <strong>Materias Asignadas:</strong> <?php echo $grupo['materias_asignadas']; ?>
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
-                        <?php else: ?>
-                            <p class="text-center">Todos los grupos tienen sus materias asignadas a profesores.</p>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
+            <?php if (!empty($grupos_materias_faltantes)): ?>
+                <table id="listadoMaterias" class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Grupo</th>
+                            <th>Materias Sin Profesor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($grupos_materias_faltantes as $grupo): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($grupo['grupo']); ?></td>
+                                <td><?php echo htmlspecialchars($grupo['materias_faltantes']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <p class="text-center">Todos los grupos tienen sus materias asignadas a profesores.</p>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
         </div>
     </div>
 </div>
@@ -118,6 +125,32 @@ include('../layout/mensajes.php');
                     }
                 }
             }
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#listadoMaterias').DataTable({
+            "pageLength": 5,
+            "language": {
+                "emptyTable": "No hay grupos con materias sin profesor",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ grupos",
+                "infoEmpty": "Mostrando 0 a 0 de 0 grupos",
+                "infoFiltered": "(Filtrado de _MAX_ grupos en total)",
+                "lengthMenu": "Mostrar _MENU_ grupos",
+                "search": "Buscar:",
+                "zeroRecords": "Sin resultados encontrados",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            },
+            "responsive": true,
+            "lengthChange": true,
+            "autoWidth": false
         });
     });
 </script>

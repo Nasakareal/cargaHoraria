@@ -2,15 +2,11 @@
   "ExpandedNodes": [
     "",
     "\\admin",
-    "\\admin\\layout",
-    "\\admin\\reportes",
     "\\app",
     "\\app\\controllers",
-    "\\app\\controllers\\reportes",
-    "\\portal",
-    "\\portal\\reportes",
-    "\\templates"
+    "\\app\\controllers\\profesores",
+    "\\app\\reports"
   ],
-  "SelectedNode": "\\admin\\layout\\parte1.php",
+  "SelectedNode": "\\app\\controllers\\profesores\\update_subjects.php",
   "PreviewInSolutionExplorer": false
 }

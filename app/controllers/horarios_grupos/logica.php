@@ -25,10 +25,11 @@ $groups = $pdo->query("SELECT *, classroom_assigned, lab_assigned FROM `groups` 
 /* Obtener materias específicas de cada grupo desde `group_subjects` */
 $subjects_by_group = [];
 foreach ($groups as $group) {
-    $stmt = $pdo->prepare("SELECT s.*, gs.group_id, g.classroom_assigned, g.lab_assigned 
+    $stmt = $pdo->prepare("SELECT s.*, gs.group_id, g.classroom_assigned, g.lab_assigned, ts.teacher_id 
                            FROM subjects s 
                            JOIN group_subjects gs ON gs.subject_id = s.subject_id 
                            JOIN `groups` g ON g.group_id = gs.group_id
+                           LEFT JOIN teacher_subjects ts ON ts.subject_id = s.subject_id AND ts.group_id = gs.group_id
                            WHERE gs.group_id = :group_id AND s.estado = '1'");
     $stmt->execute([':group_id' => $group['group_id']]);
     $subjects = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -102,14 +103,42 @@ function asignarBloqueHorario($pdo, $subject, $group, $dia, $start_time, $end_ti
         return false; /* El grupo ya tiene una materia asignada en este horario */
     }
 
+    /* Verificar disponibilidad del profesor si hay uno asignado */
+    $teacher_id = isset($subject['teacher_id']) ? $subject['teacher_id'] : null;
+
+    if (!empty($teacher_id)) {
+        $check_teacher_availability_sql = "SELECT COUNT(*) FROM schedule_assignments 
+            WHERE 
+                teacher_id = :teacher_id 
+                AND schedule_day = :schedule_day 
+                AND (
+                    (start_time < :end_time AND end_time > :start_time)
+                )";
+        $check_teacher_availability_params = [
+            ':teacher_id' => $teacher_id,
+            ':schedule_day' => $dia,
+            ':start_time' => $formatted_start_time,
+            ':end_time' => $formatted_end_time
+        ];
+
+        $check_teacher_availability = $pdo->prepare($check_teacher_availability_sql);
+        $check_teacher_availability->execute($check_teacher_availability_params);
+
+        if ($check_teacher_availability->fetchColumn() > 0) {
+            /* El profesor no está disponible en este horario, pero se asigna el horario al grupo sin profesor */
+            $teacher_id = null;
+        }
+    }
+
     /* Insertar el bloque horario en la base de datos */
     $sql_insert = "INSERT INTO schedule_assignments 
                    (subject_id, group_id, teacher_id, classroom_id, schedule_day, start_time, end_time, estado, fyh_creacion, tipo_espacio)
-                   VALUES (:subject_id, :group_id, NULL, :classroom_id, :schedule_day, :start_time, :end_time, 'activo', NOW(), :tipo_espacio)";
+                   VALUES (:subject_id, :group_id, :teacher_id, :classroom_id, :schedule_day, :start_time, :end_time, 'activo', NOW(), :tipo_espacio)";
     $stmt_insert = $pdo->prepare($sql_insert);
     $stmt_insert->execute([
         ':subject_id' => $subject['subject_id'],
         ':group_id' => $group['group_id'],
+        ':teacher_id' => $teacher_id,
         ':classroom_id' => $espacio_id,
         ':schedule_day' => $dia,
         ':start_time' => $formatted_start_time,
@@ -240,7 +269,7 @@ function distribuirMateriasEnSemana($pdo, $group, $subjects, $horario_turno, $di
                 $horas_disponibles_dia = $max_consecutive_hours - $horas_asignadas_por_materia_dia[$dia][$subject_id];
                 $horas_disponibles_en_dia = floor(($fin_turno - $inicio_actual) / 3600);
 
-                /* **Respetar las horas mínimas consecutivas** */
+                /* Respetar las horas mínimas consecutivas */
                 $horas_a_asignar = min($horas_restantes_materia, $horas_disponibles_dia, $horas_disponibles_en_dia);
                 if ($horas_a_asignar < $min_consecutive_hours) {
                     /* No hay suficiente tiempo para asignar el mínimo de horas consecutivas, continuar */
@@ -337,17 +366,9 @@ function distribuirMateriasEnSemana($pdo, $group, $subjects, $horario_turno, $di
                     /* Intentar respetar las horas mínimas consecutivas */
                     $horas_a_asignar = min($horas_restantes_materia, $horas_disponibles_dia, $horas_disponibles_en_dia);
                     if ($horas_a_asignar < $min_consecutive_hours) {
-                        /* No hay suficiente tiempo para asignar el mínimo de horas consecutivas, intentar asignar horas remanentes */
-                        if ($horas_restantes_materia > 0) {
-                            $horas_a_asignar = min($horas_restantes_materia, $horas_disponibles_dia, $horas_disponibles_en_dia);
-                            if ($horas_a_asignar <= 0) {
-                                /* No se pueden asignar más horas, avanzar en el tiempo */
-                                $inicio_actual = strtotime("+1 hour", $inicio_actual);
-                                continue;
-                            }
-                        } else {
-                            break; /* No hay horas restantes */
-                        }
+                        /* No hay suficiente tiempo para asignar el mínimo de horas consecutivas, avanzar en el tiempo */
+                        $inicio_actual = strtotime("+1 hour", $inicio_actual);
+                        continue;
                     }
 
                     $fin_bloque = strtotime("+{$horas_a_asignar} hours", $inicio_actual);
@@ -397,7 +418,6 @@ foreach ($groups as $group) {
     $subjects = $subjects_by_group[$group['group_id']];
     distribuirMateriasEnSemana($pdo, $group, $subjects, $horario_turno[0], $dias_turno);
 }
-
 
 /* Redirigir al finalizar */
 header('Location:' . APP_URL . "/admin/horarios_grupos/");

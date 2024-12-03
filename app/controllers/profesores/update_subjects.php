@@ -67,13 +67,17 @@ try {
             ");
             $sentencia_insertar->execute([$teacher_id, $materia_id, $grupo_id, $fechaHora, $fechaHora]);
 
-            /* Actualizar la tabla de horarios */
+            /** 
+             * Actualizar la tabla de horarios 
+             */
+            /*
             $sentencia_actualizar_horarios = $pdo->prepare("
                 UPDATE schedule_assignments 
                 SET teacher_id = ?, fyh_actualizacion = ?
                 WHERE group_id = ? AND subject_id = ?
             ");
             $sentencia_actualizar_horarios->execute([$teacher_id, $fechaHora, $grupo_id, $materia_id]);
+            */
         }
     }
 
