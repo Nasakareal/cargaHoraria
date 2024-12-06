@@ -79,11 +79,13 @@ include('../../app/controllers/relacion_profesor_programa_cuatrimestre/listado_d
                                         <td style="text-align: center">
                                             <div class="btn-group" role="group" aria-label="Basic example">
                                                 <a href="show.php?id=<?= $teacher_id; ?>" type="button" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>
+                                                <?php if (isset($_SESSION['sesion_rol']) && $_SESSION['sesion_rol'] == 1): ?>
                                                 <a href="edit.php?id=<?= $teacher_id; ?>" type="button" class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></a>
                                                 <form action="<?= APP_URL; ?>/app/controllers/profesores/delete.php" onclick="preguntar<?= $teacher_id; ?>(event)" method="post" id="miFormulario<?= $teacher_id; ?>" style="display:inline;">
                                                     <input type="text" name="teacher_id" value="<?= $teacher_id; ?>" hidden>
                                                     <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
                                                 </form>
+                                                <?php endif; ?>
                                                 <!-- Botón para asignar horario al profesor con estilo gris -->
                                                 <a href="asignar_horario_profesor.php?teacher_id=<?= $teacher_id; ?>" class="btn btn-secondary btn-sm" style="background-color: #fd7e14;">
                                                     <i class="bi bi-journal-text"></i>

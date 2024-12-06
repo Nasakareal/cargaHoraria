@@ -9,20 +9,21 @@ if (!$teacher_id) {
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 
+/* Actualizar la consulta SQL para manejar registros con classroom_id NULL */
 $sql_horarios = "SELECT 
                     sa.schedule_day, 
                     sa.start_time, 
                     sa.end_time, 
                     s.subject_name, 
                     g.group_name, 
-                    r.classroom_name
+                    COALESCE(r.classroom_name, 'Sin aula') AS classroom_name
                  FROM 
                     schedule_assignments sa
                  JOIN 
                     subjects s ON sa.subject_id = s.subject_id
                  JOIN 
                     `groups` g ON sa.group_id = g.group_id
-                 JOIN 
+                 LEFT JOIN 
                     classrooms r ON sa.classroom_id = r.classroom_id
                  WHERE 
                     sa.teacher_id = :teacher_id
@@ -53,16 +54,25 @@ foreach ($horas as $hora) {
 foreach ($horarios as $horario) {
     $start_time = date('H:i', strtotime($horario['start_time']));
     $end_time = date('H:i', strtotime($horario['end_time']));
-    $dia = $horario['schedule_day'];
+    $dia = ucfirst(strtolower($horario['schedule_day'])); // Asegura coincidencia con los días definidos
     $materia = $horario['subject_name'];
     $grupo = $horario['group_name'];
     $salon = $horario['classroom_name'];
 
     $detalle_clase = htmlspecialchars("$materia (Grupo: $grupo, Salón: $salon)");
 
+    // Llenar cada hora dentro del rango de inicio y fin
     foreach ($horas as $hora) {
-        if ($hora >= $start_time && $hora < $end_time && in_array($dia, $dias)) {
-            $tabla_horarios[$hora][$dia] = $detalle_clase;
+        if ($hora >= $start_time && $hora < $end_time) {
+            // Verificar que el día esté en los días definidos
+            if (in_array($dia, $dias)) {
+                // Concatenar si ya existe información
+                if (!empty($tabla_horarios[$hora][$dia])) {
+                    $tabla_horarios[$hora][$dia] .= "<br>" . $detalle_clase;
+                } else {
+                    $tabla_horarios[$hora][$dia] = $detalle_clase;
+                }
+            }
         }
     }
 }
@@ -130,6 +140,8 @@ foreach ($horarios as $horario) {
 include('../../admin/layout/parte2.php');
 include('../../layout/mensajes.php');
 ?>
+
+
 
 <script>
     $(function () {

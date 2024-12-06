@@ -4,7 +4,7 @@ include('../../admin/layout/parte1.php');
 
 
 /* Obtener todos los grupos activos para mostrarlos en la tabla*/
-$sql_groups = "SELECT group_id, group_name FROM `groups` WHERE estado = '1'";
+$sql_groups = "SELECT group_id, group_name FROM `groups` WHERE estado = '1' ORDER BY group_name ASC";
 $stmt_groups = $pdo->prepare($sql_groups);
 $stmt_groups->execute();
 $groups = $stmt_groups->fetchAll(PDO::FETCH_ASSOC);

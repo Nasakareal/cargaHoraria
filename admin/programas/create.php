@@ -23,8 +23,14 @@ include('../../app/controllers/programas/listado_de_programas.php');
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="">Nombre del programa</label>
-                                            <input type="text" name="program_name" class="form-control" required>
+                                            <label for="program_name">Nombre del programa</label>
+                                            <input type="text" id="program_name" name="program_name" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="program_area">Área</label>
+                                            <input type="text" id="program_area" name="program_area" class="form-control" required>
                                         </div>
                                     </div>
                                 </div>

@@ -1,6 +1,8 @@
 <?php
 include('../../../app/config.php');
 
+set_time_limit(600);
+
 if (isset($_FILES['file'])) {
     $file = $_FILES['file']['tmp_name'];
 
