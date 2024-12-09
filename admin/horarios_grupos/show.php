@@ -122,7 +122,7 @@ include('../../layout/mensajes.php');
 <script>
     $(function () {
         $("#example1").DataTable({
-            "pageLength": 10,
+            "pageLength": 15,
             "responsive": true,
             "lengthChange": true,
             "autoWidth": false,

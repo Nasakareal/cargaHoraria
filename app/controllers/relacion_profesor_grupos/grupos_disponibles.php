@@ -11,11 +11,12 @@ if (!$teacher_id) {
     exit;
 }
 
-/* Consulta para obtener los grupos relacionados al programa del profesor */
+/* Consulta para obtener los grupos relacionados al programa del profesor y sus turnos */
 $sql = "
-    SELECT DISTINCT g.group_id, g.group_name
+    SELECT DISTINCT g.group_id, g.group_name, s.shift_name
     FROM `groups` g
     INNER JOIN teacher_program_term tpt ON g.program_id = tpt.program_id
+    INNER JOIN `shifts` s ON g.turn_id = s.shift_id
     WHERE g.estado = '1'
       AND tpt.teacher_id = :teacher_id
 ";
@@ -28,7 +29,10 @@ try {
     /* Verificar si se encontraron grupos */
     if (!empty($grupos_disponibles)) {
         foreach ($grupos_disponibles as $grupo) {
-            echo "<option value='" . htmlspecialchars($grupo['group_id']) . "'>" . htmlspecialchars($grupo['group_name']) . "</option>";
+            echo "<option value='" . htmlspecialchars($grupo['group_id']) . "'>" .
+                htmlspecialchars($grupo['group_name']) . " - " .
+                htmlspecialchars($grupo['shift_name']) .
+                "</option>";
         }
     } else {
         echo "<option value=''>No hay grupos disponibles</option>";

@@ -91,7 +91,10 @@ foreach ($horarios as $horario) {
                     <div class="card card-outline card-info">
                         <div class="card-header">
                             <h3 class="card-title">Detalles del Horario</h3>
+                            <a href="<?= APP_URL; ?>/admin/horarios_profesores" class="btn btn-secondary" style="float: right;">Volver</a>
+
                         </div>
+
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-12">
@@ -146,7 +149,7 @@ include('../../layout/mensajes.php');
 <script>
     $(function () {
         $("#example1").DataTable({
-            "pageLength": 10,
+            "pageLength": 15,
             "responsive": true,
             "lengthChange": true,
             "autoWidth": false,

@@ -23,12 +23,22 @@ $horarios_disponibles = [
     'ZINAPÉCUARO' => [
         'Viernes' => ['start' => '16:00:00', 'end' => '20:00:00'],
         'Sábado' => ['start' => '07:00:00', 'end' => '18:00:00']
-    ]
+    ],
+    'ENFERMERIA' => [
+        'Lunes' => ['start' => '07:00:00', 'end' => '17:00:00'],
+        'Martes' => ['start' => '07:00:00', 'end' => '17:00:00'],
+        'Miércoles' => ['start' => '07:00:00', 'end' => '17:00:00'],
+        'Jueves' => ['start' => '07:00:00', 'end' => '17:00:00'],
+        'Viernes' => ['start' => '07:00:00', 'end' => '17:00:00'],
+    ],
 ];
 
+/* Definir los días por turno */
 $dias_semana = [
     'MATUTINO' => ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
     'VESPERTINO' => ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
     'MIXTO' => ['Viernes', 'Sábado'],
-    'ZINAPÉCUARO' => ['Viernes', 'Sábado']
+    'ZINAPÉCUARO' => ['Viernes', 'Sábado'],
+    'ENFERMERIA' => ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes']
 ];
+?>

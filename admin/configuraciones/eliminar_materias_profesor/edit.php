@@ -224,7 +224,7 @@ include('../../../layout/mensajes.php');
 
             /* Recopilar los grupos correspondientes a las materias seleccionadas */
             if (groupId) {
-                gruposSeleccionados.push(groupId); // Asignar directamente el grupo seleccionado
+                gruposSeleccionados.push(groupId);
             }
 
             /* Actualizar el valor del campo oculto */
