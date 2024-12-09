@@ -1,11 +1,47 @@
 <?php
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
-include('../../app/controllers/grupos/listado_de_grupos.php');
+include('../../app/controllers/horarios_grupos/grupos_disponibles.php');
+include('../../app/controllers/horarios_grupos/obtener_horario_grupo.php');
+include('../../app/controllers/horarios_grupos/procesar_horario_grupo.php');
+include('../../app/controllers/horarios_grupos/listado_asignaciones.php');
 ?>
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
+
+<!-- Selector de Grupos -->
+<div class="container">
+    <form method="GET" action="">
+        <div class="form-group">
+            <label for="groupSelector">Seleccione un grupo:</label>
+            <select id="groupSelector" name="id" class="form-control" onchange="this.form.submit()">
+                <option value="">-- Seleccionar grupo --</option>
+                <?php foreach ($grupos as $grupo): ?>
+                    <option value="<?= $grupo['group_id']; ?>" <?= isset($_GET['id']) && $_GET['id'] == $grupo['group_id'] ? 'selected' : ''; ?>>
+                        <?= htmlspecialchars($grupo['group_name']); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </form>
+</div>
+<?php 
+// Verificar si se seleccionó un grupo
+$materias = [];
+if (isset($_GET['id']) && !empty($_GET['id'])) {
+    $group_id = $_GET['id'];
+
+    // Obtener las materias del grupo seleccionado
+    $queryMaterias = $pdo->prepare("SELECT m.subject_name FROM subjects m 
+                                    INNER JOIN group_subjects gs ON m.subject_id = gs.subject_id
+                                    WHERE gs.group_id = :group_id");
+    $queryMaterias->bindParam(':group_id', $group_id, PDO::PARAM_INT);
+    $queryMaterias->execute();
+    $materias = $queryMaterias->fetchAll(PDO::FETCH_ASSOC);
+}
+
+?>
     <div class="content-header">
         <div class="container">
             <div class="row mb-2">
@@ -22,27 +58,32 @@ include('../../app/controllers/grupos/listado_de_grupos.php');
         <div class="container">
             <div class="row">
                 <!-- Lista de materias -->
-                <div class="col-md-3">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Materias Disponibles</h3>
+<div class="col-md-3">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Materias Disponibles</h3>
+        </div>
+        <div class="card-body">
+            <div id="external-events">
+                <?php if (!empty($materias)): ?>
+                    <p class="text-muted">Arrastra las materias al calendario para programarlas.</p>
+                    <?php foreach ($materias as $materia): ?>
+                        <div class="external-event bg-success" data-event='{"title":"<?= htmlspecialchars($materia['subject_name']); ?>"}'>
+                            <?= htmlspecialchars($materia['subject_name']); ?>
                         </div>
-                        <div class="card-body">
-                            <div id="external-events">
-                                <p class="text-muted">Arrastra las materias al calendario para programarlas.</p>
-                                <div class="external-event bg-success" data-event='{"title":"Matemáticas"}'>Matemáticas</div>
-                                <div class="external-event bg-warning" data-event='{"title":"Física"}'>Física</div>
-                                <div class="external-event bg-info" data-event='{"title":"Química"}'>Química</div>
-                                <div class="external-event bg-danger" data-event='{"title":"Biología"}'>Biología</div>
-                                <div class="external-event bg-primary" data-event='{"title":"Historia"}'>Historia</div>
-                                <p>
-                                    <input type="checkbox" id="drop-remove">
-                                    <label for="drop-remove">Eliminar al arrastrar</label>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p class="text-muted">Seleccione un grupo para ver las materias disponibles.</p>
+                <?php endif; ?>
+                <p>
+                    <input type="checkbox" id="drop-remove">
+                    <label for="drop-remove">Eliminar al arrastrar</label>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
 
                 <!-- Calendario -->
                 <div class="col-md-9">
@@ -70,58 +111,6 @@ include('../../layout/mensajes.php');
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/es.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery-ui-dist/jquery-ui.min.js"></script>
-
-<!-- Content Wrapper -->
-<div class="content-wrapper">
-    <div class="content-header">
-        <div class="container">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1 class="m-0">Calendario de Horarios</h1>
-                </div>
-                <div class="col-sm-6"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="content">
-        <div class="container">
-            <div class="row">
-                <!-- Lista de materias -->
-                <div class="col-md-3">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Materias Disponibles</h3>
-                        </div>
-                        <div class="card-body">
-                            <div id="external-events">
-                                <p class="text-muted">Arrastra las materias al calendario para programarlas.</p>
-                                <div class="external-event bg-success">Matemáticas</div>
-                                <div class="external-event bg-warning">Física</div>
-                                <div class="external-event bg-info">Química</div>
-                                <div class="external-event bg-danger">Biología</div>
-                                <div class="external-event bg-primary">Historia</div>
-                                <p>
-                                    <input type="checkbox" id="drop-remove">
-                                    <label for="drop-remove">Eliminar al arrastrar</label>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Calendario -->
-                <div class="col-md-9">
-                    <div class="card card-primary">
-                        <div class="card-body p-0">
-                            <div id="calendar"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script>
     $(function () {
@@ -183,7 +172,7 @@ include('../../layout/mensajes.php');
                 }
             },
             eventReceive: function (info) {
-                // Mostrar mensaje con SweetAlert
+                
                 Swal.fire({
                     title: 'Evento añadido',
                     text: `El evento "${info.event.title}" fue añadido al calendario.`,

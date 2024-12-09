@@ -2,7 +2,6 @@
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/profesores/listado_de_profesores.php');
-include('../../app/controllers/relacion_profesor_programa_cuatrimestre/listado_de_relacion.php');
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -20,23 +19,22 @@ include('../../app/controllers/relacion_profesor_programa_cuatrimestre/listado_d
                             <h3 class="card-title">Profesores registrados</h3>
                             <br>
                             <div class="card-tools d-flex flex-column flex-md-row">
-                                <!-- Botón para agregar nuevo profesor  -->
-                                    <a href="create.php" class="btn btn-primary me-2 mb-2 mb-md-0">
-                                        <i class="bi bi-plus-square"></i> Añadir nuevo profesor
-                                    </a>
+                                <!-- Botón para agregar nuevo profesor -->
+                                <?php if (isset($_SESSION['sesion_rol']) && $_SESSION['sesion_rol'] == 1): ?>
+                                <a href="create.php" class="btn btn-primary me-2 mb-2 mb-md-0">
+                                    <i class="bi bi-plus-square"></i> Añadir nuevo profesor
+                                </a>
 
                                 <!-- Formulario para cargar profesores desde archivo (solo para administradores) -->
-                                <?php if (isset($_SESSION['sesion_rol']) && $_SESSION['sesion_rol'] == 1): ?>
-                                <!-- Formulario habilitado para administradores -->
+                                
                                 <form action="<?= APP_URL; ?>/app/controllers/profesores/upload.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center">
                                     <div class="form-group me-2">
                                         <label for="file" class="d-none">Selecciona un archivo CSV:</label>
                                         <input type="file" name="file" accept=".csv, .xlsx" required>
                                     </div>
                                     <button type="submit" class="btn btn-primary">Cargar Profesores</button>
-                                 </form>
+                                </form>
                                 <?php else: ?>
-                                <!-- Formulario deshabilitado para otros roles -->
                                 <form class="d-flex align-items-center">
                                     <div class="form-group me-2">
                                         <label for="file" class="d-none">Selecciona un archivo CSV:</label>
@@ -45,7 +43,6 @@ include('../../app/controllers/relacion_profesor_programa_cuatrimestre/listado_d
                                     <button type="button" class="btn btn-primary disabled" aria-disabled="true" title="Solo disponible para administradores">Cargar Profesores</button>
                                 </form>
                                 <?php endif; ?>
-
                             </div>
                         </div>
 
@@ -54,8 +51,8 @@ include('../../app/controllers/relacion_profesor_programa_cuatrimestre/listado_d
                                 <thead>
                                     <tr>
                                         <th><center>Número</center></th>
-                                        <th><center>Nombres del profesor</center></th>
-                                        <th><center>Programa de Adscripción</center></th>
+                                        <th><center>Nombres</center></th>
+                                        <th><center>Clasificación</center></th>
                                         <th><center>Materias</center></th>
                                         <th><center>Horas Semanales</center></th>
                                         <th><center>Programas</center></th>
@@ -67,14 +64,27 @@ include('../../app/controllers/relacion_profesor_programa_cuatrimestre/listado_d
                                 $contador_teachers = 0;
                                 foreach ($teachers as $teacher) {
                                     $teacher_id = $teacher['teacher_id'];
-                                    $contador_teachers++; ?>
+                                    $contador_teachers++;
+
+                                   
+                                    $programas_texto = 'No asignado';
+                                    if (!empty($teacher['programas'])) {
+                                        $programas = explode(', ', $teacher['programas']);
+                                        $programas_limitados = array_slice($programas, 0, 5);
+                                        $programas_texto = implode(', ', $programas_limitados);
+                                        if (count($programas) > 5) {
+                                            $programas_texto .= ', ...';
+                                        }
+                                    }
+
+                                    ?>
                                     <tr>
                                         <td style="text-align: center"><?= $contador_teachers; ?></td>
                                         <td><?= $teacher['profesor']; ?></td>
-                                        <td><center><?= $teacher['programa_adscripcion']; ?></center></td>
+                                        <td><center><?= $teacher['clasificacion'] ?? 'No asignado'; ?></center></td>
                                         <td><center><?= $teacher['materias']; ?></center></td>
                                         <td><center><?= $teacher['horas_semanales']; ?></center></td>
-                                        <td><center><?= $teacher['programas']; ?></center></td>
+                                        <td><center><?= $programas_texto; ?></center></td>
                                         
                                         <td style="text-align: center">
                                             <div class="btn-group" role="group" aria-label="Basic example">
@@ -86,7 +96,6 @@ include('../../app/controllers/relacion_profesor_programa_cuatrimestre/listado_d
                                                     <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
                                                 </form>
                                                 <?php endif; ?>
-                                                <!-- Botón para asignar horario al profesor con estilo gris -->
                                                 <a href="asignar_horario_profesor.php?teacher_id=<?= $teacher_id; ?>" class="btn btn-secondary btn-sm" style="background-color: #fd7e14;">
                                                     <i class="bi bi-journal-text"></i>
                                                 </a>
@@ -143,17 +152,6 @@ include('../../layout/mensajes.php');
                 text: 'Opciones',
                 orientation: 'landscape',
                 buttons: [{
-                    text: 'Copiar',
-                    extend: 'copy',
-                }, {
-                    extend: 'pdf'
-                }, {
-                    extend: 'csv'
-                }, {
-                    extend: 'excel'
-                }, {
-                    text: 'Imprimir',
-                    extend: 'print'
                 }]
             },
             {

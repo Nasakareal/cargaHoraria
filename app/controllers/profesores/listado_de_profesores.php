@@ -4,11 +4,11 @@ $sql_teachers = "
     SELECT 
         t.teacher_id,
         t.teacher_name AS profesor,
-        COALESCE(p.program_name, 'Sin programa de adscripción') AS programa_adscripcion,
+        t.clasificacion AS clasificacion,
         GROUP_CONCAT(DISTINCT ps.program_name SEPARATOR ', ') AS programas,
         GROUP_CONCAT(DISTINCT pt.term_name SEPARATOR ', ') AS cuatrimestres,
         GROUP_CONCAT(s.subject_name SEPARATOR ', ') AS materias,
-        hours AS horas_semanales
+        t.hours AS horas_semanales
     FROM
         teachers t
     LEFT JOIN

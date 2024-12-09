@@ -14,6 +14,16 @@ include('../../app/controllers/programas/listado_de_programas.php');
 $clasificacion = isset($clasificacion) ? $clasificacion : '';
 $specialization_program_id = isset($specialization_program_id) ? $specialization_program_id : '';
 $programa_adscripcion_id = isset($program_id) ? $program_id : null;
+
+$areas = [];
+foreach ($programs as $program) {
+    if (!in_array($program['area'], array_column($areas, 'area_name'))) {
+        $areas[] = [
+            'area_id' => $program['area'], // Usamos el campo `area` como `area_id` (puedes ajustar según sea necesario)
+            'area_name' => $program['area']
+        ];
+    }
+}
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -56,22 +66,35 @@ $programa_adscripcion_id = isset($program_id) ? $program_id : null;
                                     </div>
                                 </div>
 
-                                <!-- Programa de Adscripción -->
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="programa_adscripcion">Programa de Adscripción</label>
-                                            <select name="programa_adscripcion" id="programa_adscripcion" class="form-control" <?= ($clasificacion == 'PTC') ? '' : 'disabled'; ?>>
-                                                <option value="">Seleccione un programa</option>
-                                                <?php foreach ($programs as $program): ?>
-                                                    <option value="<?= $program['program_id']; ?>" <?= ($programa_adscripcion_id == $program['program_id']) ? 'selected' : ''; ?>>
-                                                        <?= htmlspecialchars($program['program_name']); ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
+                                <!-- Áreas -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <label for="areas">Áreas</label>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <?php $counter = 0; ?>
+                        <tr>
+                            <?php foreach ($areas as $area): // Suponemos que $areas es un arreglo con las áreas ?>
+                                <td>
+                                    <input type="checkbox" name="areas[]" value="<?= $area['area_id']; ?>" id="area_<?= $area['area_id']; ?>" <?= in_array($area['area_id'], $areas_asignadas ?? []) ? 'checked' : ''; ?>>
+                                    <label for="area_<?= $area['area_id']; ?>"><?= htmlspecialchars($area['area_name']); ?></label>
+                                </td>
+                                <?php $counter++; ?>
+                                <?php if ($counter % 3 == 0): ?>
+                                    </tr><tr>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <small class="text-muted">Seleccione una o más áreas.</small>
+        </div>
+    </div>
+</div>
+
 
                                 <!-- Horarios Disponibles -->
                                 <div class="row">
@@ -117,35 +140,6 @@ $programa_adscripcion_id = isset($program_id) ? $program_id : null;
                                                 </tbody>
                                             </table>
                                             <button type="button" id="addHorario" class="btn btn-success btn-sm">Agregar Horario</button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Programas -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="programas">Programas</label>
-                                            <div class="table-responsive">
-                                                <table class="table table-bordered">
-                                                    <tbody>
-                                                        <?php $counter = 0; ?>
-                                                        <tr>
-                                                            <?php foreach ($programs as $program): ?>
-                                                                <td>
-                                                                    <input type="checkbox" name="programas[]" value="<?= $program['program_id']; ?>" id="programa_<?= $program['program_id']; ?>" <?= in_array($program['program_id'], $programas_asignados ?? []) ? 'checked' : ''; ?> <?= ($clasificacion == 'PTC') ? 'disabled' : ''; ?>>
-                                                                    <label for="programa_<?= $program['program_id']; ?>"><?= htmlspecialchars($program['program_name']); ?></label>
-                                                                </td>
-                                                                <?php $counter++; ?>
-                                                                <?php if ($counter % 3 == 0): ?>
-                                                                    </tr><tr>
-                                                                <?php endif; ?>
-                                                            <?php endforeach; ?>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            <small class="text-muted">Seleccione múltiples programas si aplica.</small>
                                         </div>
                                     </div>
                                 </div>
@@ -199,21 +193,13 @@ $programa_adscripcion_id = isset($program_id) ? $program_id : null;
             }
         });
 
-        // Cambiar clasificación
+        /* Cambiar clasificación */
         document.getElementById('clasificacion').addEventListener('change', function () {
             const clasificacion = this.value;
             const programaAdscripcion = document.getElementById('programa_adscripcion');
             const checkboxes = document.querySelectorAll('input[name="programas[]"]');
 
-            if (clasificacion === 'PTC') {
-                programaAdscripcion.disabled = false;
-                checkboxes.forEach(checkbox => checkbox.disabled = true);
-            } else {
-                programaAdscripcion.disabled = true;
-                checkboxes.forEach(checkbox => checkbox.disabled = false);
-            }
-
-            // Guardar automáticamente los cambios
+            /* Guardar automáticamente los cambios */
             const formData = new FormData(document.getElementById('editForm'));
             fetch('<?= APP_URL; ?>/app/controllers/profesores/update.php', {
                 method: 'POST',

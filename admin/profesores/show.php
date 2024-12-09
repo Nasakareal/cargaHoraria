@@ -9,9 +9,9 @@ if (!$teacher_id) {
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/profesores/datos_del_profesor.php');
+include('../../app/controllers/relacion_profesor_programa_cuatrimestre/listado_de_relacion.php');
 
 ?>
-
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <br>
@@ -68,19 +68,20 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
                                     </div>
                                 </div>
 
-                                <!-- Programa -->
+                               <!-- Programas -->
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="">Programa</label>
-                                        <p><?= $programa_adscripcion ?? 'No asignado'; ?></p>
+                                        <label for="">Programas</label>
+                                        <p><?= $programas ?? 'No asignado'; ?></p>
                                     </div>
                                 </div>
 
-                                <!-- Programa de Especialización -->
+
+                                <!-- Grupos -->
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="">Programa de Especialización</label>
-                                        <p><?= $programa_especializacion ?? 'No asignado'; ?></p>
+                                        <label for="">Grupos</label>
+                                        <p><?= $grupos ?? 'No asignado'; ?></p> 
                                     </div>
                                 </div>
 
@@ -91,7 +92,6 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
                                         <?php if (!empty($horarios_disponibles) && is_array($horarios_disponibles)): ?>
                                             <ul>
                                                 <?php
-                
                                                 $dias_espanol = [
                                                     'Monday' => 'Lunes',
                                                     'Tuesday' => 'Martes',
@@ -114,7 +114,8 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
                                         <?php endif; ?>
                                     </div>
                                 </div>
-
+                            </div>
+                            
                             <hr>
                             <div class="row">
                                 <div class="col-md-12">
@@ -132,8 +133,7 @@ include('../../app/controllers/profesores/datos_del_profesor.php');
     </div>
     <!-- /.content -->
 </div>
-<!-- /.content-wrapper -->
-</div>
+
 
 <?php
 include('../../admin/layout/parte2.php');

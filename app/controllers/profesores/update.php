@@ -9,6 +9,7 @@ $specialization_program_id = isset($_POST['programa_adscripcion']) && !empty($_P
     ? $_POST['programa_adscripcion']
     : null;
 $program_ids = isset($_POST['programas']) ? $_POST['programas'] : [];
+$area_ids = isset($_POST['areas']) ? $_POST['areas'] : [];
 $term_id = isset($_POST['term_id']) ? $_POST['term_id'] : null;
 
 /* Datos de horarios */
@@ -63,30 +64,27 @@ try {
     $sentencia_limpiar_asociaciones->bindParam(':teacher_id', $teacher_id);
     $sentencia_limpiar_asociaciones->execute();
 
-    /* Manejo específico de clasificación */
-    if ($clasificacion === 'PTC') {
-        // Guardar programa de adscripción en `teacher_program_term`
-        if ($specialization_program_id !== null) {
-            $sentencia_insertar_especializacion = $pdo->prepare("INSERT INTO teacher_program_term (teacher_id, program_id, term_id, fyh_creacion, estado) 
-                VALUES (:teacher_id, :program_id, :term_id, :fyh_creacion, 'ACTIVO')");
-            $sentencia_insertar_especializacion->bindParam(':teacher_id', $teacher_id);
-            $sentencia_insertar_especializacion->bindParam(':program_id', $specialization_program_id);
-            $sentencia_insertar_especializacion->bindParam(':term_id', $term_id);
-            $sentencia_insertar_especializacion->bindParam(':fyh_creacion', $fechaHora);
-            $sentencia_insertar_especializacion->execute();
-        }
-    } elseif ($clasificacion === 'PA' || $clasificacion === 'TA') {
-        // Guardar múltiples programas en `teacher_program_term`
-        if (!empty($program_ids)) {
-            $sentencia_insertar_asociacion = $pdo->prepare("INSERT INTO teacher_program_term (teacher_id, program_id, term_id, fyh_creacion, estado) 
-                VALUES (:teacher_id, :program_id, :term_id, :fyh_creacion, 'ACTIVO')");
-            foreach ($program_ids as $program_id) {
-                $sentencia_insertar_asociacion->bindParam(':teacher_id', $teacher_id);
-                $sentencia_insertar_asociacion->bindParam(':program_id', $program_id);
-                $sentencia_insertar_asociacion->bindParam(':term_id', $term_id);
-                $sentencia_insertar_asociacion->bindParam(':fyh_creacion', $fechaHora);
-                $sentencia_insertar_asociacion->execute();
-            }
+    /* Manejo de áreas seleccionadas */
+    if (!empty($area_ids)) {
+        $sql_programs_by_area = "SELECT program_id FROM programs WHERE area IN (" . implode(',', array_fill(0, count($area_ids), '?')) . ")";
+        $query_programs_by_area = $pdo->prepare($sql_programs_by_area);
+        $query_programs_by_area->execute($area_ids);
+        $programs_from_areas = $query_programs_by_area->fetchAll(PDO::FETCH_COLUMN);
+
+        
+        $program_ids = array_unique(array_merge($program_ids, $programs_from_areas));
+    }
+
+    /* Insertar programas en teacher_program_term */
+    if (!empty($program_ids)) {
+        $sentencia_insertar_asociacion = $pdo->prepare("INSERT INTO teacher_program_term (teacher_id, program_id, term_id, fyh_creacion, estado) 
+            VALUES (:teacher_id, :program_id, :term_id, :fyh_creacion, 'ACTIVO')");
+        foreach ($program_ids as $program_id) {
+            $sentencia_insertar_asociacion->bindParam(':teacher_id', $teacher_id);
+            $sentencia_insertar_asociacion->bindParam(':program_id', $program_id);
+            $sentencia_insertar_asociacion->bindParam(':term_id', $term_id);
+            $sentencia_insertar_asociacion->bindParam(':fyh_creacion', $fechaHora);
+            $sentencia_insertar_asociacion->execute();
         }
     }
 
