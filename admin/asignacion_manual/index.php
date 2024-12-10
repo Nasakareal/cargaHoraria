@@ -1,95 +1,56 @@
 <?php
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
-include('../../app/controllers/horarios_grupos/grupos_disponibles.php');
-include('../../app/controllers/horarios_grupos/obtener_horario_grupo.php');
-include('../../app/controllers/horarios_grupos/procesar_horario_grupo.php');
-include('../../app/controllers/horarios_grupos/listado_asignaciones.php');
+
+
+$sql_groups = "SELECT group_id, group_name FROM `groups` WHERE estado = '1'";
+$stmt_groups = $pdo->prepare($sql_groups);
+$stmt_groups->execute();
+$groups = $stmt_groups->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
-
-<!-- Selector de Grupos -->
-<div class="container">
-    <form method="GET" action="">
-        <div class="form-group">
-            <label for="groupSelector">Seleccione un grupo:</label>
-            <select id="groupSelector" name="id" class="form-control" onchange="this.form.submit()">
-                <option value="">-- Seleccionar grupo --</option>
-                <?php foreach ($grupos as $grupo): ?>
-                    <option value="<?= $grupo['group_id']; ?>" <?= isset($_GET['id']) && $_GET['id'] == $grupo['group_id'] ? 'selected' : ''; ?>>
-                        <?= htmlspecialchars($grupo['group_name']); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-    </form>
-</div>
-<?php 
-// Verificar si se seleccionó un grupo
-$materias = [];
-if (isset($_GET['id']) && !empty($_GET['id'])) {
-    $group_id = $_GET['id'];
-
-    // Obtener las materias del grupo seleccionado
-    $queryMaterias = $pdo->prepare("SELECT m.subject_name FROM subjects m 
-                                    INNER JOIN group_subjects gs ON m.subject_id = gs.subject_id
-                                    WHERE gs.group_id = :group_id");
-    $queryMaterias->bindParam(':group_id', $group_id, PDO::PARAM_INT);
-    $queryMaterias->execute();
-    $materias = $queryMaterias->fetchAll(PDO::FETCH_ASSOC);
-}
-
-?>
-    <div class="content-header">
-        <div class="container">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1 class="m-0">Calendario de Horarios</h1>
-                </div>
-                <div class="col-sm-6"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main content -->
     <div class="content">
         <div class="container">
             <div class="row">
-                <!-- Lista de materias -->
-<div class="col-md-3">
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Materias Disponibles</h3>
-        </div>
-        <div class="card-body">
-            <div id="external-events">
-                <?php if (!empty($materias)): ?>
-                    <p class="text-muted">Arrastra las materias al calendario para programarlas.</p>
-                    <?php foreach ($materias as $materia): ?>
-                        <div class="external-event bg-success" data-event='{"title":"<?= htmlspecialchars($materia['subject_name']); ?>"}'>
-                            <?= htmlspecialchars($materia['subject_name']); ?>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <p class="text-muted">Seleccione un grupo para ver las materias disponibles.</p>
-                <?php endif; ?>
-                <p>
-                    <input type="checkbox" id="drop-remove">
-                    <label for="drop-remove">Eliminar al arrastrar</label>
-                </p>
+                <h1>Listado de Grupos</h1>
             </div>
-        </div>
-    </div>
-</div>
-
-
-                <!-- Calendario -->
-                <div class="col-md-9">
-                    <div class="card card-primary">
-                        <div class="card-body p-0">
-                            <div id="calendar"></div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-outline card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Grupos registrados</h3>
+                        </div>
+                        <div class="card-body">
+                            <table id="example1" class="table table-striped table-bordered table-hover table-sm">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Número</th>
+                                        <th class="text-center">Nombre del Grupo</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <?php
+                                $contador_grupos = 0;
+                                foreach ($groups as $group) {
+                                    $contador_grupos++;
+                                    ?>
+                                    <tr>
+                                        <td style="text-align: center"><?= $contador_grupos; ?></td>
+                                        <td class="text-center"><?= htmlspecialchars($group['group_name']); ?></td>
+                                        <td class="text-center">
+                                            <!-- Botón Editar que redirige a edit.php con el ID del grupo -->
+                                            <a href="edit.php?id=<?= $group['group_id']; ?>" class="btn btn-success btn-sm">
+                                            <i class="bi bi-pencil"></i> Editar
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <?php
+                                }
+                                ?>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -103,99 +64,53 @@ include('../../admin/layout/parte2.php');
 include('../../layout/mensajes.php');
 ?>
 
-
-
-<!-- FullCalendar Styles and Scripts -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/es.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jquery-ui-dist/jquery-ui.min.js"></script>
-
 <script>
     $(function () {
-        /* Inicializar eventos arrastrables */
-        function ini_events(ele) {
-            ele.each(function () {
-                var eventObject = {
-                    title: $.trim($(this).text())
-                };
-
-                $(this).data('eventObject', eventObject);
-
-                $(this).draggable({
-                    zIndex: 1070,
-                    revert: true,
-                    revertDuration: 0
-                });
-            });
-        }
-
-        ini_events($('#external-events div.external-event'));
-
-        var containerEl = document.getElementById('external-events');
-        var checkbox = document.getElementById('drop-remove');
-        var calendarEl = document.getElementById('calendar');
-
-        /* Inicializar Draggable */
-        new FullCalendar.Draggable(containerEl, {
-            itemSelector: '.external-event',
-            eventData: function (eventEl) {
-                return {
-                    title: eventEl.innerText.trim(),
-                    backgroundColor: window.getComputedStyle(eventEl, null).getPropertyValue('background-color'),
-                    borderColor: window.getComputedStyle(eventEl, null).getPropertyValue('background-color'),
-                    textColor: window.getComputedStyle(eventEl, null).getPropertyValue('color')
-                };
-            }
-        });
-
-        /* Inicializar el Calendario */
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'timeGridWeek',
-            locale: 'es',
-            editable: true,
-            droppable: true,
-            headerToolbar: {
-                left: '',
-                center: 'title',
-                right: ''
-            },
-            allDaySlot: false,
-            slotMinTime: '07:00:00',
-            slotMaxTime: '20:00:00',
-            slotDuration: '01:00',
-            hiddenDays: [0],
-            drop: function (info) {
-                if (checkbox.checked) {
-                    info.draggedEl.parentNode.removeChild(info.draggedEl);
+        $("#example1").DataTable({
+            "pageLength": 5,
+            "language": {
+                "emptyTable": "No hay información",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ Grupos",
+                "infoEmpty": "Mostrando 0 a 0 de 0 Grupos",
+                "infoFiltered": "(Filtrado de _MAX_ total Grupos)",
+                "lengthMenu": "Mostrar _MENU_ Grupos",
+                "loadingRecords": "Cargando...",
+                "processing": "Procesando...",
+                "search": "Buscador:",
+                "zeroRecords": "Sin resultados encontrados",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
                 }
             },
-            eventReceive: function (info) {
-                
-                Swal.fire({
-                    title: 'Evento añadido',
-                    text: `El evento "${info.event.title}" fue añadido al calendario.`,
-                    icon: 'success',
-                    confirmButtonText: 'Aceptar'
-                });
-
-                console.log('Evento recibido:', info.event);
-            }
-        });
-
-        calendar.render();
+            "responsive": true,
+            "lengthChange": true,
+            "autoWidth": false,
+            buttons: [{
+                extend: 'collection',
+                text: 'Opciones',
+                orientation: 'landscape',
+                buttons: [{
+                    text: 'Copiar',
+                    extend: 'copy',
+                }, {
+                    extend: 'pdf'
+                }, {
+                    extend: 'csv'
+                }, {
+                    extend: 'excel'
+                }, {
+                    text: 'Imprimir',
+                    extend: 'print'
+                }]
+            },
+            {
+                extend: 'colvis',
+                text: 'Visor de columnas',
+                collectionLayout: 'fixed three-column'
+            }],
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
     });
 </script>
-
-
-<style>
-    .external-event {
-        cursor: pointer;
-        margin-bottom: 10px;
-        padding: 5px;
-        color: #fff;
-        text-align: center;
-        border-radius: 3px;
-    }
-</style>

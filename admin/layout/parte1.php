@@ -34,6 +34,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
 -->
 <html lang="es">
 <head>
+
+  <link rel="icon" href="/cargaHoraria/public/dist/img/UTM.png" type="image/png">
+
+
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?=APP_NAME;?></title>
@@ -168,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function () {
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4" style="background-color: #008080">
     
-    <!-- Brand Logo -->
+    <!-- Brand Logo --> 
     <a href="<?=APP_URL;?>/admin" class="brand-link" style="background-color: #008080">
       <img src="https://ut-morelia.edu.mx/wp-content/uploads/2022/05/Logo-UTM-Claro.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8; width: 50px; height: 50px; object-fit: contain;">
       <span class="brand-text font-weight-light">Carga Horaria</span>

@@ -17,7 +17,7 @@ try {
                 ((start_time < :end_time AND end_time > :start_time) AND schedule_day = :schedule_day)";
 
     $stmt = $pdo->prepare($sql);
-    $schedule_day = date('l', strtotime($start)); // Obtener el día de la semana
+    $schedule_day = date('l', strtotime($start));
     $start_time = date('H:i:s', strtotime($start));
     $end_time = $end ? date('H:i:s', strtotime($end)) : null;
 

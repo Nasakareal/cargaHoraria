@@ -602,3 +602,24 @@ CREATE TABLE teacher_availability (
 ) ENGINE=InnoDB;
 
 
+CREATE TABLE manual_schedule_assignments (
+    assignment_id INT(11) NOT NULL AUTO_INCREMENT,
+    schedule_id INT(11) DEFAULT NULL,
+    subject_id INT(11) DEFAULT NULL,
+    teacher_id INT(11) DEFAULT NULL,
+    group_id INT(11) DEFAULT NULL,
+    classroom_id INT(11) DEFAULT NULL,
+    start_time TIME DEFAULT NULL,
+    end_time TIME DEFAULT NULL,
+    schedule_day ENUM('Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo') DEFAULT NULL,
+    estado VARCHAR(11) DEFAULT NULL,
+    fyh_creacion DATETIME DEFAULT NULL,
+    fyh_actualizacion DATETIME DEFAULT NULL,
+    tipo_espacio VARCHAR(50) DEFAULT 'Aula',
+    PRIMARY KEY (assignment_id),
+    KEY schedule_id (schedule_id),
+    KEY subject_id (subject_id),
+    KEY teacher_id (teacher_id),
+    KEY group_id (group_id),
+    KEY classroom_id (classroom_id)
+) ENGINE=InnoDB;
