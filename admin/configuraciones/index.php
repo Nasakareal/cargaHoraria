@@ -57,27 +57,23 @@ include('../../admin/layout/parte1.php');
               </div>
           </div>
 
-          <!-- Configuración para Desactivar Usuarios -->
-          <div class="col-md-4 col-sm-6 col-12">
-              <div class="info-box">
-                  <span class="info-box-icon bg-warning"><i class="bi bi-person-x"></i></span>
-                  <div class="info-box-content">
-                      <span class="info-box-text"><b>Desactivar Usuarios</b></span>
-                      <a href="<?= APP_URL; ?>/app/controllers/configuraciones/desactivar_usuarios.php" class="btn btn-primary btn-sm">Ejecutar</a>
-                  </div>
-              </div>
-          </div>
-
-          <!-- Configuración para Activar Usuarios -->
-          <div class="col-md-4 col-sm-6 col-12">
-              <div class="info-box">
-                  <span class="info-box-icon bg-orange"><i class="bi bi-person-fill-check"></i></span>
-                  <div class="info-box-content">
-                      <span class="info-box-text"><b>Activar Usuarios</b></span>
-                      <a href="<?= APP_URL; ?>/app/controllers/configuraciones/activar_usuarios.php" class="btn btn-primary btn-sm">Ejecutar</a>
-                  </div>
-              </div>
-          </div>
+            <!-- Configuración para Activar/Desactivar Usuarios -->
+            <div class="col-md-4 col-sm-6 col-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-orange">
+                        <!-- Ícono dinámico -->
+                        <i id="toggle-icon" class="bi bi-person-x"></i>
+                    </span>
+                    <div class="info-box-content">
+                        <span class="info-box-text"><b id="toggle-text">Activar Usuarios</b></span>
+                        <!-- Toggle Switch -->
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-switch">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
 
             <!-- Interfaz para Eliminar Materias -->
             <div class="col-md-4 col-sm-6 col-12">
@@ -136,3 +132,97 @@ include('../../admin/layout/parte1.php');
 include('../../admin/layout/parte2.php');
 include('../../layout/mensajes.php');
 ?>
+
+<style>
+/* Estilo para el toggle switch */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 25px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 25px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 19px;
+    width: 19px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #28a745;
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+/* Estilo para las etiquetas debajo del toggle */
+.toggle-labels {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #555;
+    display: flex;
+    justify-content: space-between;
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const toggleSwitch = document.getElementById("toggle-switch");
+    const icon = document.getElementById("toggle-icon");
+    const text = document.getElementById("toggle-text");
+
+    // Cargar estado guardado
+    const estadoGuardado = localStorage.getItem("estadoUsuarios");
+    if (estadoGuardado === "activar") {
+        toggleSwitch.checked = true;
+        icon.className = "bi bi-person-fill-check";
+        text.textContent = "Desactivar Usuarios";
+    } else {
+        toggleSwitch.checked = false;
+        icon.className = "bi bi-person-x";
+        text.textContent = "Activar Usuarios";
+    }
+
+    // Guardar estado al cambiar
+    toggleSwitch.addEventListener("change", function () {
+        if (this.checked) {
+            icon.className = "bi bi-person-fill-check";
+            text.textContent = "Desactivar Usuarios";
+            localStorage.setItem("estadoUsuarios", "activar");
+            // Redirigir al script para activar usuarios
+            window.location.href = "<?= APP_URL; ?>/app/controllers/configuraciones/activar_usuarios.php";
+        } else {
+            icon.className = "bi bi-person-x";
+            text.textContent = "Activar Usuarios";
+            localStorage.setItem("estadoUsuarios", "desactivar");
+            // Redirigir al script para desactivar usuarios
+            window.location.href = "<?= APP_URL; ?>/app/controllers/configuraciones/desactivar_usuarios.php";
+        }
+    });
+});
+</script>

@@ -118,9 +118,9 @@ document.addEventListener('DOMContentLoaded', function () {
             /* Actualizar conteo de notificaciones */
             if (data.length > 0) {
                 countElement.textContent = data.length;
-                countElement.style.display = 'inline'; // Mostrar el contador
+                countElement.style.display = 'inline';
             } else {
-                countElement.style.display = 'none'; // Ocultar el contador
+                countElement.style.display = 'none';
             }
 
             headerElement.textContent = `${data.length} Notificaciones`;
@@ -147,10 +147,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 });
 </script>
-
-
-
-
 
 
       <li class="nav-item">
@@ -296,16 +292,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 </a>
               </li>
             </ul>
-
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="<?= APP_URL; ?>/admin/intercambios" class="nav-link">
-                <i class="bi bi-arrow-left-right"></i>
-                  <p>Intercambiar Horarios</p>
-                </a>
-              </li>
-            </ul>
-
           </li>
             
           <li class="nav-item">
@@ -342,16 +328,32 @@ document.addEventListener('DOMContentLoaded', function () {
                 </a>
               </li>
             </ul>
+          </li>
 
+            <li class="nav-item">
+            <a href="#" class="nav-link" style= "background-color: #3688f4">
+              <i class="nav-icon fas"><i class="bi bi-clock"></i></i>
+              <p>
+                Horarios
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="<?= APP_URL; ?>/admin/asignacion_manual/" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Asignar Horario de Laboratorios</p>
+                  <p>Asignación Manual de Horarios</p>
                 </a>
               </li>
             </ul>
-
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?= APP_URL; ?>/admin/intercambios" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                  <p>Intercambiar Horarios</p>
+                </a>
+              </li>
+            </ul>
           </li>
 
           
@@ -398,6 +400,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
           </li>
 
+            
+
 
 
           <br>
@@ -410,8 +414,6 @@ document.addEventListener('DOMContentLoaded', function () {
             </a>
           </li>
 <br>
-
-
 
 
 

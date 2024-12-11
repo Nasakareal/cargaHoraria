@@ -1,5 +1,4 @@
 <?php
-
 include_once('../../app/config.php');
 include_once('../../admin/layout/parte1.php');
 include('../../app/controllers/profesores/listado_de_profesores.php');
@@ -23,6 +22,7 @@ include('../../app/controllers/profesores/listado_de_profesores.php');
                                     <tr>
                                         <th class="text-center">Número</th>
                                         <th class="text-center">Nombre del Profesor</th>
+                                        <th class="text-center">Clasificación</th>
                                         <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
@@ -35,6 +35,7 @@ include('../../app/controllers/profesores/listado_de_profesores.php');
                                     <tr>
                                         <td style="text-align: center"><?= $contador_teachers; ?></td>
                                         <td class="text-center"><?= htmlspecialchars($teacher['profesor']); ?></td>
+                                        <td><center><?= $teacher['clasificacion'] ?? 'No asignado'; ?></center></td>
                                         <td class="text-center">
                                             <a href="show.php?id=<?= $teacher['teacher_id']; ?>" class="btn btn-info">Ver detalles</a>
                                         </td>
@@ -82,22 +83,6 @@ include_once('../../layout/mensajes.php');
             "lengthChange": true,
             "autoWidth": false,
             buttons: [{
-                extend: 'collection',
-                text: 'Opciones',
-                orientation: 'landscape',
-                buttons: [{
-                    text: 'Copiar',
-                    extend: 'copy',
-                }, {
-                    extend: 'pdf'
-                }, {
-                    extend: 'csv'
-                }, {
-                    extend: 'excel'
-                }, {
-                    text: 'Imprimir',
-                    extend: 'print'
-                }]
             },
             {
                 extend: 'colvis',

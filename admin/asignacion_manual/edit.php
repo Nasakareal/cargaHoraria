@@ -2,9 +2,6 @@
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/horarios_grupos/grupos_disponibles.php');
-include('../../app/controllers/horarios_grupos/obtener_horario_grupo.php');
-include('../../app/controllers/horarios_grupos/procesar_horario_grupo.php');
-include('../../app/controllers/horarios_grupos/listado_asignaciones.php');
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -26,14 +23,12 @@ include('../../app/controllers/horarios_grupos/listado_asignaciones.php');
         </div>
     </form>
 </div>
-<?php 
-// Verificar si se seleccionó un grupo
+<?php
+
 $materias = [];
 if (isset($_GET['id']) && !empty($_GET['id'])) {
     $group_id = $_GET['id'];
-
-    // Obtener las materias del grupo seleccionado
-    $queryMaterias = $pdo->prepare("SELECT m.subject_name FROM subjects m 
+    $queryMaterias = $pdo->prepare("SELECT m.subject_id, m.subject_name FROM subjects m 
                                     INNER JOIN group_subjects gs ON m.subject_id = gs.subject_id
                                     WHERE gs.group_id = :group_id");
     $queryMaterias->bindParam(':group_id', $group_id, PDO::PARAM_INT);
@@ -41,6 +36,47 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
     $materias = $queryMaterias->fetchAll(PDO::FETCH_ASSOC);
 }
 
+
+$queryAsignaciones = $pdo->prepare("SELECT a.subject_id, m.subject_name, a.start_time, a.end_time, a.schedule_day
+                                    FROM manual_schedule_assignments a
+                                    INNER JOIN subjects m ON a.subject_id = m.subject_id
+                                    WHERE a.group_id = :group_id");
+$queryAsignaciones->bindParam(':group_id', $_GET['id'], PDO::PARAM_INT);
+$queryAsignaciones->execute();
+$asignaciones = $queryAsignaciones->fetchAll(PDO::FETCH_ASSOC);
+
+$events = [];
+
+foreach ($asignaciones as $asignacion) {
+    
+    $daysOfWeek = ['lunes' => 1, 'martes' => 2, 'miércoles' => 3, 'jueves' => 4, 'viernes' => 5];
+    $schedule_day_lower = strtolower($asignacion['schedule_day']);
+
+    if (!isset($daysOfWeek[$schedule_day_lower])) {
+        echo "Día inválido: " . $asignacion['schedule_day'] . "<br>";
+        continue;
+    }
+
+    $dayOfWeek = $daysOfWeek[$schedule_day_lower];
+    $start_date = new DateTime();
+    $start_date->setISODate($start_date->format('Y'), $start_date->format('W'), $dayOfWeek);
+    $start_date->setTime(substr($asignacion['start_time'], 0, 2), substr($asignacion['start_time'], 3, 2));
+    $end_date = clone $start_date;
+    $end_date->setTime(substr($asignacion['end_time'], 0, 2), substr($asignacion['end_time'], 3, 2));
+    $start_datetime = $start_date->format('Y-m-d\TH:i:s');
+    $end_datetime = $end_date->format('Y-m-d\TH:i:s');
+    
+    $events[] = [
+        'title' => htmlspecialchars($asignacion['subject_name']),
+        'start' => $start_datetime,
+        'end' => $end_datetime,
+        'subject_id' => $asignacion['subject_id'],
+        'backgroundColor' => '#FF5733',
+        'borderColor' => '#FF5733',
+        'textColor' => '#fff'
+    ];
+}
+$events_json = json_encode($events);
 ?>
     <div class="content-header">
         <div class="container">
@@ -58,32 +94,33 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
         <div class="container">
             <div class="row">
                 <!-- Lista de materias -->
-<div class="col-md-3">
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Materias Disponibles</h3>
-        </div>
-        <div class="card-body">
-            <div id="external-events">
-                <?php if (!empty($materias)): ?>
-                    <p class="text-muted">Arrastra las materias al calendario para programarlas.</p>
-                    <?php foreach ($materias as $materia): ?>
-                        <div class="external-event bg-success" data-event='{"title":"<?= htmlspecialchars($materia['subject_name']); ?>"}'>
-                            <?= htmlspecialchars($materia['subject_name']); ?>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Materias Disponibles</h3>
                         </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <p class="text-muted">Seleccione un grupo para ver las materias disponibles.</p>
-                <?php endif; ?>
-                <p>
-                    <input type="checkbox" id="drop-remove">
-                    <label for="drop-remove">Eliminar al arrastrar</label>
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
+                    <div class="card-body">
+                        <div id="external-events">
+                            <?php if (!empty($materias)): ?>
+                                <p class="text-muted">Arrastra las materias al calendario para programarlas.</p>
+                            <?php foreach ($materias as $materia): ?>
+                                <div class="external-event bg-success" data-event='{"title":"<?= htmlspecialchars($materia['subject_name']); ?>", "subject_id":"<?= $materia['subject_id']; ?>"}'>
+                            <?= htmlspecialchars($materia['subject_name']); ?>
+                                </div>
 
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="text-muted">Seleccione un grupo para ver las materias disponibles.</p>
+                        <?php endif; ?>
+
+                            <p>
+                            <input type="checkbox" id="drop-remove">
+                            <label for="drop-remove">Eliminar al arrastrar</label>
+                            </p>
+                        </div>
+                    </div>
+                    </div>
+                </div>
 
                 <!-- Calendario -->
                 <div class="col-md-9">
@@ -103,8 +140,6 @@ include('../../admin/layout/parte2.php');
 include('../../layout/mensajes.php');
 ?>
 
-
-
 <!-- FullCalendar Styles and Scripts -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
@@ -113,12 +148,19 @@ include('../../layout/mensajes.php');
 <script src="https://cdn.jsdelivr.net/npm/jquery-ui-dist/jquery-ui.min.js"></script>
 
 <script>
+    
+    const events = <?php echo $events_json; ?>;
+    const materias = <?php echo json_encode($materias); ?>;
+    console.log("Eventos desde PHP:", events);
+    console.log("Materias desde PHP:", materias);
+
     $(function () {
         /* Inicializar eventos arrastrables */
         function ini_events(ele) {
             ele.each(function () {
                 var eventObject = {
-                    title: $.trim($(this).text())
+                    title: $.trim($(this).text()),
+                    subject_id: $(this).data('event').subject_id
                 };
 
                 $(this).data('eventObject', eventObject);
@@ -143,6 +185,7 @@ include('../../layout/mensajes.php');
             eventData: function (eventEl) {
                 return {
                     title: eventEl.innerText.trim(),
+                    subject_id: $(eventEl).data('event').subject_id,
                     backgroundColor: window.getComputedStyle(eventEl, null).getPropertyValue('background-color'),
                     borderColor: window.getComputedStyle(eventEl, null).getPropertyValue('background-color'),
                     textColor: window.getComputedStyle(eventEl, null).getPropertyValue('color')
@@ -154,17 +197,18 @@ include('../../layout/mensajes.php');
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'timeGridWeek',
             locale: 'es',
+            timeZone: 'America/Mexico_City',
             editable: true,
             droppable: true,
             headerToolbar: {
                 left: '',
-                center: 'title',
+                center: '',
                 right: ''
             },
             allDaySlot: false,
             slotMinTime: '07:00:00',
             slotMaxTime: '20:00:00',
-            slotDuration: '01:00',
+            slotDuration: '00:30',
             hiddenDays: [0],
             drop: function (info) {
                 if (checkbox.checked) {
@@ -172,7 +216,6 @@ include('../../layout/mensajes.php');
                 }
             },
             eventReceive: function (info) {
-                // Mostrar una alerta con botones "Guardar" y "Cancelar"
                 Swal.fire({
                     title: '¿Deseas guardar la asignación?',
                     text: `El evento "${info.event.title}" fue añadido al calendario. ¿Quieres guardarlo?`,
@@ -182,16 +225,18 @@ include('../../layout/mensajes.php');
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Aquí es donde colocamos el AJAX para guardar la asignación
+                        const start_time = info.event.start ? info.event.start.toISOString().slice(11, 19) : null;
+                        const end_time = info.event.end ? info.event.end.toISOString().slice(11, 19) : null;
+
                         $.ajax({
-                            url: '../../app/controllers/asignacion_manual/update.php', // Ruta del servidor
+                            url: '../../app/controllers/asignacion_manual/update.php', 
                             type: 'POST',
                             data: {
-                                title: info.event.title,
-                                start_time: info.event.start.toISOString().slice(11, 19),
-                                end_time: info.event.end.toISOString().slice(11, 19),
-                                schedule_day: info.event.start.toLocaleString('es', { weekday: 'long' }),
-                                group_id: <?= $_GET['id']; ?>  // Obtener el grupo seleccionado
+                                subject_id: info.event.extendedProps.subject_id, 
+                                start_time: start_time,
+                                end_time: end_time,
+                                schedule_day: info.event.start ? info.event.start.toLocaleString('es', { weekday: 'long' }) : null,
+                                group_id: <?= $_GET['id']; ?> 
                             },
                             success: function(response) {
                                 var data = JSON.parse(response);
@@ -221,7 +266,6 @@ include('../../layout/mensajes.php');
                             }
                         });
                     } else {
-                        // Si el usuario cancela, eliminar el evento del calendario
                         info.event.remove();
                         Swal.fire({
                             title: 'Asignación cancelada',
@@ -231,18 +275,19 @@ include('../../layout/mensajes.php');
                         });
                     }
                 });
-
-                console.log('Evento recibido:', info.event);
+            },
+            events: events,
+            eventDidMount: function(info) {
+                
+                if(info.event.start && info.event.start < new Date()) {
+                    info.el.style.backgroundColor = "#FF6F61";
+                }
             }
         });
 
         calendar.render();
     });
 </script>
-
-
-
-
 
 <style>
     .external-event {
@@ -254,4 +299,3 @@ include('../../layout/mensajes.php');
         border-radius: 3px;
     }
 </style>
-

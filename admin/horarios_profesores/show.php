@@ -9,7 +9,7 @@ if (!$teacher_id) {
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 
-/* Actualizar la consulta SQL para manejar registros con classroom_id NULL */
+/* Actualizar la consulta SQL para manejar registros */
 $sql_horarios = "SELECT 
                     sa.schedule_day, 
                     sa.start_time, 
@@ -54,19 +54,19 @@ foreach ($horas as $hora) {
 foreach ($horarios as $horario) {
     $start_time = date('H:i', strtotime($horario['start_time']));
     $end_time = date('H:i', strtotime($horario['end_time']));
-    $dia = ucfirst(strtolower($horario['schedule_day'])); // Asegura coincidencia con los días definidos
+    $dia = ucfirst(strtolower($horario['schedule_day']));
     $materia = $horario['subject_name'];
     $grupo = $horario['group_name'];
     $salon = $horario['classroom_name'];
 
     $detalle_clase = htmlspecialchars("$materia (Grupo: $grupo, Salón: $salon)");
 
-    // Llenar cada hora dentro del rango de inicio y fin
+    
     foreach ($horas as $hora) {
         if ($hora >= $start_time && $hora < $end_time) {
-            // Verificar que el día esté en los días definidos
+            
             if (in_array($dia, $dias)) {
-                // Concatenar si ya existe información
+                
                 if (!empty($tabla_horarios[$hora][$dia])) {
                     $tabla_horarios[$hora][$dia] .= "<br>" . $detalle_clase;
                 } else {

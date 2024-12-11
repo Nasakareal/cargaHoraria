@@ -67,7 +67,7 @@ include('../../layout/mensajes.php');
 <script>
     $(function () {
         $("#example1").DataTable({
-            "pageLength": 5,
+            "pageLength": 10,
             "language": {
                 "emptyTable": "No hay información",
                 "info": "Mostrando _START_ a _END_ de _TOTAL_ Grupos",
@@ -93,17 +93,6 @@ include('../../layout/mensajes.php');
                 text: 'Opciones',
                 orientation: 'landscape',
                 buttons: [{
-                    text: 'Copiar',
-                    extend: 'copy',
-                }, {
-                    extend: 'pdf'
-                }, {
-                    extend: 'csv'
-                }, {
-                    extend: 'excel'
-                }, {
-                    text: 'Imprimir',
-                    extend: 'print'
                 }]
             },
             {

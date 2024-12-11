@@ -9,16 +9,33 @@ if (!$group_id) {
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/grupos/datos_del_grupo.php');
-
+include('../../app/controllers/horarios_grupos/grupos_disponibles.php');
 ?>
-
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
+
+    <!-- Selector de Grupos -->
+    <div class="container">
+        <form method="GET" action="">
+            <div class="form-group">
+                <label for="groupSelector">Seleccione un grupo:</label>
+                <select id="groupSelector" name="id" class="form-control" onchange="this.form.submit()">
+                    <option value="">-- Seleccionar grupo --</option>
+                    <?php foreach ($grupos as $grupo): ?>
+                        <option value="<?= $grupo['group_id']; ?>" <?= isset($_GET['id']) && $_GET['id'] == $grupo['group_id'] ? 'selected' : ''; ?>>
+                            <?= htmlspecialchars($grupo['group_name']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </form>
+    </div>
+
     <br>
     <div class="content">
         <div class="container">
             <div class="row">
-                <h1>Datos del Grupo</h1> 
+                <h1>Datos del Grupo</h1>
             </div>
             <div class="row">
                 <div class="col-md-12">
@@ -42,32 +59,49 @@ include('../../app/controllers/grupos/datos_del_grupo.php');
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="">Periodo</label>
-                                        <p><?= htmlspecialchars($term_name); ?></p>  
+                                        <label for="">Cuatrimestre</label>
+                                        <p><?= htmlspecialchars($term_name); ?></p>
                                     </div>
                                 </div>
                                 
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Volumen</label>
-                                        <p><?= htmlspecialchars($volumen_grupo); ?></p> 
+                                        <p><?= htmlspecialchars($volumen_grupo); ?></p>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Turno</label>
-                                        <p><?= htmlspecialchars($turno); ?></p> 
+                                        <p><?= htmlspecialchars($turno); ?></p>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="">Nivel educativo</label> 
-                                        <p><?= htmlspecialchars($nivel_educativo); ?></p> 
+                                        <label for="">Nivel educativo</label>
+                                        <p><?= htmlspecialchars($nivel_educativo); ?></p>
                                     </div>
                                 </div>
                             </div>
 
                             <hr>
+                            <!-- Sección de materias -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3>Materias del Grupo</h3>
+                                    <ul>
+                                        <?php if (!empty($materias)): ?>
+                                            <?php foreach (explode(', ', $materias) as $materia): ?>
+                                                <li><?= htmlspecialchars($materia); ?></li>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <li>No hay materias asignadas a este grupo.</li>
+                                        <?php endif; ?>
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- Fin de sección de materias -->
+
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">

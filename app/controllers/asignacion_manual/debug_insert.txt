@@ -1,0 +1,10 @@
+Ejecutando INSERT: title=HABILIDADES SOCIEMOCIONALES Y MANEJO DE CONFLICTOS, start_time=17:00:00, end_time=18:00:00, schedule_day=martes, group_id=754
+Ejecutando INSERT: title=FÍSICA, start_time=00:00:00, end_time=01:00:00, schedule_day=miércoles, group_id=754
+Ejecutando INSERT: title=CONFECCIÓN INDUSTRIAL, start_time=00:00:00, end_time=01:00:00, schedule_day=martes, group_id=754
+Ejecutando INSERT: title=FÍSICA, start_time=23:00:00, end_time=00:00:00, schedule_day=miércoles, group_id=754
+Ejecutando INSERT: title=FÍSICA, start_time=22:00:00, end_time=23:00:00, schedule_day=miércoles, group_id=754
+Ejecutando INSERT: title=INGLÉS II, start_time=17:00:00, end_time=18:00:00, schedule_day=miércoles, group_id=754
+Ejecutando INSERT: title=FÍSICA, start_time=13:00:00, end_time=14:00:00, schedule_day=miércoles, group_id=754
+Ejecutando INSERT: title=HABILIDADES SOCIEMOCIONALES Y MANEJO DE CONFLICTOS, start_time=14:00:00, end_time=15:00:00, schedule_day=martes, group_id=754
+Ejecutando INSERT: subject_id=1143, start_time=13:00:00, end_time=14:00:00, schedule_day=lunes, group_id=754
+Ejecutando INSERT: subject_id=1143, start_time=13:00:00, end_time=14:00:00, schedule_day=lunes, group_id=755

@@ -115,7 +115,7 @@ function enviarMensaje() {
 <footer class="main-footer">
     <!-- To the right -->
     <div class="float-right d-none d-sm-inline">
-        <span>Versión 1.1.7.2</span> |
+        <span>Versión 1.1.7.3</span> |
         <a href="<?= APP_URL; ?>/portal/reportes/" class="text-decoration-none">
             Informar un Problema
         </a>

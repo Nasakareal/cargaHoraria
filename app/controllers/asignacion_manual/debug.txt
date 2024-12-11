@@ -1,0 +1,30 @@
+Datos recibidos: title=HISTORIA Y SOCIOLOGÍA DE LA MODA, start_time=16:00:00, end_time=, schedule_day=miércoles, group_id=754
+Datos recibidos: title=HABILIDADES SOCIEMOCIONALES Y MANEJO DE CONFLICTOS, start_time=22:00:00, end_time=, schedule_day=miércoles, group_id=754
+Datos recibidos: title=HABILIDADES SOCIEMOCIONALES Y MANEJO DE CONFLICTOS, start_time=16:00:00, end_time=, schedule_day=martes, group_id=754
+Datos recibidos: title=HABILIDADES SOCIEMOCIONALES Y MANEJO DE CONFLICTOS, start_time=17:00:00, end_time=, schedule_day=martes, group_id=754
+Datos recibidos: title=FÍSICA, start_time=00:00:00, end_time=, schedule_day=miércoles, group_id=754
+Datos recibidos: title=CONFECCIÓN INDUSTRIAL, start_time=00:00:00, end_time=, schedule_day=martes, group_id=754
+Datos recibidos: title=FÍSICA, start_time=23:00:00, end_time=, schedule_day=miércoles, group_id=754
+Datos recibidos: title=FÍSICA, start_time=22:00:00, end_time=, schedule_day=miércoles, group_id=754
+Datos recibidos: title=INGLÉS II, start_time=17:00:00, end_time=, schedule_day=miércoles, group_id=754
+Datos recibidos: title=FÍSICA, start_time=13:00:00, end_time=, schedule_day=miércoles, group_id=754
+Datos recibidos: title=HABILIDADES SOCIEMOCIONALES Y MANEJO DE CONFLICTOS, start_time=14:00:00, end_time=, schedule_day=martes, group_id=754
+Datos recibidos: subject_id=, start_time=16:00:00, end_time=, schedule_day=martes, group_id=754
+Datos recibidos: subject_id=, start_time=13:00:00, end_time=, schedule_day=lunes, group_id=754
+Datos recibidos: subject_id=, start_time=14:00:00, end_time=, schedule_day=martes, group_id=754
+Datos recibidos: subject_id=, start_time=14:00:00, end_time=, schedule_day=martes, group_id=754
+Datos recibidos: subject_id=, start_time=13:00:00, end_time=, schedule_day=viernes, group_id=754
+Datos recibidos: subject_id=, start_time=14:00:00, end_time=, schedule_day=viernes, group_id=754
+Datos recibidos: subject_id=, start_time=14:00:00, end_time=, schedule_day=martes, group_id=754
+Datos recibidos: subject_id=1143, start_time=13:00:00, end_time=, schedule_day=lunes, group_id=754
+Datos recibidos: subject_id=1143, start_time=13:00:00, end_time=, schedule_day=lunes, group_id=754
+Datos recibidos: subject_id=1145, start_time=13:00:00, end_time=, schedule_day=lunes, group_id=754
+Datos recibidos: subject_id=1143, start_time=13:00:00, end_time=, schedule_day=lunes, group_id=754
+Datos recibidos: subject_id=1145, start_time=13:00:00, end_time=, schedule_day=lunes, group_id=754
+Datos recibidos: subject_id=1143, start_time=13:00:00, end_time=, schedule_day=lunes, group_id=754
+Datos recibidos: subject_id=1143, start_time=13:00:00, end_time=, schedule_day=lunes, group_id=755
+Datos recibidos: subject_id=1231, start_time=13:00:00, end_time=, schedule_day=martes, group_id=755
+Datos recibidos: subject_id=1143, start_time=13:00:00, end_time=, schedule_day=lunes, group_id=755
+Datos recibidos: subject_id=1143, start_time=07:00:00, end_time=, schedule_day=lunes, group_id=755
+Datos recibidos: subject_id=1145, start_time=07:00:00, end_time=, schedule_day=martes, group_id=755
+Datos recibidos: subject_id=1143, start_time=08:00:00, end_time=, schedule_day=lunes, group_id=755

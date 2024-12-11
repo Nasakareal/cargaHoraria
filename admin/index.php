@@ -48,8 +48,7 @@ $porcentaje_no_cubiertas = 100 - $porcentaje_cubiertas;
                     </div>
                 </div>
             </div>
-
-            <!-- Listado de Grupos con Materias No Asignadas -->
+<!-- Listado de Grupos con Materias No Asignadas -->
 <div class="col-md-7">
     <div class="card">
         <div class="card-header">
@@ -59,7 +58,14 @@ $porcentaje_no_cubiertas = 100 - $porcentaje_cubiertas;
             <p class="text-center"><strong>Total de Grupos Faltantes:</strong> <?php echo $total_grupos; ?></p>
             <p class="text-center"><strong>Total de Materias Faltantes:</strong> <?php echo $materias_no_cubiertas; ?></p>
 
-            <?php if (!empty($grupos_materias_faltantes)): ?>
+            <?php
+            
+            $grupos_con_materias_faltantes = array_filter($grupos_materias_faltantes, function ($grupo) {
+                return isset($grupo['materias_faltantes']) && $grupo['materias_faltantes'] > 0;
+            });
+            ?>
+
+            <?php if (!empty($grupos_con_materias_faltantes)): ?>
                 <table id="listadoMaterias" class="table table-striped table-bordered">
                     <thead>
                         <tr>
@@ -68,7 +74,7 @@ $porcentaje_no_cubiertas = 100 - $porcentaje_cubiertas;
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($grupos_materias_faltantes as $grupo): ?>
+                        <?php foreach ($grupos_con_materias_faltantes as $grupo): ?>
                             <tr>
                                 <td><?php echo htmlspecialchars($grupo['grupo']); ?></td>
                                 <td><?php echo htmlspecialchars($grupo['materias_faltantes']); ?></td>
@@ -82,6 +88,7 @@ $porcentaje_no_cubiertas = 100 - $porcentaje_cubiertas;
         </div>
     </div>
 </div>
+
 
         </div>
     </div>
