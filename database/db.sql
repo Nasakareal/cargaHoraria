@@ -646,6 +646,16 @@ SET shift_id = CASE
 END
 WHERE term_id >= 7;
 
+UPDATE subjects
+SET weekly_hours = CASE
+    WHEN subject_id = 1500 THEN 5
+    WHEN subject_id = 1501 THEN 7
+    WHEN subject_id = 1600 THEN 5
+END,
+lab_hours = 5,
+lab1_hours = 5,
+max_consecutive_lab_hours = 5
+WHERE subject_id IN (1500, 1501, 1600);
 
 
 

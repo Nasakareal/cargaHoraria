@@ -9,9 +9,9 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Aumentar el límite de tiempo de ejecución si es necesario
-set_time_limit(1200);
+set_time_limit(1600);
 
-ini_set('memory_limit', '156M');
+ini_set('memory_limit', '156M'); // Aumentado a 256M para mayor capacidad
 
 // Eliminar asignaciones activas anteriores
 $pdo->exec("DELETE FROM schedule_assignments WHERE estado = 'activo'");
@@ -30,17 +30,21 @@ function remove_accents($string) {
 $turn_id_to_turno = [
     1 => 'MATUTINO',
     2 => 'VESPERTINO',
-    // Añade más mapeos según tus turnos
-    // 3 => 'OTRO_TURNO',
+    3 => 'MIXTO',
+    4 => 'ZINAPÉCUARO',
+    5 => 'ENFERMERIA',
+    6 => 'MATUTINO AVANZADO',
+    7 => 'VESPERTINO AVANZADO',
+    // Añade más mapeos según tus turnos si existen
 ];
 
 /* Obtener datos de grupos */
 $groups = $pdo->query("SELECT *, classroom_assigned, lab_assigned FROM `groups` WHERE estado = '1'")->fetchAll(PDO::FETCH_ASSOC);
 
 // Definir los turnos a excluir
-$excluded_turnos = ['MIXTO', 'ZINAPECUARO']; // Asegúrate de que estos nombres coincidan exactamente con los de tu base de datos
+$excluded_turnos = ['MIXTO', 'ZINAPÉCUARO']; // Asegúrate de que estos nombres coincidan exactamente con los de tu base de datos
 
-// Filtrar grupos para excluir "MIXTO" y "ZINAPECUARO"
+// Filtrar grupos para excluir "MIXTO" y "ZINAPÉCUARO"
 $groups = array_filter($groups, function($group) use ($turn_id_to_turno, $excluded_turnos) {
     $turno_id = $group['turn_id'];
     if (!isset($turn_id_to_turno[$turno_id])) {
@@ -69,13 +73,13 @@ $groups = array_values($groups);
 include('../../../app/controllers/grupos/materias_grupos.php');
 
 /* Definir un número máximo de intentos para evitar bucles infinitos */
-define('MAX_INTENTOS', 100);
+define('MAX_INTENTOS', 60);
 
 /* Función para asignar un bloque horario */
 function asignarBloqueHorario($pdo, $subject, $group, $dia, $start_time, $end_time, $tipo_espacio, &$mensajes_error)
 {
     /* Registrar intento de asignación */
-    error_log("Intentando asignar materia ID: {$subject['subject_id']} al grupo ID: {$group['group_id']} en $dia de " . date('H:i:s', $start_time) . " a " . date('H:i:s', $end_time) . " en $tipo_espacio.");
+    error_log("Intentando asignar materia '{$subject['subject_name']}' (ID: {$subject['subject_id']}) al grupo ID: {$group['group_id']} en $dia de " . date('H:i:s', $start_time) . " a " . date('H:i:s', $end_time) . " en $tipo_espacio.");
 
     if (!isset($subject['subject_id'])) {
         error_log("Error: 'subject_id' no está definido.");
@@ -223,7 +227,7 @@ function asignarBloqueHorario($pdo, $subject, $group, $dia, $start_time, $end_ti
         ':tipo_espacio' => $tipo_espacio
     ]);
 
-    error_log("Materia ID: {$subject['subject_id']} asignada al grupo ID: {$group['group_id']} en $dia de $formatted_start_time a $formatted_end_time en $tipo_espacio.");
+    error_log("Materia '{$subject['subject_name']}' (ID: {$subject['subject_id']}) asignada al grupo ID: {$group['group_id']} en $dia de $formatted_start_time a $formatted_end_time en $tipo_espacio.");
 
     return true; /* Bloque asignado exitosamente */
 }
@@ -290,8 +294,8 @@ function calcularDisponibilidadDias($pdo, $group_id, $dias_turno, $horario_turno
 /* Función para distribuir materias en la semana */
 function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $dias_turno, &$mensajes_error, $horarios_disponibles)
 {
-    /* Inicializar prioridad para turnos "MIXTO" y "ZINAPECUARO" */
-    $turnos_prioritarios = ['MIXTO', 'ZINAPECUARO'];
+    /* Inicializar prioridad para turnos "MIXTO" y "ZINAPÉCUARO" */
+    $turnos_prioritarios = ['MIXTO', 'ZINAPÉCUARO'];
 
     /* Obtener el nombre del turno del grupo */
     // Aquí, $horario_turno ya es el nombre del turno, según el mapeo
@@ -309,7 +313,7 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
 
     /* Ordenar las materias para priorizar aquellas con más horas restantes */
     usort($subjects, function ($a, $b) {
-        return $b['total_remaining_hours'] - $a['total_remaining_hours'];
+        return $b['remaining_hours'] - $a['remaining_hours'];
     });
 
     /* Asignación principal de materias durante la semana */
@@ -331,8 +335,10 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
 
             foreach ($subjects as &$subject) {
                 $subject_id = $subject['subject_id'];
-                $remaining_class_hours = $subject['remaining_class_hours'];
-                $remaining_lab_hours = $subject['remaining_lab_hours'];
+                $remaining_hours = $subject['remaining_hours'];
+                $tipo_espacio = $subject['type'];
+                $max_consecutive_hours = $subject['max_consecutive_hours'];
+                $min_consecutive_hours = $subject['min_consecutive_hours'];
 
                 /* Inicializar horas asignadas en el día si no existe */
                 if (!isset($horas_asignadas_por_materia_dia[$dia])) {
@@ -342,92 +348,61 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
                     $horas_asignadas_por_materia_dia[$dia][$subject_id] = 0;
                 }
 
-                /* Determinar tipo de espacio y horas a asignar */
-                $tipo_espacio = null;
-                $horas_a_asignar = 0;
-
-                /* Implementar prioridad para turnos "MIXTO" y "ZINAPECUARO" */
+                /* Determinar el tipo de espacio y validar según el turno */
                 if (in_array($grupo_turno, $turnos_prioritarios)) {
-                    /* Solo asignar materias de laboratorio los viernes y sábados */
-                    if (!in_array($dia, ['Viernes', 'Sábado'])) {
+                    // Solo asignar materias de laboratorio los viernes y sábados
+                    if ($tipo_espacio !== 'Laboratorio' || !in_array($dia, ['Viernes', 'Sábado'])) {
                         continue;
                     }
-                    if ($remaining_lab_hours <= 0) {
-                        continue; /* No hay horas de laboratorio para asignar */
-                    }
-                    $tipo_espacio = 'Laboratorio';
-                    // Flexibilizar las horas consecutivas
-                    $max_consecutive_hours = max((int) $subject['max_consecutive_lab_hours'], 1);
-                    $min_consecutive_hours = isset($subject['min_consecutive_lab_hours']) ? max((int)$subject['min_consecutive_lab_hours'], 1) : 1;
-                    $horas_restantes_materia = $remaining_lab_hours;
-                } else {
-                    /* Asignar materias normalmente */
-                    if ($remaining_class_hours > 0) {
-                        $tipo_espacio = 'Aula';
-                        $max_consecutive_hours = max((int) $subject['max_consecutive_class_hours'], 1);
-                        $min_consecutive_hours = isset($subject['min_consecutive_class_hours']) ? max((int)$subject['min_consecutive_class_hours'], 1) : 1;
-                        $horas_restantes_materia = $remaining_class_hours;
-                    } elseif ($remaining_lab_hours > 0) {
-                        $tipo_espacio = 'Laboratorio';
-                        $max_consecutive_hours = max((int) $subject['max_consecutive_lab_hours'], 1);
-                        $min_consecutive_hours = isset($subject['min_consecutive_lab_hours']) ? max((int)$subject['min_consecutive_lab_hours'], 1) : 1;
-                        $horas_restantes_materia = $remaining_lab_hours;
-                    } else {
-                        continue; /* No hay horas para asignar, pasar a la siguiente materia */
-                    }
                 }
 
-                /* Calcular las horas que se pueden asignar sin exceder el máximo diario */
+                /* Calcular las horas que se pueden asignar sin exceder el máximo */
                 $horas_disponibles_dia = $max_consecutive_hours - ($horas_asignadas_por_materia_dia[$dia][$subject_id] ?? 0);
                 $horas_disponibles_en_dia = floor(($fin_turno - $inicio_actual) / 3600);
-
-                /* Asegurar que no se asignen más horas de las que quedan */
-                $horas_a_asignar = min($horas_restantes_materia, $horas_disponibles_dia, $horas_disponibles_en_dia, $subject['total_remaining_hours']);
+                $horas_a_asignar = min($remaining_hours, $horas_disponibles_dia, $horas_disponibles_en_dia);
 
                 /* Respetar las horas mínimas consecutivas */
-                if ($horas_a_asignar < $min_consecutive_hours) {
-                    /* No hay suficiente tiempo para asignar el mínimo de horas consecutivas, avanzar una hora */
-                    error_log("No se pudo asignar el mínimo de horas consecutivas para la materia ID: {$subject['subject_id']} en el grupo ID: {$group['group_id']} el día $dia.");
-                    $inicio_actual = strtotime("+1 hour", $inicio_actual);
-                    continue;
-                } else {
-                    /* Ajustar las horas a asignar para que sean al menos el mínimo y no excedan el máximo */
-                    $horas_a_asignar = max($min_consecutive_hours, $horas_a_asignar);
+                // Ajustar min_consecutive_hours si las horas restantes son menores
+                if ($horas_a_asignar < $min_consecutive_hours && $horas_a_asignar > 0) {
+                    if ($tipo_espacio === 'Aula' && $horas_a_asignar <= $min_consecutive_hours) {
+                        // Permitir asignar la hora restante para materias de Aula
+                        // No modificar $min_consecutive_hours
+                    } else {
+                        // No cumplir con el mínimo, avanzar una hora
+                        error_log("No se pudo asignar el mínimo de horas consecutivas para la materia '{$subject['subject_name']}' (ID: {$subject['subject_id']}) en el grupo ID: {$group['group_id']} el día $dia.");
+                        $inicio_actual = strtotime("+1 hour", $inicio_actual);
+                        continue;
+                    }
                 }
 
+                /* Definir el fin del bloque */
                 $fin_bloque = strtotime("+{$horas_a_asignar} hours", $inicio_actual);
 
                 if ($fin_bloque > $fin_turno) {
                     /* Ajustar el fin del bloque al final del turno si excede */
                     $fin_bloque = $fin_turno;
                     $horas_a_asignar = floor(($fin_bloque - $inicio_actual) / 3600);
-                    if ($horas_a_asignar < $min_consecutive_hours) {
-                        $inicio_actual = strtotime("+1 hour", $inicio_actual);
-                        continue;
+                    if ($horas_a_asignar < $min_consecutive_hours && $horas_a_asignar > 0) {
+                        if ($tipo_espacio === 'Aula' && $horas_a_asignar <= $min_consecutive_hours) {
+                            // Permitir asignar la hora restante para materias de Aula
+                        } else {
+                            // No cumplir con el mínimo, avanzar una hora
+                            $inicio_actual = strtotime("+1 hour", $inicio_actual);
+                            continue;
+                        }
                     }
                 }
 
-                // Asegurarse de que no se exceda `total_remaining_hours`
-                if ($horas_a_asignar > $subject['total_remaining_hours']) {
-                    $horas_a_asignar = $subject['total_remaining_hours'];
-                    $fin_bloque = strtotime("+{$horas_a_asignar} hours", $inicio_actual);
-                }
-
+                /* Intentar asignar el bloque horario */
                 if ($horas_a_asignar > 0 && asignarBloqueHorario($pdo, $subject, $group, $dia, $inicio_actual, $fin_bloque, $tipo_espacio, $mensajes_error)) {
                     /* Actualizar horas restantes y horas asignadas en el día */
-                    if ($tipo_espacio === 'Aula') {
-                        $subject['remaining_class_hours'] -= $horas_a_asignar;
-                    } else {
-                        $subject['remaining_lab_hours'] -= $horas_a_asignar;
-                    }
-                    $subject['total_remaining_hours'] -= $horas_a_asignar;
-
+                    $subject['remaining_hours'] -= $horas_a_asignar;
                     $horas_asignadas_por_materia_dia[$dia][$subject_id] += $horas_a_asignar;
                     $inicio_actual = $fin_bloque;
                     $asignacion_realizada = true;
 
                     /* Si las horas restantes son cero, continuar con la siguiente materia */
-                    if ($subject['total_remaining_hours'] <= 0) {
+                    if ($subject['remaining_hours'] <= 0) {
                         continue;
                     }
                 } else {
@@ -453,11 +428,12 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
 
     foreach ($subjects as &$subject) {
         $subject_id = $subject['subject_id'];
-        $remaining_class_hours = $subject['remaining_class_hours'];
-        $remaining_lab_hours = $subject['remaining_lab_hours'];
-        $total_remaining_hours = $subject['total_remaining_hours'];
+        $remaining_hours = $subject['remaining_hours'];
+        $tipo_espacio = $subject['type'];
+        $max_consecutive_hours = $subject['max_consecutive_hours'];
+        $min_consecutive_hours = $subject['min_consecutive_hours'];
 
-        if ($total_remaining_hours > 0) {
+        if ($remaining_hours > 0) {
             /* Intentar asignar las horas restantes en los días con más disponibilidad */
             foreach ($dias_ordenados as $dia) {
                 if (isset($horarios_disponibles[$grupo_turno][$dia])) {
@@ -480,86 +456,56 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
                     $horas_asignadas_por_materia_dia[$dia][$subject_id] = 0;
                 }
 
-                /* Obtener límites de horas consecutivas */
-                $max_consecutive_hours_class = max((int) ($subject['max_consecutive_class_hours'] ?? 1), 1);
-                $min_consecutive_hours_class = max((int) ($subject['min_consecutive_class_hours'] ?? 1), 1);
-                $max_consecutive_hours_lab = max((int) ($subject['max_consecutive_lab_hours'] ?? 1), 1);
-                $min_consecutive_hours_lab = max((int) ($subject['min_consecutive_lab_hours'] ?? 1), 1);
-
-                while ($inicio_actual_dia < $fin_turno_dia && $subject['total_remaining_hours'] > 0) {
-                    /* Determinar tipo de espacio y horas a asignar */
-                    if ($subject['remaining_class_hours'] > 0) {
-                        $tipo_espacio = 'Aula';
-                        $max_consecutive_hours = $max_consecutive_hours_class;
-                        $min_consecutive_hours = $min_consecutive_hours_class;
-                        $horas_restantes_materia = $subject['remaining_class_hours'];
-                    } elseif ($subject['remaining_lab_hours'] > 0) {
-                        $tipo_espacio = 'Laboratorio';
-                        $max_consecutive_hours = $max_consecutive_hours_lab;
-                        $min_consecutive_hours = $min_consecutive_hours_lab;
-                        $horas_restantes_materia = $subject['remaining_lab_hours'];
-                    } else {
-                        break; /* No hay horas restantes */
-                    }
-
-                    /* Calcular las horas que se pueden asignar sin exceder el máximo diario */
+                while ($inicio_actual_dia < $fin_turno_dia && $subject['remaining_hours'] > 0) {
+                    /* Calcular las horas disponibles para asignar */
                     $horas_disponibles_dia = $max_consecutive_hours - ($horas_asignadas_por_materia_dia[$dia][$subject_id] ?? 0);
                     $horas_disponibles_en_dia = floor(($fin_turno_dia - $inicio_actual_dia) / 3600);
-
-                    /* Asegurar que no se asignen más horas de las que quedan */
-                    $horas_a_asignar = min($horas_restantes_materia, $horas_disponibles_dia, $horas_disponibles_en_dia, $subject['total_remaining_hours']);
+                    $horas_a_asignar = min($subject['remaining_hours'], $horas_disponibles_dia, $horas_disponibles_en_dia);
 
                     /* Respetar las horas mínimas consecutivas */
-                    if ($horas_a_asignar < $min_consecutive_hours) {
-                        /* No hay suficiente tiempo para asignar el mínimo de horas consecutivas, intentar asignar horas remanentes */
-                        if ($horas_restantes_materia > 0) {
-                            $horas_a_asignar = min($horas_restantes_materia, $horas_disponibles_dia, $horas_disponibles_en_dia, $subject['total_remaining_hours']);
-                            if ($horas_a_asignar <= 0) {
-                                /* No se pueden asignar más horas, avanzar en el tiempo */
-                                $inicio_actual_dia = strtotime("+1 hour", $inicio_actual_dia);
-                                continue;
-                            }
+                    if ($horas_a_asignar < $min_consecutive_hours && $horas_a_asignar > 0) {
+                        if ($tipo_espacio === 'Aula' && $horas_a_asignar <= $min_consecutive_hours) {
+                            // Permitir asignar la hora restante para materias de Aula
                         } else {
-                            break; /* No hay horas restantes */
+                            // No cumplir con el mínimo, avanzar una hora
+                            error_log("No se pudo asignar el mínimo de horas consecutivas para la materia '{$subject['subject_name']}' (ID: {$subject['subject_id']}) en el grupo ID: {$group['group_id']} el día $dia.");
+                            $inicio_actual_dia = strtotime("+1 hour", $inicio_actual_dia);
+                            continue;
                         }
                     }
 
+                    /* Definir el fin del bloque */
                     $fin_bloque_dia = strtotime("+{$horas_a_asignar} hours", $inicio_actual_dia);
 
                     if ($fin_bloque_dia > $fin_turno_dia) {
                         /* Ajustar el fin del bloque al final del turno si excede */
                         $fin_bloque_dia = $fin_turno_dia;
                         $horas_a_asignar = floor(($fin_bloque_dia - $inicio_actual_dia) / 3600);
-                        if ($horas_a_asignar < $min_consecutive_hours) {
-                            $inicio_actual_dia = strtotime("+1 hour", $inicio_actual_dia);
-                            continue;
+                        if ($horas_a_asignar < $min_consecutive_hours && $horas_a_asignar > 0) {
+                            if ($tipo_espacio === 'Aula' && $horas_a_asignar <= $min_consecutive_hours) {
+                                // Permitir asignar la hora restante para materias de Aula
+                            } else {
+                                // No cumplir con el mínimo, avanzar una hora
+                                $inicio_actual_dia = strtotime("+1 hour", $inicio_actual_dia);
+                                continue;
+                            }
                         }
                     }
 
-                    // Asegurarse de que no se exceda `total_remaining_hours`
-                    if ($horas_a_asignar > $subject['total_remaining_hours']) {
-                        $horas_a_asignar = $subject['total_remaining_hours'];
-                        $fin_bloque_dia = strtotime("+{$horas_a_asignar} hours", $inicio_actual_dia);
-                    }
-
+                    /* Intentar asignar el bloque horario */
                     if ($horas_a_asignar > 0 && asignarBloqueHorario($pdo, $subject, $group, $dia, $inicio_actual_dia, $fin_bloque_dia, $tipo_espacio, $mensajes_error)) {
-                        /* Actualizar horas restantes */
-                        if ($tipo_espacio === 'Aula') {
-                            $subject['remaining_class_hours'] -= $horas_a_asignar;
-                        } else {
-                            $subject['remaining_lab_hours'] -= $horas_a_asignar;
-                        }
-                        $subject['total_remaining_hours'] -= $horas_a_asignar;
-
+                        /* Actualizar horas restantes y horas asignadas en el día */
+                        $subject['remaining_hours'] -= $horas_a_asignar;
                         $horas_asignadas_por_materia_dia[$dia][$subject_id] += $horas_a_asignar;
                         $inicio_actual_dia = $fin_bloque_dia;
                     } else {
+                        /* No se pudo asignar en este bloque, intentar en el siguiente */
                         $inicio_actual_dia = strtotime("+1 hour", $inicio_actual_dia);
                     }
                 }
 
                 /* Si ya no quedan horas por asignar, salir del bucle */
-                if ($subject['total_remaining_hours'] <= 0) {
+                if ($subject['remaining_hours'] <= 0) {
                     break;
                 }
             }
@@ -570,7 +516,7 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
 function todasMateriasAsignadas($subjects)
 {
     foreach ($subjects as $subject) {
-        if ($subject['total_remaining_hours'] > 0) {
+        if ($subject['remaining_hours'] > 0) {
             return false;
         }
     }
@@ -625,18 +571,25 @@ foreach ($groups as $group) {
                 'subject_id' => $subject['subject_id'],
                 'subject_name' => $subject['subject_name'],
                 'teacher_id' => $subject['teacher_id'],
-                'remaining_class_hours' => $subject['class_hours'], // Corregido
-                'remaining_lab_hours' => $subject['lab_hours'],     // Corregido
-                'total_remaining_hours' => $subject['weekly_hours'], // Correcto
-                'max_consecutive_class_hours' => $subject['max_consecutive_class_hours'], // Agregado
-                'min_consecutive_class_hours' => $subject['min_consecutive_class_hours'], // Agregado
-                'max_consecutive_lab_hours' => $subject['max_consecutive_lab_hours'],      // Agregado
-                'min_consecutive_lab_hours' => $subject['min_consecutive_lab_hours']       // Agregado
+                'remaining_hours' => $subject['remaining_hours'],
+                'type' => $subject['type'],
+                'max_consecutive_hours' => $subject['max_consecutive_hours'],
+                'min_consecutive_hours' => $subject['min_consecutive_hours'],
             ];
         }, $subjects_by_group[$group['group_id']]);
 
-        // Eliminar o comentar la línea de shuffle para priorizar materias con más horas restantes
-        // shuffle($subjects);
+        // Priorizar asignaciones de Laboratorio en turnos prioritarios
+        usort($subjects, function ($a, $b) {
+            // Priorizar Laboratorios
+            if ($a['type'] === 'Laboratorio' && $b['type'] !== 'Laboratorio') {
+                return -1;
+            }
+            if ($a['type'] !== 'Laboratorio' && $b['type'] === 'Laboratorio') {
+                return 1;
+            }
+            // Luego, por más horas restantes
+            return $b['remaining_hours'] - $a['remaining_hours'];
+        });
 
         distribuirMateriasEnSemana($pdo, $group, $subjects, $horario_turno, $dias_turno, $mensajes_error, $horarios_disponibles);
 

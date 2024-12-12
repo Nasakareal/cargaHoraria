@@ -16,19 +16,34 @@ foreach ($groups as $group) {
     $subjects = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     /* Inicializar horas restantes por materia */
-    foreach ($subjects as &$subject) {
-        $subject['remaining_class_hours'] = $subject['class_hours'];
-        
-        if (isset($subject['lab_hours']) && !is_null($subject['lab_hours'])) {
-            $subject['remaining_lab_hours'] = $subject['lab_hours'];
-        } else {
-            $subject['remaining_lab_hours'] = 0;
+    foreach ($subjects as $subject) {
+        // Crear una entrada para las horas de clase
+        if ($subject['class_hours'] > 0) {
+            $class_subject = [
+                'subject_id' => $subject['subject_id'],
+                'subject_name' => $subject['subject_name'] . " (Clase)",
+                'teacher_id' => $subject['teacher_id'],
+                'remaining_hours' => $subject['class_hours'],
+                'type' => 'Aula',
+                'max_consecutive_hours' => (int) $subject['max_consecutive_class_hours'],
+                'min_consecutive_hours' => 1, // Establecer mínimo a 1 para Aula
+            ];
+            $subjects_by_group[$group['group_id']][] = $class_subject;
         }
-        $subject['total_remaining_hours'] = $subject['class_hours'] + $subject['remaining_lab_hours'];
 
-        /* Asignar horas mínimas consecutivas (si no existen, usar el máximo) */
-        $subject['min_consecutive_class_hours'] = isset($subject['min_consecutive_class_hours']) ? (int) $subject['min_consecutive_class_hours'] : (int) $subject['max_consecutive_class_hours'];
-        $subject['min_consecutive_lab_hours'] = isset($subject['min_consecutive_lab_hours']) ? (int) $subject['min_consecutive_lab_hours'] : (int) $subject['max_consecutive_lab_hours'];
+        // Crear una entrada para las horas de laboratorio
+        if (isset($subject['lab_hours']) && $subject['lab_hours'] > 0) {
+            $lab_subject = [
+                'subject_id' => $subject['subject_id'],
+                'subject_name' => $subject['subject_name'] . " (Laboratorio)",
+                'teacher_id' => $subject['teacher_id'],
+                'remaining_hours' => $subject['lab_hours'],
+                'type' => 'Laboratorio',
+                'max_consecutive_hours' => (int) $subject['max_consecutive_lab_hours'],
+                'min_consecutive_hours' => isset($subject['min_consecutive_lab_hours']) ? (int) $subject['min_consecutive_lab_hours'] : (int) $subject['max_consecutive_lab_hours'],
+            ];
+            $subjects_by_group[$group['group_id']][] = $lab_subject;
+        }
     }
-    $subjects_by_group[$group['group_id']] = $subjects;
 }
+?>

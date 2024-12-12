@@ -18,7 +18,7 @@ if (!$nombre_sesion_usuario || !$foto_sesion_usuario) {
         $_SESSION['sesion_nombre_usuario'] = $nombre_sesion_usuario;
 
         
-        $foto_sesion_usuario = $usuarioData['foto_perfil'] ?: 'https://cdn-icons-png.flaticon.com/512/74/74472.png';
+        $foto_sesion_usuario = $usuarioData['foto_perfil'] ?: '';
         $_SESSION['sesion_foto_usuario'] = $foto_sesion_usuario;
     } else {
         header('Location: ' . APP_URL . '/login');
