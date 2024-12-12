@@ -623,3 +623,38 @@ CREATE TABLE manual_schedule_assignments (
     KEY group_id (group_id),
     KEY classroom_id (classroom_id)
 ) ENGINE=InnoDB;
+
+
+
+ALTER TABLE shifts
+MODIFY shift_name ENUM('MATUTINO', 'VESPERTINO', 'MIXTO', 'ZINAPÉCUARO', 'ENFERMERIA', 'MATUTINO AVANZADO', 'VESPERTINO AVANZADO') 
+CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci NOT NULL;
+
+
+
+INSERT INTO shifts (shift_name, schedule_details, fyh_creacion, estado)
+VALUES
+('MATUTINO AVANZADO', 'LUNES A VIERNES de 07:00 A 12:00', NOW(), 'ACTIVO'),
+('VESPERTINO AVANZADO', 'LUNES A VIERNES de 12:00 A 17:00', NOW(), 'ACTIVO');
+
+
+UPDATE `groups`
+SET shift_id = CASE
+    WHEN turn_id = 1 THEN 6
+    WHEN turn_id = 2 THEN 7
+    ELSE turn_id
+END
+WHERE term_id >= 7;
+
+
+
+
+
+
+
+
+
+
+
+
+

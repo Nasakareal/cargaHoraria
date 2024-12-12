@@ -28,3 +28,4 @@ Datos recibidos: subject_id=1143, start_time=13:00:00, end_time=, schedule_day=l
 Datos recibidos: subject_id=1143, start_time=07:00:00, end_time=, schedule_day=lunes, group_id=755
 Datos recibidos: subject_id=1145, start_time=07:00:00, end_time=, schedule_day=martes, group_id=755
 Datos recibidos: subject_id=1143, start_time=08:00:00, end_time=, schedule_day=lunes, group_id=755
+Datos recibidos: subject_id=1133, start_time=07:00:00, end_time=, schedule_day=lunes, group_id=726

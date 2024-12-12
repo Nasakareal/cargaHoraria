@@ -3,18 +3,18 @@
 /* Definir los horarios disponibles por turno y día */
 $horarios_disponibles = [
     'MATUTINO' => [
-        'Lunes' => ['start' => '07:00:00', 'end' => '15:00:00'],
-        'Martes' => ['start' => '07:00:00', 'end' => '15:00:00'],
-        'Miércoles' => ['start' => '07:00:00', 'end' => '15:00:00'],
-        'Jueves' => ['start' => '07:00:00', 'end' => '15:00:00'],
-        'Viernes' => ['start' => '07:00:00', 'end' => '15:00:00'],
+        'Lunes' => ['start' => '07:00:00', 'end' => '14:00:00'],
+        'Martes' => ['start' => '07:00:00', 'end' => '14:00:00'],
+        'Miércoles' => ['start' => '07:00:00', 'end' => '14:00:00'],
+        'Jueves' => ['start' => '07:00:00', 'end' => '14:00:00'],
+        'Viernes' => ['start' => '07:00:00', 'end' => '14:00:00'],
     ],
     'VESPERTINO' => [
-        'Lunes' => ['start' => '12:00:00', 'end' => '20:00:00'],
-        'Martes' => ['start' => '12:00:00', 'end' => '20:00:00'],
-        'Miércoles' => ['start' => '12:00:00', 'end' => '20:00:00'],
-        'Jueves' => ['start' => '12:00:00', 'end' => '20:00:00'],
-        'Viernes' => ['start' => '12:00:00', 'end' => '20:00:00'],
+        'Lunes' => ['start' => '12:00:00', 'end' => '19:00:00'],
+        'Martes' => ['start' => '12:00:00', 'end' => '19:00:00'],
+        'Miércoles' => ['start' => '12:00:00', 'end' => '19:00:00'],
+        'Jueves' => ['start' => '12:00:00', 'end' => '19:00:00'],
+        'Viernes' => ['start' => '12:00:00', 'end' => '19:00:00'],
     ],
     'MIXTO' => [
         'Viernes' => ['start' => '16:00:00', 'end' => '20:00:00'],
@@ -31,6 +31,20 @@ $horarios_disponibles = [
         'Jueves' => ['start' => '07:00:00', 'end' => '17:00:00'],
         'Viernes' => ['start' => '07:00:00', 'end' => '17:00:00'],
     ],
+    'MATUTINO AVANZADO' => [
+        'Lunes' => ['start' => '07:00:00', 'end' => '12:00:00'],
+        'Martes' => ['start' => '07:00:00', 'end' => '12:00:00'],
+        'Miércoles' => ['start' => '07:00:00', 'end' => '12:00:00'],
+        'Jueves' => ['start' => '07:00:00', 'end' => '12:00:00'],
+        'Viernes' => ['start' => '07:00:00', 'end' => '12:00:00'],
+    ],
+    'VESPERTINO AVANZADO' => [
+        'Lunes' => ['start' => '12:00:00', 'end' => '17:00:00'],
+        'Martes' => ['start' => '12:00:00', 'end' => '17:00:00'],
+        'Miércoles' => ['start' => '12:00:00', 'end' => '17:00:00'],
+        'Jueves' => ['start' => '12:00:00', 'end' => '17:00:00'],
+        'Viernes' => ['start' => '12:00:00', 'end' => '17:00:00'],
+    ],
 ];
 
 /* Definir los días por turno */
@@ -39,6 +53,10 @@ $dias_semana = [
     'VESPERTINO' => ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
     'MIXTO' => ['Viernes', 'Sábado'],
     'ZINAPÉCUARO' => ['Viernes', 'Sábado'],
-    'ENFERMERIA' => ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes']
+    'ENFERMERIA' => ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
+    'MATUTINO AVANZADO' => ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
+    'VESPERTINO AVANZADO' => ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes']
 ];
+
+
 ?>

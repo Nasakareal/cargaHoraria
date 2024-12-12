@@ -1,10 +1,14 @@
 <?php
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
+include('../../app/controllers/grupos/listado_de_grupos.php');
+
+
+
 
 
 /* Obtener todos los grupos activos para mostrarlos en la tabla*/
-$sql_groups = "SELECT group_id, group_name FROM `groups` WHERE estado = '1' ORDER BY group_name ASC";
+$sql_groups = "SELECT group_id, group_name, turn_id FROM `groups` WHERE estado = '1' ORDER BY group_name ASC";
 $stmt_groups = $pdo->prepare($sql_groups);
 $stmt_groups->execute();
 $groups = $stmt_groups->fetchAll(PDO::FETCH_ASSOC);
@@ -14,7 +18,7 @@ $groups = $stmt_groups->fetchAll(PDO::FETCH_ASSOC);
     <div class="content">
         <div class="container">
             <div class="row">
-                <h1>Listado de Grupos</h1>
+                <h1>Listado de Horarios de Grupos</h1>
             </div>
             <div class="row">
                 <div class="col-md-12">
@@ -42,6 +46,7 @@ $groups = $stmt_groups->fetchAll(PDO::FETCH_ASSOC);
                                     <tr>
                                         <th class="text-center">Número</th>
                                         <th class="text-center">Nombre del Grupo</th>
+                                        <th class="text-center">Turno</th>
                                         <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
@@ -54,6 +59,7 @@ $groups = $stmt_groups->fetchAll(PDO::FETCH_ASSOC);
                                     <tr>
                                         <td style="text-align: center"><?= $contador_grupos; ?></td>
                                         <td class="text-center"><?= htmlspecialchars($group['group_name']); ?></td>
+                                        <td class="text-center"><?= $group['turn_id']; ?></td>
                                         <td class="text-center">
                                             <!-- Botón Ver que redirige a show.php con el ID del grupo -->
                                             <a href="show.php?id=<?= $group['group_id']; ?>" class="btn btn-info btn-sm">

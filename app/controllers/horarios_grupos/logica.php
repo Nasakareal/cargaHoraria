@@ -9,9 +9,9 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Aumentar el límite de tiempo de ejecución si es necesario
-set_time_limit(3400);
+set_time_limit(1200);
 
-ini_set('memory_limit', '300M');
+ini_set('memory_limit', '156M');
 
 // Eliminar asignaciones activas anteriores
 $pdo->exec("DELETE FROM schedule_assignments WHERE estado = 'activo'");
@@ -21,13 +21,55 @@ include('../../../app/controllers/horarios_grupos/horarios_disponibles.php');
 /* Inicializar un array para recolectar mensajes de error */
 $mensajes_error = [];
 
+/* Función para eliminar acentos de una cadena */
+function remove_accents($string) {
+    return iconv('UTF-8', 'ASCII//TRANSLIT', $string);
+}
+
+/* Definir el mapeo entre turn_id y nombre del turno */
+$turn_id_to_turno = [
+    1 => 'MATUTINO',
+    2 => 'VESPERTINO',
+    // Añade más mapeos según tus turnos
+    // 3 => 'OTRO_TURNO',
+];
+
 /* Obtener datos de grupos */
 $groups = $pdo->query("SELECT *, classroom_assigned, lab_assigned FROM `groups` WHERE estado = '1'")->fetchAll(PDO::FETCH_ASSOC);
+
+// Definir los turnos a excluir
+$excluded_turnos = ['MIXTO', 'ZINAPECUARO']; // Asegúrate de que estos nombres coincidan exactamente con los de tu base de datos
+
+// Filtrar grupos para excluir "MIXTO" y "ZINAPECUARO"
+$groups = array_filter($groups, function($group) use ($turn_id_to_turno, $excluded_turnos) {
+    $turno_id = $group['turn_id'];
+    if (!isset($turn_id_to_turno[$turno_id])) {
+        // Si no hay un mapeo definido, asumir 'MATUTINO' por defecto
+        $turno = 'MATUTINO';
+    } else {
+        $turno = $turn_id_to_turno[$turno_id];
+    }
+
+    // Convertir ambos strings a minúsculas para una comparación insensible a mayúsculas
+    $turno_lower = mb_strtolower($turno, 'UTF-8');
+    $excluded_turnos_lower = array_map(function($t) {
+        return mb_strtolower($t, 'UTF-8');
+    }, $excluded_turnos);
+
+    // Comparar sin considerar tildes
+    $turno_normalized = remove_accents($turno_lower);
+    $excluded_normalized = array_map('remove_accents', $excluded_turnos_lower);
+
+    return !in_array($turno_normalized, $excluded_normalized);
+});
+
+// Reindexar el arreglo después de filtrar
+$groups = array_values($groups);
 
 include('../../../app/controllers/grupos/materias_grupos.php');
 
 /* Definir un número máximo de intentos para evitar bucles infinitos */
-define('MAX_INTENTOS', 600);
+define('MAX_INTENTOS', 100);
 
 /* Función para asignar un bloque horario */
 function asignarBloqueHorario($pdo, $subject, $group, $dia, $start_time, $end_time, $tipo_espacio, &$mensajes_error)
@@ -187,10 +229,26 @@ function asignarBloqueHorario($pdo, $subject, $group, $dia, $start_time, $end_ti
 }
 
 /* Función para calcular la disponibilidad de días */
-function calcularDisponibilidadDias($pdo, $group_id, $dias_turno, $inicio_turno, $fin_turno)
+function calcularDisponibilidadDias($pdo, $group_id, $dias_turno, $horario_turno, $horarios_disponibles)
 {
+    // Verificar que $dias_turno sea un arreglo
+    if (!is_array($dias_turno)) {
+        error_log("Error: 'dias_turno' no es un arreglo.");
+        return [];
+    }
+
     $disponibilidad_dias = [];
     foreach ($dias_turno as $dia) {
+        if (isset($horarios_disponibles[$horario_turno][$dia])) {
+            $start_time_str = $horarios_disponibles[$horario_turno][$dia]['start'];
+            $end_time_str = $horarios_disponibles[$horario_turno][$dia]['end'];
+            $inicio_turno = strtotime($start_time_str);
+            $fin_turno = strtotime($end_time_str);
+        } else {
+            // Si no hay un horario definido para este día y turno, saltar
+            continue;
+        }
+
         $horas_disponibles = 0;
         $inicio_actual = $inicio_turno;
         while ($inicio_actual < $fin_turno) {
@@ -230,19 +288,19 @@ function calcularDisponibilidadDias($pdo, $group_id, $dias_turno, $inicio_turno,
 }
 
 /* Función para distribuir materias en la semana */
-function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $dias_turno, &$mensajes_error)
+function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $dias_turno, &$mensajes_error, $horarios_disponibles)
 {
-    global $horarios_disponibles;
-
-    /* Inicializar prioridad para turnos "MIXTO" y "ZINAPÉCUARO" */
-    $turnos_prioritarios = ['MIXTO', 'ZINAPÉCUARO'];
+    /* Inicializar prioridad para turnos "MIXTO" y "ZINAPECUARO" */
+    $turnos_prioritarios = ['MIXTO', 'ZINAPECUARO'];
 
     /* Obtener el nombre del turno del grupo */
-    $grupo_turno = array_search($horario_turno, $horarios_disponibles, true);
+    // Aquí, $horario_turno ya es el nombre del turno, según el mapeo
+    $grupo_turno = $horario_turno;
 
-    if ($grupo_turno === false) {
-        error_log("Error: Turno no encontrado para el grupo ID: {$group['group_id']}");
-        $mensajes_error[] = "Turno no encontrado para el grupo ID: {$group['group_id']}.";
+    /* Verificar si el turno es válido */
+    if (!isset($horarios_disponibles[$grupo_turno])) {
+        error_log("Error: Horario de turno '$grupo_turno' no encontrado para el grupo ID: {$group['group_id']}");
+        $mensajes_error[] = "Horario de turno '$grupo_turno' no encontrado para el grupo ID: {$group['group_id']}.";
         return;
     }
 
@@ -288,7 +346,7 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
                 $tipo_espacio = null;
                 $horas_a_asignar = 0;
 
-                /* Implementar prioridad para turnos "MIXTO" y "ZINAPÉCUARO" */
+                /* Implementar prioridad para turnos "MIXTO" y "ZINAPECUARO" */
                 if (in_array($grupo_turno, $turnos_prioritarios)) {
                     /* Solo asignar materias de laboratorio los viernes y sábados */
                     if (!in_array($dia, ['Viernes', 'Sábado'])) {
@@ -300,19 +358,19 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
                     $tipo_espacio = 'Laboratorio';
                     // Flexibilizar las horas consecutivas
                     $max_consecutive_hours = max((int) $subject['max_consecutive_lab_hours'], 1);
-                    $min_consecutive_hours = 1; // Reducido a 1
+                    $min_consecutive_hours = isset($subject['min_consecutive_lab_hours']) ? max((int)$subject['min_consecutive_lab_hours'], 1) : 1;
                     $horas_restantes_materia = $remaining_lab_hours;
                 } else {
                     /* Asignar materias normalmente */
                     if ($remaining_class_hours > 0) {
                         $tipo_espacio = 'Aula';
                         $max_consecutive_hours = max((int) $subject['max_consecutive_class_hours'], 1);
-                        $min_consecutive_hours = 1; // Reducido a 1
+                        $min_consecutive_hours = isset($subject['min_consecutive_class_hours']) ? max((int)$subject['min_consecutive_class_hours'], 1) : 1;
                         $horas_restantes_materia = $remaining_class_hours;
                     } elseif ($remaining_lab_hours > 0) {
                         $tipo_espacio = 'Laboratorio';
                         $max_consecutive_hours = max((int) $subject['max_consecutive_lab_hours'], 1);
-                        $min_consecutive_hours = 1; // Reducido a 1
+                        $min_consecutive_hours = isset($subject['min_consecutive_lab_hours']) ? max((int)$subject['min_consecutive_lab_hours'], 1) : 1;
                         $horas_restantes_materia = $remaining_lab_hours;
                     } else {
                         continue; /* No hay horas para asignar, pasar a la siguiente materia */
@@ -320,7 +378,7 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
                 }
 
                 /* Calcular las horas que se pueden asignar sin exceder el máximo diario */
-                $horas_disponibles_dia = $max_consecutive_hours - $horas_asignadas_por_materia_dia[$dia][$subject_id];
+                $horas_disponibles_dia = $max_consecutive_hours - ($horas_asignadas_por_materia_dia[$dia][$subject_id] ?? 0);
                 $horas_disponibles_en_dia = floor(($fin_turno - $inicio_actual) / 3600);
 
                 /* Asegurar que no se asignen más horas de las que quedan */
@@ -391,7 +449,7 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
     }
 
     /* Asignación de horas restantes priorizando días con más disponibilidad */
-    $dias_ordenados = calcularDisponibilidadDias($pdo, $group['group_id'], $dias_turno, $inicio_turno, $fin_turno);
+    $dias_ordenados = calcularDisponibilidadDias($pdo, $group['group_id'], $dias_turno, $horario_turno, $horarios_disponibles);
 
     foreach ($subjects as &$subject) {
         $subject_id = $subject['subject_id'];
@@ -508,7 +566,6 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
         }
     }
 }
-
 /* Función para verificar si todas las materias han sido asignadas */
 function todasMateriasAsignadas($subjects)
 {
@@ -530,10 +587,27 @@ foreach ($groups as $group) {
         error_log("Intento $intento para el grupo ID: {$group['group_id']}");
 
         $turno_id = $group['turn_id'];
-        $turno_keys = array_keys($horarios_disponibles);
-        $turno = isset($turno_keys[$turno_id - 1]) ? $turno_keys[$turno_id - 1] : 'MATUTINO';
-        $horario_turno = $horarios_disponibles[$turno];
-        $dias_turno = $dias_semana[$turno];
+        if (!isset($turn_id_to_turno[$turno_id])) {
+            $turno = 'MATUTINO'; // Por defecto
+            error_log("Turno ID: $turno_id no mapeado. Usando 'MATUTINO' por defecto.");
+        } else {
+            $turno = $turn_id_to_turno[$turno_id];
+        }
+
+        if (!isset($horarios_disponibles[$turno])) {
+            error_log("Horario de turno '$turno' no encontrado para el grupo ID: {$group['group_id']}");
+            $mensajes_error[] = "Horario de turno '$turno' no encontrado para el grupo ID: {$group['group_id']}.";
+            break;
+        }
+
+        $horario_turno = $turno;
+        $dias_turno = $dias_semana[$turno] ?? []; // Asegurarse de que existe
+
+        if (empty($dias_turno)) {
+            error_log("No hay días definidos para el turno '$turno' del grupo ID: {$group['group_id']}");
+            $mensajes_error[] = "No hay días definidos para el turno '$turno' del grupo ID: {$group['group_id']}.";
+            break;
+        }
 
         if (!isset($subjects_by_group[$group['group_id']])) {
             error_log("No se encontraron materias para el grupo ID: {$group['group_id']}");
@@ -564,7 +638,7 @@ foreach ($groups as $group) {
         // Eliminar o comentar la línea de shuffle para priorizar materias con más horas restantes
         // shuffle($subjects);
 
-        distribuirMateriasEnSemana($pdo, $group, $subjects, $horario_turno, $dias_turno, $mensajes_error);
+        distribuirMateriasEnSemana($pdo, $group, $subjects, $horario_turno, $dias_turno, $mensajes_error, $horarios_disponibles);
 
         // Verificar si todas las materias han sido asignadas
         if (todasMateriasAsignadas($subjects)) {

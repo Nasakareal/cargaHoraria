@@ -18,7 +18,7 @@ foreach ($groups as $group) {
     /* Inicializar horas restantes por materia */
     foreach ($subjects as &$subject) {
         $subject['remaining_class_hours'] = $subject['class_hours'];
-        // Si la materia tiene laboratorios asociados
+        
         if (isset($subject['lab_hours']) && !is_null($subject['lab_hours'])) {
             $subject['remaining_lab_hours'] = $subject['lab_hours'];
         } else {
