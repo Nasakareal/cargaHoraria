@@ -639,7 +639,7 @@ VALUES
 
 
 UPDATE `groups`
-SET shift_id = CASE
+SET turn_id = CASE
     WHEN turn_id = 1 THEN 6
     WHEN turn_id = 2 THEN 7
     ELSE turn_id
@@ -665,6 +665,9 @@ WHERE subject_id IN (1500, 1501, 1600);
 
 
 
+ALTER TABLE schedule_assignments
+ADD CONSTRAINT unique_teacher_schedule
+UNIQUE (teacher_id, schedule_day, start_time, end_time);
 
 
 

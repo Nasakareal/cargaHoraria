@@ -9,9 +9,10 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Aumentar el límite de tiempo de ejecución si es necesario
-set_time_limit(1600);
+set_time_limit(800);
 
-ini_set('memory_limit', '156M'); // Aumentado a 256M para mayor capacidad
+// Aumentar el límite de memoria
+ini_set('memory_limit', '300M'); // Aumentado a 256M para mayor capacidad
 
 // Eliminar asignaciones activas anteriores
 $pdo->exec("DELETE FROM schedule_assignments WHERE estado = 'activo'");
@@ -22,7 +23,8 @@ include('../../../app/controllers/horarios_grupos/horarios_disponibles.php');
 $mensajes_error = [];
 
 /* Función para eliminar acentos de una cadena */
-function remove_accents($string) {
+function remove_accents($string)
+{
     return iconv('UTF-8', 'ASCII//TRANSLIT', $string);
 }
 
@@ -39,13 +41,21 @@ $turn_id_to_turno = [
 ];
 
 /* Obtener datos de grupos */
-$groups = $pdo->query("SELECT *, classroom_assigned, lab_assigned FROM `groups` WHERE estado = '1'")->fetchAll(PDO::FETCH_ASSOC);
+try {
+    $groups = $pdo->query("SELECT *, classroom_assigned, lab_assigned FROM `groups` WHERE estado = '1'")->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    error_log("Error al obtener grupos: " . $e->getMessage());
+    $_SESSION['mensaje'] = "Error al obtener grupos.";
+    $_SESSION['icono'] = "error";
+    header('Location:' . APP_URL . "/admin/horarios_grupos/");
+    exit();
+}
 
 // Definir los turnos a excluir
 $excluded_turnos = ['MIXTO', 'ZINAPÉCUARO']; // Asegúrate de que estos nombres coincidan exactamente con los de tu base de datos
 
 // Filtrar grupos para excluir "MIXTO" y "ZINAPÉCUARO"
-$groups = array_filter($groups, function($group) use ($turn_id_to_turno, $excluded_turnos) {
+$groups = array_filter($groups, function ($group) use ($turn_id_to_turno, $excluded_turnos) {
     $turno_id = $group['turn_id'];
     if (!isset($turn_id_to_turno[$turno_id])) {
         // Si no hay un mapeo definido, asumir 'MATUTINO' por defecto
@@ -56,7 +66,7 @@ $groups = array_filter($groups, function($group) use ($turn_id_to_turno, $exclud
 
     // Convertir ambos strings a minúsculas para una comparación insensible a mayúsculas
     $turno_lower = mb_strtolower($turno, 'UTF-8');
-    $excluded_turnos_lower = array_map(function($t) {
+    $excluded_turnos_lower = array_map(function ($t) {
         return mb_strtolower($t, 'UTF-8');
     }, $excluded_turnos);
 
@@ -73,7 +83,7 @@ $groups = array_values($groups);
 include('../../../app/controllers/grupos/materias_grupos.php');
 
 /* Definir un número máximo de intentos para evitar bucles infinitos */
-define('MAX_INTENTOS', 60);
+define('MAX_INTENTOS', 50);
 
 /* Función para asignar un bloque horario */
 function asignarBloqueHorario($pdo, $subject, $group, $dia, $start_time, $end_time, $tipo_espacio, &$mensajes_error)
@@ -208,7 +218,28 @@ function asignarBloqueHorario($pdo, $subject, $group, $dia, $start_time, $end_ti
                 return false; /* El profesor ya tiene una materia asignada en este horario */
             }
         }
+    }
 
+    /* Verificar si la asignación exacta ya existe para evitar duplicados */
+    $check_duplicate_sql = "SELECT COUNT(*) FROM schedule_assignments
+        WHERE teacher_id = :teacher_id
+        AND schedule_day = :schedule_day
+        AND start_time = :start_time
+        AND end_time = :end_time";
+    $check_duplicate_params = [
+        ':teacher_id' => $subject['teacher_id'],
+        ':schedule_day' => $dia,
+        ':start_time' => $formatted_start_time,
+        ':end_time' => $formatted_end_time
+    ];
+
+    $check_duplicate_stmt = $pdo->prepare($check_duplicate_sql);
+    $check_duplicate_stmt->execute($check_duplicate_params);
+
+    if ($check_duplicate_stmt->fetchColumn() > 0) {
+        error_log("Asignación duplicada detectada para el profesor ID: {$subject['teacher_id']} en $dia de $formatted_start_time a $formatted_end_time.");
+        $mensajes_error[] = "El profesor (ID: {$subject['teacher_id']}) ya tiene una asignación el $dia de $formatted_start_time a $formatted_end_time.";
+        return false;
     }
 
     /* Insertar el bloque horario en la base de datos */
@@ -359,7 +390,14 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
                 /* Calcular las horas que se pueden asignar sin exceder el máximo */
                 $horas_disponibles_dia = $max_consecutive_hours - ($horas_asignadas_por_materia_dia[$dia][$subject_id] ?? 0);
                 $horas_disponibles_en_dia = floor(($fin_turno - $inicio_actual) / 3600);
-                $horas_a_asignar = min($remaining_hours, $horas_disponibles_dia, $horas_disponibles_en_dia);
+
+                /*El aventurero */
+                if ($tipo_espacio === 'Aula') {
+                    $horas_a_asignar = max($min_consecutive_hours, min($remaining_hours, $horas_disponibles_dia, $horas_disponibles_en_dia));
+                } else {
+                    $horas_a_asignar = min($remaining_hours, $horas_disponibles_dia, $horas_disponibles_en_dia);
+                }
+
 
                 /* Respetar las horas mínimas consecutivas */
                 // Ajustar min_consecutive_hours si las horas restantes son menores
@@ -512,6 +550,7 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
         }
     }
 }
+
 /* Función para verificar si todas las materias han sido asignadas */
 function todasMateriasAsignadas($subjects)
 {
@@ -561,44 +600,50 @@ foreach ($groups as $group) {
             break;
         }
 
-        // Eliminar asignaciones activas para este grupo antes de cada intento
-        $pdo->prepare("DELETE FROM schedule_assignments WHERE estado = 'activo' AND group_id = :group_id")
-            ->execute([':group_id' => $group['group_id']]);
+        try {
+            // Eliminar asignaciones activas para este grupo antes de cada intento
+            $pdo->prepare("DELETE FROM schedule_assignments WHERE estado = 'activo' AND group_id = :group_id")
+                ->execute([':group_id' => $group['group_id']]);
 
-        // Clonar el array de materias para no modificar el original en cada intento
-        $subjects = array_map(function ($subject) {
-            return [
-                'subject_id' => $subject['subject_id'],
-                'subject_name' => $subject['subject_name'],
-                'teacher_id' => $subject['teacher_id'],
-                'remaining_hours' => $subject['remaining_hours'],
-                'type' => $subject['type'],
-                'max_consecutive_hours' => $subject['max_consecutive_hours'],
-                'min_consecutive_hours' => $subject['min_consecutive_hours'],
-            ];
-        }, $subjects_by_group[$group['group_id']]);
+            // Clonar el array de materias para no modificar el original en cada intento
+            $subjects = array_map(function ($subject) {
+                return [
+                    'subject_id' => $subject['subject_id'],
+                    'subject_name' => $subject['subject_name'],
+                    'teacher_id' => $subject['teacher_id'],
+                    'remaining_hours' => $subject['remaining_hours'],
+                    'type' => $subject['type'],
+                    'max_consecutive_hours' => $subject['max_consecutive_hours'],
+                    'min_consecutive_hours' => $subject['min_consecutive_hours'],
+                ];
+            }, $subjects_by_group[$group['group_id']]);
 
-        // Priorizar asignaciones de Laboratorio en turnos prioritarios
-        usort($subjects, function ($a, $b) {
-            // Priorizar Laboratorios
-            if ($a['type'] === 'Laboratorio' && $b['type'] !== 'Laboratorio') {
-                return -1;
+            // Priorizar asignaciones de Laboratorio en turnos prioritarios
+            usort($subjects, function ($a, $b) {
+                // Priorizar Laboratorios
+                if ($a['type'] === 'Laboratorio' && $b['type'] !== 'Laboratorio') {
+                    return -1;
+                }
+                if ($a['type'] !== 'Laboratorio' && $b['type'] === 'Laboratorio') {
+                    return 1;
+                }
+                // Luego, por más horas restantes
+                return $b['remaining_hours'] - $a['remaining_hours'];
+            });
+
+            distribuirMateriasEnSemana($pdo, $group, $subjects, $horario_turno, $dias_turno, $mensajes_error, $horarios_disponibles);
+
+            // Verificar si todas las materias han sido asignadas
+            if (todasMateriasAsignadas($subjects)) {
+                $asignacion_completa = true;
+                error_log("Todas las materias asignadas para el grupo ID: {$group['group_id']} en $intento intento(s).");
+            } else {
+                error_log("Quedan materias por asignar para el grupo ID: {$group['group_id']} después del intento $intento.");
             }
-            if ($a['type'] !== 'Laboratorio' && $b['type'] === 'Laboratorio') {
-                return 1;
-            }
-            // Luego, por más horas restantes
-            return $b['remaining_hours'] - $a['remaining_hours'];
-        });
-
-        distribuirMateriasEnSemana($pdo, $group, $subjects, $horario_turno, $dias_turno, $mensajes_error, $horarios_disponibles);
-
-        // Verificar si todas las materias han sido asignadas
-        if (todasMateriasAsignadas($subjects)) {
-            $asignacion_completa = true;
-            error_log("Todas las materias asignadas para el grupo ID: {$group['group_id']} en $intento intento(s).");
-        } else {
-            error_log("Quedan materias por asignar para el grupo ID: {$group['group_id']} después del intento $intento.");
+        } catch (PDOException $e) {
+            error_log("Error durante la asignación en el intento $intento para el grupo ID: {$group['group_id']}: " . $e->getMessage());
+            $mensajes_error[] = "Error durante la asignación para el grupo ID: {$group['group_id']} en el intento $intento.";
+            break;
         }
     }
 
