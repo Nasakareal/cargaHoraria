@@ -658,12 +658,6 @@ max_consecutive_lab_hours = 5
 WHERE subject_id IN (1500, 1501, 1600);
 
 
-
-
-
-
-
-
 ALTER TABLE schedule_assignments
 ADD CONSTRAINT unique_teacher_schedule
 UNIQUE (teacher_id, schedule_day, start_time, end_time);
@@ -676,6 +670,27 @@ SET lab_hours = CASE
     WHEN subject_id = 1600 THEN 5
 END
 WHERE subject_id IN (1500, 1501, 1600);
+
+
+
+
+
+
+
+ALTER TABLE manual_schedule_assignments
+DROP INDEX schedule_id;
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

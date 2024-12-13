@@ -23,8 +23,8 @@ include('../../app/controllers/horarios_grupos/grupos_disponibles.php');
         </div>
     </form>
 </div>
-<?php
 
+<?php
 $materias = [];
 if (isset($_GET['id']) && !empty($_GET['id'])) {
     $group_id = $_GET['id'];
@@ -36,8 +36,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
     $materias = $queryMaterias->fetchAll(PDO::FETCH_ASSOC);
 }
 
-
-$queryAsignaciones = $pdo->prepare("SELECT a.subject_id, m.subject_name, a.start_time, a.end_time, a.schedule_day
+$queryAsignaciones = $pdo->prepare("SELECT a.assignment_id, a.subject_id, m.subject_name, a.start_time, a.end_time, a.schedule_day
                                     FROM manual_schedule_assignments a
                                     INNER JOIN subjects m ON a.subject_id = m.subject_id
                                     WHERE a.group_id = :group_id");
@@ -48,7 +47,6 @@ $asignaciones = $queryAsignaciones->fetchAll(PDO::FETCH_ASSOC);
 $events = [];
 
 foreach ($asignaciones as $asignacion) {
-    
     $daysOfWeek = ['lunes' => 1, 'martes' => 2, 'miércoles' => 3, 'jueves' => 4, 'viernes' => 5];
     $schedule_day_lower = strtolower($asignacion['schedule_day']);
 
@@ -71,13 +69,16 @@ foreach ($asignaciones as $asignacion) {
         'start' => $start_datetime,
         'end' => $end_datetime,
         'subject_id' => $asignacion['subject_id'],
+        'assignment_id' => $asignacion['assignment_id'],
         'backgroundColor' => '#FF5733',
         'borderColor' => '#FF5733',
         'textColor' => '#fff'
     ];
 }
+
 $events_json = json_encode($events);
 ?>
+
     <div class="content-header">
         <div class="container">
             <div class="row mb-2">
@@ -148,7 +149,6 @@ include('../../layout/mensajes.php');
 <script src="https://cdn.jsdelivr.net/npm/jquery-ui-dist/jquery-ui.min.js"></script>
 
 <script>
-    
     const events = <?php echo $events_json; ?>;
     const materias = <?php echo json_encode($materias); ?>;
     console.log("Eventos desde PHP:", events);
@@ -276,9 +276,124 @@ include('../../layout/mensajes.php');
                     }
                 });
             },
+            eventDrop: function (info) {
+                Swal.fire({
+                    title: '¿Deseas guardar la nueva asignación?',
+                    text: `El evento "${info.event.title}" ha sido movido. ¿Quieres guardar la nueva asignación?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Guardar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const start_time = info.event.start ? info.event.start.toISOString().slice(11, 19) : null;
+                        const end_time = info.event.end ? info.event.end.toISOString().slice(11, 19) : null;
+
+                        // Enviar el ID de la asignación junto con la actualización
+                        const assignment_id = info.event.extendedProps.assignment_id;
+
+                        $.ajax({
+                            url: '../../app/controllers/asignacion_manual/update.php', 
+                            type: 'POST',
+                            data: {
+                                assignment_id: assignment_id,  // Enviar el ID de la asignación existente
+                                subject_id: info.event.extendedProps.subject_id, 
+                                start_time: start_time,
+                                end_time: end_time,
+                                schedule_day: info.event.start ? info.event.start.toLocaleString('es', { weekday: 'long' }) : null,
+                                group_id: <?= $_GET['id']; ?> 
+                            },
+                            success: function(response) {
+                                var data = JSON.parse(response);
+                                if (data.status === 'success') {
+                                    Swal.fire({
+                                        title: 'Asignación guardada',
+                                        text: `La asignación "${info.event.title}" ha sido guardada correctamente.`,
+                                        icon: 'success',
+                                        confirmButtonText: 'Aceptar'
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: 'Error',
+                                        text: 'Hubo un problema al guardar la asignación.',
+                                        icon: 'error',
+                                        confirmButtonText: 'Aceptar'
+                                    });
+                                }
+                            },
+                            error: function() {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: 'Hubo un problema al intentar guardar la asignación.',
+                                    icon: 'error',
+                                    confirmButtonText: 'Aceptar'
+                                });
+                            }
+                        });
+                    } else {
+                        info.event.revert();
+                        Swal.fire({
+                            title: 'Movimiento cancelado',
+                            text: `El evento "${info.event.title}" ha sido revertido al lugar original.`,
+                            icon: 'info',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
+                });
+            },
+            eventClick: function(info) {
+                // Opción para eliminar evento
+                Swal.fire({
+                    title: '¿Deseas eliminar esta asignación?',
+                    text: `El evento "${info.event.title}" será eliminado.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const assignment_id = info.event.extendedProps.assignment_id;  // Asegúrate de que assignment_id esté disponible
+
+                        $.ajax({
+                            url: '../../app/controllers/asignacion_manual/delete.php', 
+                            type: 'POST',
+                            data: {
+                                assignment_id: assignment_id,  // Asegúrate de que assignment_id esté en las propiedades extendidas
+                                group_id: <?= $_GET['id']; ?>
+                            },
+                            success: function(response) {
+                                var data = JSON.parse(response);
+                                if (data.status === 'success') {
+                                    info.event.remove();
+                                    Swal.fire({
+                                        title: 'Asignación eliminada',
+                                        text: `La asignación "${info.event.title}" ha sido eliminada correctamente.`,
+                                        icon: 'success',
+                                        confirmButtonText: 'Aceptar'
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: 'Error',
+                                        text: 'Hubo un problema al eliminar la asignación.',
+                                        icon: 'error',
+                                        confirmButtonText: 'Aceptar'
+                                    });
+                                }
+                            },
+                            error: function() {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: 'Hubo un problema al intentar eliminar la asignación.',
+                                    icon: 'error',
+                                    confirmButtonText: 'Aceptar'
+                                });
+                            }
+                        });
+                    }
+                });
+            },
             events: events,
             eventDidMount: function(info) {
-                
                 if(info.event.start && info.event.start < new Date()) {
                     info.el.style.backgroundColor = "#FF6F61";
                 }
@@ -288,6 +403,7 @@ include('../../layout/mensajes.php');
         calendar.render();
     });
 </script>
+
 
 <style>
     .external-event {
