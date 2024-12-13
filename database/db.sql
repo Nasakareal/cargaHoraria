@@ -664,10 +664,25 @@ WHERE subject_id IN (1500, 1501, 1600);
 
 
 
-
 ALTER TABLE schedule_assignments
 ADD CONSTRAINT unique_teacher_schedule
 UNIQUE (teacher_id, schedule_day, start_time, end_time);
+
+
+UPDATE subject_labs
+SET lab_hours = CASE
+    WHEN subject_id = 1500 THEN 5
+    WHEN subject_id = 1501 THEN 7
+    WHEN subject_id = 1600 THEN 5
+END
+WHERE subject_id IN (1500, 1501, 1600);
+
+
+
+
+
+
+
 
 
 
