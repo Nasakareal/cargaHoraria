@@ -15,3 +15,6 @@ assignment_id=9, group_id=698
 assignment_id=, group_id=783
 assignment_id=, group_id=783, lab_id=
 assignment_id=28, group_id=783, lab_id=
+assignment_id=6, group_id=698, lab_id=
+assignment_id=5, group_id=698, lab_id=
+assignment_id=4, group_id=698, lab_id=

@@ -40,7 +40,7 @@ $asignaciones = $queryAsignaciones->fetchAll(PDO::FETCH_ASSOC);
 $events = [];
 
 foreach ($asignaciones as $asignacion) {
-    $daysOfWeek = ['lunes' => 1, 'martes' => 2, 'miércoles' => 3, 'jueves' => 4, 'viernes' => 5];
+    $daysOfWeek = ['lunes' => 1, 'martes' => 2, 'miércoles' => 3, 'jueves' => 4, 'viernes' => 5, 'sábado' => 6];
     $schedule_day_lower = strtolower($asignacion['schedule_day']);
 
     if (!isset($daysOfWeek[$schedule_day_lower])) {
