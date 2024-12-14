@@ -8,3 +8,10 @@ assignment_id=, group_id=698
 assignment_id=5, group_id=698
 assignment_id=6, group_id=698
 assignment_id=7, group_id=698
+assignment_id=8, group_id=707
+assignment_id=10, group_id=698
+assignment_id=11, group_id=698
+assignment_id=9, group_id=698
+assignment_id=, group_id=783
+assignment_id=, group_id=783, lab_id=
+assignment_id=28, group_id=783, lab_id=

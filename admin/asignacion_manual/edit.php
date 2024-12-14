@@ -1,30 +1,12 @@
 <?php
 include('../../app/config.php');
+include('../../app/helpers/verificar_admin.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/horarios_grupos/grupos_disponibles.php');
-?>
+include('../../app/controllers/asignacion_manual/listado_de_laboratorios.php');
+include('../../app/controllers/asignacion_manual/obtener_laboratorio.php');
 
-<!-- Content Wrapper. Contains page content -->
-<div class="content-wrapper">
 
-<!-- Selector de Grupos -->
-<div class="container">
-    <form method="GET" action="">
-        <div class="form-group">
-            <label for="groupSelector">Seleccione un grupo:</label>
-            <select id="groupSelector" name="id" class="form-control" onchange="this.form.submit()">
-                <option value="">-- Seleccionar grupo --</option>
-                <?php foreach ($grupos as $grupo): ?>
-                    <option value="<?= $grupo['group_id']; ?>" <?= isset($_GET['id']) && $_GET['id'] == $grupo['group_id'] ? 'selected' : ''; ?>>
-                        <?= htmlspecialchars($grupo['group_name']); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-    </form>
-</div>
-
-<?php
 $materias = [];
 if (isset($_GET['id']) && !empty($_GET['id'])) {
     $group_id = $_GET['id'];
@@ -36,11 +18,22 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
     $materias = $queryMaterias->fetchAll(PDO::FETCH_ASSOC);
 }
 
-$queryAsignaciones = $pdo->prepare("SELECT a.assignment_id, a.subject_id, m.subject_name, a.start_time, a.end_time, a.schedule_day
-                                    FROM manual_schedule_assignments a
-                                    INNER JOIN subjects m ON a.subject_id = m.subject_id
-                                    WHERE a.group_id = :group_id");
+$lab_id = isset($_GET['lab_id']) && !empty($_GET['lab_id']) ? $_GET['lab_id'] : null;
+
+$queryAsignaciones = $pdo->prepare("
+    SELECT a.assignment_id, a.subject_id, m.subject_name, a.start_time, a.end_time, a.schedule_day
+    FROM manual_schedule_assignments a
+    INNER JOIN subjects m ON a.subject_id = m.subject_id
+    WHERE a.group_id = :group_id" . 
+    ($lab_id ? " AND (a.lab1_assigned = :lab_id OR a.lab2_assigned = :lab_id)" : "")
+);
+
 $queryAsignaciones->bindParam(':group_id', $_GET['id'], PDO::PARAM_INT);
+
+if ($lab_id) {
+    $queryAsignaciones->bindParam(':lab_id', $lab_id, PDO::PARAM_INT);
+}
+
 $queryAsignaciones->execute();
 $asignaciones = $queryAsignaciones->fetchAll(PDO::FETCH_ASSOC);
 
@@ -76,8 +69,43 @@ foreach ($asignaciones as $asignacion) {
     ];
 }
 
+
+
 $events_json = json_encode($events);
 ?>
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+
+<!-- Selector de Grupos -->
+<div class="container">
+    <form method="GET" action="">
+    <div class="form-group">
+        <label for="groupSelector">Seleccione un grupo:</label>
+        <select id="groupSelector" name="id" class="form-control" onchange="this.form.submit()">
+            <option value="">-- Seleccionar grupo --</option>
+            <?php foreach ($grupos as $grupo): ?>
+                <option value="<?= $grupo['group_id']; ?>" <?= isset($_GET['id']) && $_GET['id'] == $grupo['group_id'] ? 'selected' : ''; ?>>
+                    <?= htmlspecialchars($grupo['group_name']); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+
+    <!-- Filtro de laboratorio -->
+<div class="form-group">
+    <label for="labSelector">Seleccione un laboratorio:</label>
+    <select id="labSelector" name="lab_id" class="form-control" onchange="this.form.submit()">
+        <option value="">-- Seleccionar laboratorio --</option>
+        <?php foreach ($labs as $lab): ?>
+            <option value="<?= $lab['lab_id']; ?>" <?= isset($_GET['lab_id']) && $_GET['lab_id'] == $lab['lab_id'] ? 'selected' : ''; ?>>
+                <?= htmlspecialchars($lab['lab_name']); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+</div>
+</form>
+</div>
 
     <div class="content-header">
         <div class="container">
@@ -151,8 +179,11 @@ include('../../layout/mensajes.php');
 <script>
     const events = <?php echo $events_json; ?>;
     const materias = <?php echo json_encode($materias); ?>;
+    const lab_id = <?= isset($_GET['lab_id']) && !empty($_GET['lab_id']) ? $_GET['lab_id'] : 'null'; ?>;
+
     console.log("Eventos desde PHP:", events);
     console.log("Materias desde PHP:", materias);
+    console.log("Laboratorio seleccionado:", lab_id);
 
     $(function () {
         /* Inicializar eventos arrastrables */
@@ -215,6 +246,19 @@ include('../../layout/mensajes.php');
                     info.draggedEl.parentNode.removeChild(info.draggedEl);
                 }
             },
+
+            // Filtrar los eventos dependiendo de si lab_id está presente o no
+            events: function(info, successCallback, failureCallback) {
+                if (lab_id && lab_id !== 'null') {
+                    // Filtrar solo los eventos relacionados con el laboratorio seleccionado
+                    const filteredEvents = events.filter(event => event.lab_id == lab_id);
+                    successCallback(filteredEvents);
+                } else {
+                    // Si no hay lab_id seleccionado, mostrar todos los eventos
+                    successCallback(events);
+                }
+            },
+
             eventReceive: function (info) {
                 Swal.fire({
                     title: '¿Deseas guardar la asignación?',
@@ -236,7 +280,8 @@ include('../../layout/mensajes.php');
                                 start_time: start_time,
                                 end_time: end_time,
                                 schedule_day: info.event.start ? info.event.start.toLocaleString('es', { weekday: 'long' }) : null,
-                                group_id: <?= $_GET['id']; ?> 
+                                group_id: <?= $_GET['id']; ?>,
+                                lab_id: lab_id
                             },
                             success: function(response) {
                                 var data = JSON.parse(response);
@@ -276,6 +321,7 @@ include('../../layout/mensajes.php');
                     }
                 });
             },
+
             eventDrop: function (info) {
                 Swal.fire({
                     title: '¿Deseas guardar la nueva asignación?',
@@ -289,19 +335,19 @@ include('../../layout/mensajes.php');
                         const start_time = info.event.start ? info.event.start.toISOString().slice(11, 19) : null;
                         const end_time = info.event.end ? info.event.end.toISOString().slice(11, 19) : null;
 
-                        // Enviar el ID de la asignación junto con la actualización
                         const assignment_id = info.event.extendedProps.assignment_id;
 
                         $.ajax({
                             url: '../../app/controllers/asignacion_manual/update.php', 
                             type: 'POST',
                             data: {
-                                assignment_id: assignment_id,  // Enviar el ID de la asignación existente
+                                assignment_id: assignment_id,
                                 subject_id: info.event.extendedProps.subject_id, 
                                 start_time: start_time,
                                 end_time: end_time,
                                 schedule_day: info.event.start ? info.event.start.toLocaleString('es', { weekday: 'long' }) : null,
-                                group_id: <?= $_GET['id']; ?> 
+                                group_id: <?= $_GET['id']; ?>,
+                                lab_id: lab_id
                             },
                             success: function(response) {
                                 var data = JSON.parse(response);
@@ -341,8 +387,8 @@ include('../../layout/mensajes.php');
                     }
                 });
             },
+
             eventClick: function(info) {
-                // Opción para eliminar evento
                 Swal.fire({
                     title: '¿Deseas eliminar esta asignación?',
                     text: `El evento "${info.event.title}" será eliminado.`,
@@ -352,13 +398,13 @@ include('../../layout/mensajes.php');
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        const assignment_id = info.event.extendedProps.assignment_id;  // Asegúrate de que assignment_id esté disponible
+                        const assignment_id = info.event.extendedProps.assignment_id;
 
                         $.ajax({
                             url: '../../app/controllers/asignacion_manual/delete.php', 
                             type: 'POST',
                             data: {
-                                assignment_id: assignment_id,  // Asegúrate de que assignment_id esté en las propiedades extendidas
+                                assignment_id: assignment_id,
                                 group_id: <?= $_GET['id']; ?>
                             },
                             success: function(response) {
@@ -392,6 +438,7 @@ include('../../layout/mensajes.php');
                     }
                 });
             },
+
             events: events,
             eventDidMount: function(info) {
                 if(info.event.start && info.event.start < new Date()) {

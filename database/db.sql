@@ -682,6 +682,9 @@ DROP INDEX schedule_id;
 
 
 
+ALTER TABLE manual_schedule_assignments
+ADD COLUMN lab1_assigned BOOLEAN DEFAULT 0,
+ADD COLUMN lab2_assigned BOOLEAN DEFAULT 0;
 
 
 
