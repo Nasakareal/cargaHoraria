@@ -2,7 +2,6 @@
 
 include('../../../app/config.php');
 
-/* Obtener y validar el ID del laboratorio */
 $lab_id = filter_input(INPUT_POST, 'lab_id', FILTER_VALIDATE_INT);
 if (!$lab_id) {
     session_start();
@@ -12,12 +11,10 @@ if (!$lab_id) {
     exit();
 }
 
-/* Iniciar sesión si no está activa */
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-/* Verificar si el usuario tiene permisos de administrador */
 if (!isset($_SESSION['sesion_rol']) || $_SESSION['sesion_rol'] != 1) {
     $_SESSION['mensaje'] = "No tienes permisos para eliminar laboratorios. Solo los administradores pueden realizar esta acción.";
     $_SESSION['icono'] = "error";
@@ -42,6 +39,5 @@ try {
     $_SESSION['icono'] = "error";
 }
 
-/* Redirigir al listado de laboratorios */
 header('Location: ' . APP_URL . "/admin/laboratorios");
 exit();

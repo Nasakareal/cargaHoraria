@@ -4,7 +4,8 @@ $sql = "SELECT
             l.lab_id, 
             l.lab_name, 
             l.fyh_creacion, 
-            l.description
+            l.description,
+            l.area
         FROM 
             labs l";
 

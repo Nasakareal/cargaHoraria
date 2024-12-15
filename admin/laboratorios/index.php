@@ -32,8 +32,6 @@ include('../../app/controllers/laboratorios/listado_de_laboratorios.php');
                                     <i class="bi bi-plus-square"></i> Agregar nuevo Laboratorio
                                 </a>
                             <?php endif; ?>
-
-
                             </div>
                         </div>
 
@@ -44,6 +42,7 @@ include('../../app/controllers/laboratorios/listado_de_laboratorios.php');
                                         <th class="text-center">Número</th>
                                         <th class="text-center">Nombre del Laboratorio</th>
                                         <th class="text-center">Descripción</th>
+                                        <th class="text-center">Área(s)</th>
                                         <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
@@ -58,6 +57,7 @@ include('../../app/controllers/laboratorios/listado_de_laboratorios.php');
                                             <td style="text-align: center"><?= $contador_labs; ?></td>
                                             <td class="text-center"><?= $lab['lab_name']; ?></td>
                                             <td class="text-center"><?= $lab['description']; ?></td>
+                                            <td class="text-center"><?= $lab['area']; ?></td>
                                             <td style="text-align: center">
                                                 <div class="btn-group" role="group" aria-label="Basic example">
                                                     <a href="show.php?id=<?= $lab_id; ?>" type="button" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>

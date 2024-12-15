@@ -10,6 +10,20 @@ if (!$lab_id) {
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/laboratorios/datos_del_laboratorio.php');
+
+$sql_programs = "SELECT 
+                    DISTINCT p.area  -- Usamos DISTINCT para obtener solo áreas únicas
+                 FROM
+                    programs p";
+
+$query_programs = $pdo->prepare($sql_programs);
+$query_programs->execute();
+$programs = $query_programs->fetchAll(PDO::FETCH_ASSOC);
+
+if (empty($programs)) {
+    $programs = [];
+}
+
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -31,16 +45,37 @@ include('../../app/controllers/laboratorios/datos_del_laboratorio.php');
                                 <div class="row">
                                     <!-- Campo oculto para el ID del laboratorio -->
                                     <input type="hidden" name="lab_id" value="<?= $lab_id; ?>">
+
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="lab_name">Nombre del laboratorio</label>
                                             <input type="text" class="form-control" id="lab_name" name="lab_name" value="<?= $lab_name; ?>" required>
                                         </div>
                                     </div>
+                                    
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="description">Descripción</label>
                                             <textarea class="form-control" id="description" name="description" rows="4"><?= $description; ?></textarea>
+                                        </div>
+                                    </div>
+
+                                    <!-- Campo para editar el área (Checkboxes) -->
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="area">Área(s)</label>
+                                            <div>
+                                                <?php foreach ($programs as $program): ?>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="area_<?= $program['area']; ?>" name="areas[]" value="<?= $program['area']; ?>"
+                                                            <?php if (in_array($program['area'], explode(',', $area)))
+                                                                echo 'checked'; ?>>
+                                                        <label class="form-check-label" for="area_<?= $program['area']; ?>">
+                                                            <?= $program['area']; ?>
+                                                        </label>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -64,6 +99,9 @@ include('../../app/controllers/laboratorios/datos_del_laboratorio.php');
     <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
+
+
+
 
 <?php
 include('../../admin/layout/parte2.php');

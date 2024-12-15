@@ -673,18 +673,30 @@ WHERE subject_id IN (1500, 1501, 1600);
 
 
 
-
-
-
-
 ALTER TABLE manual_schedule_assignments
 DROP INDEX schedule_id;
-
 
 
 ALTER TABLE manual_schedule_assignments
 ADD COLUMN lab1_assigned BOOLEAN DEFAULT 0,
 ADD COLUMN lab2_assigned BOOLEAN DEFAULT 0;
+
+
+
+
+
+
+
+
+
+
+ALTER TABLE labs ADD COLUMN area VARCHAR(255) NULL;
+
+
+
+
+
+
 
 
 

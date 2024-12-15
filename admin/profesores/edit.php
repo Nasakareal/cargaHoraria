@@ -19,7 +19,7 @@ $areas = [];
 foreach ($programs as $program) {
     if (!in_array($program['area'], array_column($areas, 'area_name'))) {
         $areas[] = [
-            'area_id' => $program['area'], // Usamos el campo `area` como `area_id` (puedes ajustar según sea necesario)
+            'area_id' => $program['area'],
             'area_name' => $program['area']
         ];
     }
@@ -67,34 +67,33 @@ foreach ($programs as $program) {
                                 </div>
 
                                 <!-- Áreas -->
-<div class="row">
-    <div class="col-md-12">
-        <div class="form-group">
-            <label for="areas">Áreas</label>
-            <div class="table-responsive">
-                <table class="table table-bordered">
-                    <tbody>
-                        <?php $counter = 0; ?>
-                        <tr>
-                            <?php foreach ($areas as $area): // Suponemos que $areas es un arreglo con las áreas ?>
-                                <td>
-                                    <input type="checkbox" name="areas[]" value="<?= $area['area_id']; ?>" id="area_<?= $area['area_id']; ?>" <?= in_array($area['area_id'], $areas_asignadas ?? []) ? 'checked' : ''; ?>>
-                                    <label for="area_<?= $area['area_id']; ?>"><?= htmlspecialchars($area['area_name']); ?></label>
-                                </td>
-                                <?php $counter++; ?>
-                                <?php if ($counter % 3 == 0): ?>
-                                    </tr><tr>
-                                <?php endif; ?>
-                            <?php endforeach; ?>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <small class="text-muted">Seleccione una o más áreas.</small>
-        </div>
-    </div>
-</div>
-
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="areas">Áreas</label>
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered">
+                                                        <tbody>
+                                                            <?php $counter = 0; ?>
+                                                            <tr>
+                                                                <?php foreach ($areas as $area): ?>
+                                                                    <td>
+                                                                        <input type="checkbox" name="areas[]" value="<?= $area['area_id']; ?>" id="area_<?= $area['area_id']; ?>" <?= in_array($area['area_id'], $areas_asignadas ?? []) ? 'checked' : ''; ?>>
+                                                                        <label for="area_<?= $area['area_id']; ?>"><?= htmlspecialchars($area['area_name']); ?></label>
+                                                                    </td>
+                                                                    <?php $counter++; ?>
+                                                                    <?php if ($counter % 3 == 0): ?>
+                                                                        </tr><tr>
+                                                                    <?php endif; ?>
+                                                                <?php endforeach; ?>
+                                                            </tr>
+                                                         </tbody>
+                                                    </table>
+                                                </div>
+                                                <small class="text-muted">Seleccione una o más áreas.</small>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                 <!-- Horarios Disponibles -->
                                 <div class="row">
@@ -186,20 +185,16 @@ foreach ($programs as $program) {
             horariosTable.appendChild(newRow);
         });
 
-        // Eliminar horario
         horariosTable.addEventListener('click', function (event) {
             if (event.target.classList.contains('remove-row')) {
                 event.target.closest('tr').remove();
             }
         });
 
-        /* Cambiar clasificación */
         document.getElementById('clasificacion').addEventListener('change', function () {
             const clasificacion = this.value;
             const programaAdscripcion = document.getElementById('programa_adscripcion');
             const checkboxes = document.querySelectorAll('input[name="programas[]"]');
-
-            /* Guardar automáticamente los cambios */
             const formData = new FormData(document.getElementById('editForm'));
             fetch('<?= APP_URL; ?>/app/controllers/profesores/update.php', {
                 method: 'POST',
