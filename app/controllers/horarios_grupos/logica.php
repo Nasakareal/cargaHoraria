@@ -44,14 +44,7 @@ function restaurarAsignacionesLaboratorio($pdo)
                             'Laboratorio'
                         FROM manual_schedule_assignments m
                         WHERE m.tipo_espacio = 'Laboratorio'
-                          AND NOT EXISTS (
-                              SELECT 1 FROM schedule_assignments s
-                              WHERE s.group_id = m.group_id
-                                AND s.schedule_day = m.schedule_day
-                                AND s.start_time = m.start_time
-                                AND s.end_time = m.end_time
-                                AND s.tipo_espacio = 'Laboratorio'
-                          )";
+                          ";
 
         $rows_affected = $pdo->exec($sql_restore);
         error_log("Consulta de restauración ejecutada: $sql_restore");
