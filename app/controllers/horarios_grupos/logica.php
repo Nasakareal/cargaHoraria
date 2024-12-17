@@ -29,25 +29,33 @@ function restaurarAsignacionesLaboratorio($pdo)
     try {
         error_log("Iniciando la restauración de asignaciones de laboratorio...");
 
-        $sql_restore = "INSERT INTO schedule_assignments 
-                        (subject_id, group_id, teacher_id, classroom_id, schedule_day, start_time, end_time, estado, fyh_creacion, tipo_espacio)
-                        SELECT 
-                            m.subject_id, 
-                            m.group_id, 
-                            NULL AS teacher_id, 
-                            NULL AS classroom_id, 
-                            m.schedule_day, 
-                            m.start_time, 
-                            m.end_time, 
-                            'activo', 
-                            NOW(), 
-                            'Laboratorio'
-                        FROM manual_schedule_assignments m
-                        WHERE m.tipo_espacio = 'Laboratorio'
-                          ";
+        $sql_restore = "
+            INSERT INTO schedule_assignments 
+                (subject_id, group_id, teacher_id, classroom_id, schedule_day, start_time, end_time, estado, fyh_creacion, tipo_espacio)
+            SELECT 
+                m.subject_id, 
+                m.group_id, 
+                t.teacher_id AS teacher_id,
+                c.classroom_id AS classroom_id,
+                m.schedule_day, 
+                m.start_time, 
+                m.end_time, 
+                'activo', 
+                NOW(), 
+                'Laboratorio'
+            FROM manual_schedule_assignments m
+            LEFT JOIN teachers t ON m.teacher_id = t.teacher_id
+            LEFT JOIN classrooms c ON m.classroom_id = c.classroom_id
+            WHERE m.tipo_espacio = 'Laboratorio'
+        ";
 
-        $rows_affected = $pdo->exec($sql_restore);
+        // Registrar la consulta para depuración
         error_log("Consulta de restauración ejecutada: $sql_restore");
+
+        // Preparar y ejecutar la consulta para obtener el número de filas afectadas
+        $stmt = $pdo->prepare($sql_restore);
+        $stmt->execute();
+        $rows_affected = $stmt->rowCount();
 
         if ($rows_affected > 0) {
             error_log("Asignaciones de laboratorio restauradas exitosamente: $rows_affected filas insertadas.");
@@ -56,12 +64,20 @@ function restaurarAsignacionesLaboratorio($pdo)
         }
     } catch (PDOException $e) {
         error_log("Error al restaurar asignaciones de laboratorio: " . $e->getMessage());
+        // **Solo para desarrollo:** Muestra el error en la página
+        echo "Error al restaurar asignaciones de laboratorio: " . $e->getMessage();
+        exit();
+
+        /*
+        // **Para producción:** Utiliza redirección y mensajes de sesión
         $_SESSION['mensaje'] = "Error al restaurar asignaciones de laboratorio.";
         $_SESSION['icono'] = "error";
         header('Location:' . APP_URL . "/admin/horarios_grupos/");
         exit();
+        */
     }
 }
+
 
 restaurarAsignacionesLaboratorio($pdo);
 
