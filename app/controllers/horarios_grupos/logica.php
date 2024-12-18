@@ -202,7 +202,6 @@ function asignarBloqueHorario($pdo, $subject, $group, $dia, $start_time, $end_ti
         return false;
     }
 
-    // Insertar la asignación
     $sql_insert = "INSERT INTO schedule_assignments 
                    (subject_id, group_id, teacher_id, classroom_id, schedule_day, start_time, end_time, estado, fyh_creacion, tipo_espacio)
                    VALUES (:subject_id, :group_id, :teacher_id, :classroom_id, :schedule_day, :start_time, :end_time, 'activo', NOW(), :tipo_espacio)";
