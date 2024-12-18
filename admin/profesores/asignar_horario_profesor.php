@@ -2,7 +2,6 @@
 include('../../app/config.php');
 include('../../app/middleware.php');
 
-/* Verificar si el usuario tiene el permiso */
 if (!verificarPermiso($_SESSION['sesion_id_usuario'], 'teacher_assign', $pdo)) {
     $_SESSION['mensaje'] = "No tienes permiso para asignar profesores a materias y grupos.";
     $_SESSION['icono'] = "error";
@@ -14,10 +13,8 @@ if (!verificarPermiso($_SESSION['sesion_id_usuario'], 'teacher_assign', $pdo)) {
     exit;
 }
 
-/* Obtener el ID del profesor */
 $teacher_id = filter_input(INPUT_GET, 'teacher_id', FILTER_VALIDATE_INT);
 
-/* Verificar si el ID es válido */
 if (!$teacher_id) {
     echo "ID de profesor inválido.";
     exit;

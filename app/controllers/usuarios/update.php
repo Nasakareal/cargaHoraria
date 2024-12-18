@@ -6,42 +6,44 @@ $id_usuario = $_POST['id_usuario'];
 $nombres = $_POST['nombres'];
 $rol_id = $_POST['rol_id'];
 $email = $_POST['email'];
+$area = $_POST['area'];
 $password = $_POST['password'];
 $password_repet = $_POST['password_repet'];
 $fechaHora = date("Y-m-d H:i:s");
 
-/* Verificar si se desea cambiar la contraseña */
 if ($password == "") {
-    /* No se cambia la contraseña */
     $sentencia = $pdo->prepare("UPDATE usuarios
         SET nombres=:nombres,
-        rol_id=:rol_id,
-        email=:email,
-        fyh_actualizacion=:fyh_actualizacion
+            rol_id=:rol_id,
+            email=:email,
+            area=:area,
+            fyh_actualizacion=:fyh_actualizacion
         WHERE id_usuario=:id_usuario");
     
     $sentencia->bindParam(':nombres', $nombres);
     $sentencia->bindParam(':rol_id', $rol_id);
     $sentencia->bindParam(':email', $email);
+    $sentencia->bindParam(':area', $area);
     $sentencia->bindParam(':fyh_actualizacion', $fechaHora);
     $sentencia->bindParam(':id_usuario', $id_usuario);
 
 } else {
-    /* Cambiar la contraseña si las contraseñas coinciden */
     if ($password == $password_repet) {
-        $password_encriptada = password_hash($password, PASSWORD_BCRYPT); // Encriptar la nueva contraseña
+        $password_encriptada = password_hash($password, PASSWORD_BCRYPT);
 
         $sentencia = $pdo->prepare("UPDATE usuarios
             SET nombres=:nombres,
-            rol_id=:rol_id,
-            email=:email,
-            password=:password,
-            fyh_actualizacion=:fyh_actualizacion
+                rol_id=:rol_id,
+                email=:email,
+                area=:area,
+                password=:password,
+                fyh_actualizacion=:fyh_actualizacion
             WHERE id_usuario=:id_usuario");
         
         $sentencia->bindParam(':nombres', $nombres);
         $sentencia->bindParam(':rol_id', $rol_id);
         $sentencia->bindParam(':email', $email);
+        $sentencia->bindParam(':area', $area);
         $sentencia->bindParam(':password', $password_encriptada);
         $sentencia->bindParam(':fyh_actualizacion', $fechaHora);
         $sentencia->bindParam(':id_usuario', $id_usuario);

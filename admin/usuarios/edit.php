@@ -7,6 +7,12 @@ include('../../app/helpers/verificar_admin.php');
 include ('../../admin/layout/parte1.php');
 include ('../../app/controllers/usuarios/datos_del_usuario.php');
 include ('../../app/controllers/roles/listado_de_roles.php');
+
+$sql_areas = "SELECT DISTINCT area FROM programs";
+$query_areas = $pdo->prepare($sql_areas);
+$query_areas->execute();
+$areas = $query_areas->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -62,7 +68,7 @@ include ('../../app/controllers/roles/listado_de_roles.php');
                       </div>
                     </div>
                     <div class="row">
-                    <div class="col-md-4">
+                      <div class="col-md-4">
                         <div class="form-group">
                           <label for="">Password</label>
                           <input type="password" name="password" class="form-control">
@@ -73,6 +79,20 @@ include ('../../app/controllers/roles/listado_de_roles.php');
                         <div class="form-group">
                           <label for="">Repetir Password</label>
                           <input type="password" name="password_repet" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="">Área</label>
+                          <select name="area" id="area" class="form-control" required>
+                              <option value="" disabled>Seleccione un área</option>
+                              <?php foreach ($areas as $area_item): ?>
+                                  <option value="<?= $area_item['area']; ?>" 
+                                      <?php if ($area_item['area'] == $area): ?> selected <?php endif; ?>>
+                                      <?= $area_item['area']; ?>
+                                  </option>
+                              <?php endforeach; ?>
+                          </select>
                         </div>
                       </div>
                     </div>

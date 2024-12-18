@@ -62,10 +62,18 @@ include('../../app/controllers/usuarios/datos_del_usuario.php');
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
+                          <label for="">Área</label>
+                          <p><?= $area; ?></p> <!-- Mostrar el área -->
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
                           <label for="">Fecha y Hora de creación</label>
                           <p><?= $fyh_creacion; ?></p>
                         </div>
                       </div>
+                    </div>
+                    <div class="row">
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="">Estado</label>

@@ -695,6 +695,8 @@ ALTER TABLE labs ADD COLUMN area VARCHAR(255) NULL;
 
 
 
+ALTER TABLE usuarios
+ADD COLUMN area VARCHAR(255) COLLATE utf8mb4_spanish_ci NULL;
 
 
 
