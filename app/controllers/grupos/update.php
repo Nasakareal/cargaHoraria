@@ -8,10 +8,11 @@ $term_id = $_POST['term_id'];
 $volume = $_POST['volume'];
 $turn_id = $_POST['turn_id'];
 $nivel_id = $_POST['nivel_id'];
+$classroom_assigned = $_POST['classroom_id'];
 
 $group_name = mb_strtoupper($group_name, 'UTF-8');
 
-if (empty($group_name) || empty($program_id) || empty($term_id) || empty($turn_id) || empty($nivel_id)) {
+if (empty($group_name) || empty($program_id) || empty($term_id) || empty($turn_id) || empty($nivel_id) || empty($classroom_assigned)) {
     session_start();
     $_SESSION['mensaje'] = "Todos los campos son obligatorios.";
     $_SESSION['icono'] = "error";
@@ -25,6 +26,7 @@ $sentencia = $pdo->prepare("UPDATE `groups`
                                 term_id = :term_id, 
                                 volume = :volume, 
                                 turn_id = :turn_id, 
+                                classroom_assigned = :classroom_assigned, 
                                 fyh_actualizacion = NOW() 
                             WHERE group_id = :group_id");
 
@@ -33,6 +35,7 @@ $sentencia->bindParam(':program_id', $program_id);
 $sentencia->bindParam(':term_id', $term_id);
 $sentencia->bindParam(':volume', $volume);
 $sentencia->bindParam(':turn_id', $turn_id);
+$sentencia->bindParam(':classroom_assigned', $classroom_assigned);
 $sentencia->bindParam(':group_id', $group_id);
 
 try {
@@ -48,13 +51,11 @@ try {
     $nivel_existente = $sentencia_verificar->fetch(PDO::FETCH_ASSOC);
 
     if ($nivel_existente) {
-        
         $stmt_level_name = $pdo->prepare("SELECT level_name FROM `educational_levels` WHERE level_id = :nivel_id");
         $stmt_level_name->bindParam(':nivel_id', $nivel_id);
         $stmt_level_name->execute();
         $level_name = $stmt_level_name->fetchColumn();
 
-        
         $sentencia_nivel = $pdo->prepare("UPDATE `educational_levels`
                                           SET level_name = :level_name
                                           WHERE group_id = :group_id");
@@ -75,17 +76,14 @@ try {
         throw new Exception("No se pudo actualizar o insertar el nivel educativo en la tabla `educational_levels`.");
     }
 
-    /* Buscar y añadir materias del programa educativo */
     $stmt_subjects = $pdo->prepare("SELECT subject_id FROM subjects WHERE program_id = :program_id AND term_id = :term_id");
     $stmt_subjects->execute([':program_id' => $program_id, ':term_id' => $term_id]);
     $subjects = $stmt_subjects->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($subjects as $subject) {
-        /* Verificar si la materia ya está asignada */
         $stmt_check_subject = $pdo->prepare("SELECT * FROM group_subjects WHERE group_id = :group_id AND subject_id = :subject_id");
         $stmt_check_subject->execute([':group_id' => $group_id, ':subject_id' => $subject['subject_id']]);
         if (!$stmt_check_subject->fetch(PDO::FETCH_ASSOC)) {
-            /* Insertar materia si no está asignada */
             $stmt_group_subject = $pdo->prepare("INSERT INTO group_subjects (group_id, subject_id, fyh_creacion, estado) 
                                                  VALUES (:group_id, :subject_id, NOW(), '1')");
             $stmt_group_subject->execute([':group_id' => $group_id, ':subject_id' => $subject['subject_id']]);

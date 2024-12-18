@@ -12,6 +12,7 @@ include('../../app/controllers/programas/listado_de_programas.php');
 include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
 include('../../app/controllers/turnos/listado_de_turnos.php');
 include('../../app/controllers/niveles/listado_de_niveles.php');
+include('../../app/controllers/salones/listado_de_salones.php');
 
 $group_name = isset($group_name) ? $group_name : "Grupo no encontrado";
 $program_id = isset($program_id) ? $program_id : null;
@@ -129,6 +130,50 @@ $nivel_id = isset($nivel_id) ? $nivel_id : null;
                                     </div>
                                 </div>
 
+                                <!-- Campo para seleccionar Edificio -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="building_id">Edificio</label>
+                                            <select id="building_id" name="building_id" class="form-control">
+                                            <option value="">Seleccione un Edificio</option>
+                                                <?php 
+                                                $buildings = array_unique(array_column($classrooms, 'edificio'));
+                                                foreach ($buildings as $building): ?>
+                                                    <option value="<?= htmlspecialchars($building, ENT_QUOTES, 'UTF-8'); ?>">
+                                                        <?= htmlspecialchars($building, ENT_QUOTES, 'UTF-8'); ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Campo para seleccionar Planta -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="floor_id">Planta</label>
+                                            <select id="floor_id" name="floor_id" class="form-control" disabled>
+                                                <option value="">Seleccione una Planta</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Campo para seleccionar Salón -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="classroom_id">Salón</label>
+                                            <select id="classroom_id" name="classroom_id" class="form-control" disabled>
+                                                <option value="">Seleccione un Salón</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+
                                 <hr>
                                 <div class="row">
                                     <div class="col-md-12">
@@ -151,3 +196,45 @@ $nivel_id = isset($nivel_id) ? $nivel_id : null;
 include('../../admin/layout/parte2.php');
 include('../../layout/mensajes.php');
 ?>
+
+<!-- Scripts para manejar la interactividad -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const buildingSelect = document.getElementById("building_id");
+    const floorSelect = document.getElementById("floor_id");
+    const classroomSelect = document.getElementById("classroom_id");
+
+    const classrooms = <?= json_encode($classrooms); ?>;
+
+    buildingSelect.addEventListener("change", function() {
+        const building = buildingSelect.value;
+        floorSelect.innerHTML = '<option value="">Seleccione una Planta</option>';
+        classroomSelect.innerHTML = '<option value="">Seleccione un Salón</option>';
+        floorSelect.disabled = true;
+        classroomSelect.disabled = true;
+
+        if (building) {
+            const floors = [...new Set(classrooms.filter(c => c.edificio === building).map(c => c.planta))];
+            floors.forEach(floor => {
+                floorSelect.innerHTML += `<option value="${floor}">${floor}</option>`;
+            });
+            floorSelect.disabled = false;
+        }
+    });
+
+    floorSelect.addEventListener("change", function() {
+        const building = buildingSelect.value;
+        const floor = floorSelect.value;
+        classroomSelect.innerHTML = '<option value="">Seleccione un Salón</option>';
+        classroomSelect.disabled = true;
+
+        if (building && floor) {
+            const filteredClassrooms = classrooms.filter(c => c.edificio === building && c.planta === floor);
+            filteredClassrooms.forEach(classroom => {
+                classroomSelect.innerHTML += `<option value="${classroom.classroom_id}">${classroom.nombre_salon}</option>`;
+            });
+            classroomSelect.disabled = false;
+        }
+    });
+});
+</script>
