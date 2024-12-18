@@ -2,6 +2,11 @@
 
 include('../../config.php');
 
+/* Iniciar sesión si no está ya iniciada */
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 /* Obtener datos de la sesión */
 $email_sesion = $_SESSION['sesion_email'];
 $rol_id = $_SESSION['sesion_rol']; // ID del rol
@@ -26,6 +31,7 @@ try {
     }
 
     $area_usuario = $usuario['area'];
+    $areas = array_map('trim', explode(',', $area_usuario)); // Convertir a array y eliminar espacios
 
     if ($rol_id == 1) {
         $sql_grupos = "
@@ -37,16 +43,25 @@ try {
         $stmt_grupos = $pdo->prepare($sql_grupos);
         $stmt_grupos->execute();
     } else {
+        if (empty($areas)) {
+            echo "<option value=''>No se han asignado áreas al usuario</option>";
+            exit;
+        }
+
+        // Crear placeholders dinámicamente
+        $placeholders = implode(',', array_fill(0, count($areas), '?'));
+
         $sql_grupos = "
             SELECT DISTINCT g.group_id, g.group_name, s.shift_name
             FROM `groups` g
             INNER JOIN `shifts` s ON g.turn_id = s.shift_id
             WHERE g.estado = '1'
-              AND g.area = :area_usuario
+              AND g.area IN ($placeholders)
         ";
         $stmt_grupos = $pdo->prepare($sql_grupos);
-        $stmt_grupos->bindParam(':area_usuario', $area_usuario);
-        $stmt_grupos->execute();
+        
+        // Ejecutar con el array de áreas
+        $stmt_grupos->execute($areas);
     }
 
     $grupos_disponibles = $stmt_grupos->fetchAll(PDO::FETCH_ASSOC);

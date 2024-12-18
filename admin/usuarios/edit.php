@@ -13,8 +13,10 @@ $query_areas = $pdo->prepare($sql_areas);
 $query_areas->execute();
 $areas = $query_areas->fetchAll(PDO::FETCH_ASSOC);
 
-?>
+// Obtener las áreas actuales del usuario, suponiendo que están almacenadas como una cadena separada por comas
+$user_areas = !empty($area) ? explode(',', $area) : [];
 
+?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <br>
@@ -36,9 +38,9 @@ $areas = $query_areas->fetchAll(PDO::FETCH_ASSOC);
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="">Nombre del rol</label>
-                          <input type="text" name="id_usuario" value="<?=$id_usuario;?>" hidden>
+                          <input type="hidden" name="id_usuario" value="<?=$id_usuario;?>">
                           <div class="form-inline">
-                          <select name="rol_id" id="" class="form-control">
+                          <select name="rol_id" class="form-control">
                           <?php 
                           foreach ($roles as $role){ 
                             $nombre_rol_tabla = $role['nombre_rol']?>
@@ -83,16 +85,18 @@ $areas = $query_areas->fetchAll(PDO::FETCH_ASSOC);
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
-                          <label for="">Área</label>
-                          <select name="area" id="area" class="form-control" required>
-                              <option value="" disabled>Seleccione un área</option>
-                              <?php foreach ($areas as $area_item): ?>
-                                  <option value="<?= $area_item['area']; ?>" 
-                                      <?php if ($area_item['area'] == $area): ?> selected <?php endif; ?>>
-                                      <?= $area_item['area']; ?>
-                                  </option>
-                              <?php endforeach; ?>
-                          </select>
+                          <label for="">Áreas</label>
+                          <div class="form-control" style="height:auto; padding:10px;">
+                            <?php foreach ($areas as $area_item): ?>
+                                <div class="form-check">
+                                  <input class="form-check-input" type="checkbox" name="areas[]" value="<?= htmlspecialchars($area_item['area']); ?>" id="area_<?= htmlspecialchars($area_item['area']); ?>" 
+                                  <?php if (in_array($area_item['area'], $user_areas)) echo 'checked'; ?>>
+                                  <label class="form-check-label" for="area_<?= htmlspecialchars($area_item['area']); ?>">
+                                    <?= htmlspecialchars($area_item['area']); ?>
+                                  </label>
+                                </div>
+                            <?php endforeach; ?>
+                          </div>
                         </div>
                       </div>
                     </div>
