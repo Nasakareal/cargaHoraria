@@ -1,6 +1,5 @@
 <?php
 include('../../app/config.php');
-include('../../app/helpers/verificar_admin.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/horarios_grupos/grupos_disponibles.php');
 include('../../app/controllers/asignacion_manual/listado_de_laboratorios.php');

@@ -1,6 +1,5 @@
 <?php
 include('../../app/config.php');
-include('../../app/helpers/verificar_admin.php');
 include('../../admin/layout/parte1.php');
 
 

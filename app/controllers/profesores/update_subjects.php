@@ -30,8 +30,14 @@ try {
             $sentencia_obtener_horarios->execute([$materia_id, $grupo_id]);
             $horarios_nuevos = $sentencia_obtener_horarios->fetchAll(PDO::FETCH_ASSOC);
 
+            /* **ELIMINACIÓN DE LA EXCEPCIÓN**:
+               No lanzar excepción si no se encuentran horarios.
+               Simplemente continuar el proceso. */
             if (empty($horarios_nuevos)) {
-                throw new Exception("No se encontraron horarios para la materia ID $materia_id y grupo ID $grupo_id.");
+                // Opcional: Puedes registrar un aviso o mensaje de log si lo deseas.
+                // Por ejemplo:
+                // error_log("No se encontraron horarios para la materia ID $materia_id y grupo ID $grupo_id.");
+                continue; // Saltar a la siguiente asignación
             }
 
             foreach ($horarios_nuevos as $horario_nuevo) {
