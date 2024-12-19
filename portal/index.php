@@ -1,149 +1,163 @@
 <?php
-include ('../app/config.php');
-include ('../layout/parte1.php');
-include('../app/controllers/profesores/listado_de_profesores.php');
-include('../app/controllers/materias/listado_de_materias.php');
-include('../app/controllers/programas/listado_de_programas.php');
-include('../app/controllers/grupos/listado_de_grupos.php');
-include('../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
+include('../app/config.php');
+include('../layout/parte1.php');
+include('../app/controllers/materias/obtener_materias.php');
+include('../app/controllers/materias/programas_no_asignados.php');
+
+
+$grupos_materias_faltantes = isset($grupos_materias_faltantes) ? $grupos_materias_faltantes : [];
+$total_grupos = count($grupos_materias_faltantes);
+
+$materias_cubiertas = 0;
+$materias_no_cubiertas = 0;
+
+
+foreach ($grupos_materias_faltantes as $grupo) {
+    $materias_cubiertas += $grupo['materias_asignadas'];
+    $materias_no_cubiertas += $grupo['materias_no_cubiertas'];
+}
+
+$total_materias = $materias_cubiertas + $materias_no_cubiertas;
+$porcentaje_cubiertas = $total_materias > 0 ? round(($materias_cubiertas / $total_materias) * 100, 2) : 0;
+$porcentaje_no_cubiertas = 100 - $porcentaje_cubiertas;
 ?>
 
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
+<!-- Content Wrapper -->
+<div class="content-wrapper">
     <br>
-    <div class="contentainer">
-      <div class="container">
-        <div class="row">
-          <h1><?=APP_NAME;?></h1>
+    <div class="container">
+        <div class="row justify-content-center">
+            <h1 class="text-center"><?= APP_NAME; ?></h1>
         </div>
         <br>
-        <div class="row">
-
-          
-            <div class="col-lg-3 col-6">
-            <div class="small-box bg-info">
-              <div class="inner">
-                <?php
-                $contador_teachers = 0;
-                foreach ($teachers as $teacher) {
-                    $contador_teachers++;
-                }
-                ?>
-                <h3><?= $contador_teachers; ?></h3>
-                <p>Profesores registrados</p>
-              </div>
-              <div class="icon">
-                <i class="fas"><i class="bi bi-people-fill"></i></i>
-              </div>
-              <a href="<?= APP_URL; ?>/portal/profesores" class="small-box-footer">
-                Más información <i class="fas fa-arrow-circle-right"></i>
-              </a>
+        <div class="row justify-content-center">
+            <!-- Gráfico de Pastel -->
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title text-center">Materias Cubiertas</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-center">
+                            <canvas id="materiasChart"></canvas>
+                        </div>
+                        <p class="mt-3 text-center">
+                            <strong>Porcentaje de Materias Cubiertas:</strong> <?php echo $porcentaje_cubiertas; ?>%<br>
+                            <strong>Porcentaje de Materias No Cubiertas:</strong> <?php echo $porcentaje_no_cubiertas; ?>%
+                        </p>
+                    </div>
+                </div>
             </div>
-          </div>
+<!-- Listado de Grupos con Materias No Asignadas -->
+<div class="col-md-7">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title text-center">Grupos con Materias Sin Profesor</h3>
+        </div>
+        <div class="card-body">
+            <p class="text-center"><strong>Total de Grupos Faltantes:</strong> <?php echo $total_grupos; ?></p>
+            <p class="text-center"><strong>Total de Materias Faltantes:</strong> <?php echo $materias_no_cubiertas; ?></p>
 
-            <div class="col-lg-3 col-6">
-            <div class="small-box bg-info">
-              <div class="inner">
-                <?php
-                $contador_subjects = 0;
-                foreach ($subjects as $subject) {
-                    $contador_subjects++;
-                }
-                ?>
-                <h3><?= $contador_subjects; ?></h3>
-                <p>Materias registradas</p>
-              </div>
-              <div class="icon">
-                <i class="fas"><i class="bi bi-journal-bookmark-fill"></i></i>
-              </div>
-              <a href="<?= APP_URL; ?>/portal/materias" class="small-box-footer">
-                Más información <i class="fas fa-arrow-circle-right"></i>
-              </a>
-            </div>
-          </div>
-
-            <div class="col-lg-3 col-6">
-            <div class="small-box bg-info">
-              <div class="inner">
-                <?php
-                $contador_programs = 0;
-                foreach ($programs as $program) {
-                    $contador_programs++;
-                }
-                ?>
-                <h3><?= $contador_programs; ?></h3>
-                <p>Programas registrados</p>
-              </div>
-              <div class="icon">
-                <i class="fas"><i class="bi bi-backpack2"></i></i>
-              </div>
-              <a href="<?= APP_URL; ?>/portal/programas" class="small-box-footer">
-                Más información <i class="fas fa-arrow-circle-right"></i>
-              </a>
-            </div>
-          </div>
-
-            <div class="col-lg-3 col-6">
-            <div class="small-box bg-info">
-              <div class="inner">
-                <?php
-                $contador_groups = 0;
-                foreach ($groups as $group) {
-                    $contador_groups++;
-                }
-                ?>
-                <h3><?= $contador_groups; ?></h3>
-                <p>Grupos registrados</p>
-              </div>
-              <div class="icon">
-                <i class="fas"><i class="bi bi-boxes"></i></i>
-              </div>
-              <a href="<?= APP_URL; ?>/portal/grupos" class="small-box-footer">
-                Más información <i class="fas fa-arrow-circle-right"></i>
-              </a>
-            </div>
-          </div>
-
-            <div class="col-lg-3 col-6">
-            <div class="small-box bg-info">
-              <div class="inner">
-                <?php
-                $contador_terms = 0;
-                foreach ($terms as $term) {
-                    $contador_terms++;
-                }
-                ?>
-                <h3><?= $contador_terms; ?></h3>
-                <p>Cuatrimestres registrados</p>
-              </div>
-              <div class="icon">
-                <i class="fas"><i class="bi bi-calendar3"></i></i>
-              </div>
-              <a href="<?= APP_URL; ?>/portal/cuatrimestres" class="small-box-footer">
-                Más información <i class="fas fa-arrow-circle-right"></i>
-              </a>
-            </div>
-          </div>
-
+            <?php
             
+            $grupos_con_materias_faltantes = array_filter($grupos_materias_faltantes, function ($grupo) {
+                return isset($grupo['materias_faltantes']) && $grupo['materias_faltantes'] > 0;
+            });
+            ?>
 
-          
+            <?php if (!empty($grupos_con_materias_faltantes)): ?>
+                <table id="listadoMaterias" class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Grupo</th>
+                            <th>Materias Sin Profesor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($grupos_con_materias_faltantes as $grupo): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($grupo['grupo']); ?></td>
+                                <td><?php echo htmlspecialchars($grupo['materias_faltantes']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <p class="text-center">Todos los grupos tienen sus materias asignadas a profesores.</p>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
 
         </div>
-        <!-- /.row -->
-      </div><!-- /.container-fluid -->
     </div>
-    <!-- /.content -->
-  </div>
+</div>
 
-  <div>
-    <p>Hello There</p>
-  </div>
-  <!-- /.content-wrapper -->
-
-<?php 
-  
-include ('../layout/parte2.php');
-include ('../layout/mensajes.php');
-  
+<?php
+include('../admin/layout/parte2.php');
+include('../layout/mensajes.php');
 ?>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var ctx = document.getElementById('materiasChart').getContext('2d');
+        var materiasChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Cubierta', 'No Cubierta'],
+                datasets: [{
+                    data: [<?php echo $materias_cubiertas; ?>, <?php echo $materias_no_cubiertas; ?>],
+                    backgroundColor: ['#008080', '#A9A9A9'],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                var label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += context.raw;
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#listadoMaterias').DataTable({
+            "pageLength": 5,
+            "language": {
+                "emptyTable": "No hay grupos con materias sin profesor",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ grupos",
+                "infoEmpty": "Mostrando 0 a 0 de 0 grupos",
+                "infoFiltered": "(Filtrado de _MAX_ grupos en total)",
+                "lengthMenu": "Mostrar _MENU_ grupos",
+                "search": "Buscar:",
+                "zeroRecords": "Sin resultados encontrados",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            },
+            "responsive": true,
+            "lengthChange": true,
+            "autoWidth": false
+        });
+    });
+</script>

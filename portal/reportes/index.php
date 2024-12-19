@@ -1,6 +1,6 @@
 <?php
 include('../../app/config.php');
-include('../../admin/layout/parte1.php');
+include('../../layout/parte1.php');
 
 ?>
 

@@ -549,6 +549,7 @@ include('../../layout/mensajes.php');
     }
 
     .fc-timegrid-event {
+        font-size: 10px;
         background-color: #8B0000 !important;
         border-color: #660000 !important;
         color: white !important;
