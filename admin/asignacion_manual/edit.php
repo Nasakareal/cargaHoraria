@@ -36,9 +36,11 @@ $sql = "
         a.start_time, 
         a.end_time, 
         a.schedule_day,
-        a.group_id
+        a.group_id,
+        g.group_name
     FROM manual_schedule_assignments a
     INNER JOIN subjects m ON a.subject_id = m.subject_id
+    INNER JOIN `groups` g ON a.group_id = g.group_id
     WHERE a.schedule_day IS NOT NULL
 ";
 
@@ -78,7 +80,7 @@ foreach ($asignaciones as $asignacion) {
     $end_date->setTime((int)substr($asignacion['end_time'], 0, 2), (int)substr($asignacion['end_time'], 3, 2));
 
     $events[] = [
-        'title' => htmlspecialchars($asignacion['subject_name'] . ' - Grupo ' . $asignacion['group_id']),
+        'title' => htmlspecialchars($asignacion['subject_name'] . ' - Grupo ' . $asignacion['group_name']),
         'start' => $start_date->format('Y-m-d\TH:i:s'),
         'end' => $end_date->format('Y-m-d\TH:i:s'),
         'backgroundColor' => '#8B0000',
