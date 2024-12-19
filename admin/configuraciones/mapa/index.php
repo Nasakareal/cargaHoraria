@@ -28,8 +28,8 @@ include('../../../admin/layout/parte1.php');
                                 <?php include('auditorio.php'); ?>
                                 <a href="detalles_edificio_b.php" style="cursor: pointer;"><?php include('edificio_b.php'); ?></a>
                                 <?php include('cafeteria.php'); ?>
-                                <?php include('Laboratorio_P2.php'); ?>
-                                <?php include('Laboratorio_P1.php'); ?>
+                                <?php include('laboratorio_P2.php'); ?>
+                                <?php include('laboratorio_P1.php'); ?>
                                 <?php include('explanada.php'); ?>
                                 <?php include('administracion.php'); ?>
                                 <?php include('cancha_futbol.php'); ?>

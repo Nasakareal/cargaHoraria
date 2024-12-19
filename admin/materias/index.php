@@ -1,10 +1,24 @@
 <?php
 include('../../app/config.php');
+include('../../app/middleware.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/materias/listado_de_materias.php');
 include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
 include('../../app/controllers/programas/listado_de_programas.php');
 include('../../app/controllers/laboratorios/listado_de_laboratorios.php');
+
+
+if (!verificarPermiso($_SESSION['sesion_id_usuario'], 8, $pdo)) {
+    $_SESSION['mensaje'] = "No tienes permiso para ver las materias.";
+    $_SESSION['icono'] = "error";
+    ?>
+    <script>
+        history.back();
+    </script>
+    <?php
+    exit;
+}
+
 
 /* Función para obtener los laboratorios asignados a una materia */
 function obtenerLaboratoriosAsignados($pdo, $subject_id)

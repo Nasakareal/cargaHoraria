@@ -103,3 +103,19 @@ include('../../layout/mensajes.php');
         }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
     });
 </script>
+
+<style>
+    .dataTables_filter input {
+        background-color: #ffd800;
+        color: #333;
+        border: 1px solid #555;
+        border-radius: 4px;
+        padding: 5px;
+        font-weight: bold;
+    }
+
+    .dataTables_filter label {
+        color: #333;
+        font-weight: bold;
+    }
+</style>

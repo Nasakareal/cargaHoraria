@@ -3,11 +3,26 @@
 header('Content-Type: text/html; charset=utf-8');
 
 include('../../app/config.php');
+include('../../app/middleware.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/programas/listado_de_programas.php');
 include('../../app/controllers/grupos/listado_de_grupos.php');
 include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
 include('../../app/controllers/niveles/listado_de_niveles.php');
+
+
+
+if (!verificarPermiso($_SESSION['sesion_id_usuario'], 'group_view', $pdo)) {
+    $_SESSION['mensaje'] = "No tienes permiso para ver grupos.";
+    $_SESSION['icono'] = "error";
+    ?>
+    <script>
+        history.back();
+    </script>
+    <?php
+    exit;
+}
+
 
 ?>
 
@@ -180,3 +195,19 @@ include('../../layout/mensajes.php');
         }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
     });
 </script>
+
+<style>
+    .dataTables_filter input {
+        background-color: #ffd800;
+        color: #333;
+        border: 1px solid #555;
+        border-radius: 4px;
+        padding: 5px;
+        font-weight: bold;
+    }
+
+    .dataTables_filter label {
+        color: #333;
+        font-weight: bold;
+    }
+</style>

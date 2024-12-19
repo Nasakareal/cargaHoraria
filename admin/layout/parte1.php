@@ -7,6 +7,13 @@ $rol_id = $_SESSION['sesion_rol'];
 $nombre_sesion_usuario = $_SESSION['sesion_nombre_usuario'] ?? null;
 $foto_sesion_usuario = $_SESSION['sesion_foto_usuario'] ?? null;
 
+
+if ($rol_id == 6) {
+    header('Location: ' . APP_URL . '/portal');
+    exit();
+}
+
+
 if (!$nombre_sesion_usuario || !$foto_sesion_usuario) {
     $query = $pdo->prepare("SELECT nombres, foto_perfil FROM usuarios WHERE email = :email AND estado = '1'");
     $query->bindParam(':email', $email_sesion);

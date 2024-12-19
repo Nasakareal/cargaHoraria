@@ -36,10 +36,10 @@ function enviarMensaje() {
 
     /* Convertir a mayúsculas y eliminar acentos */
     mensaje = mensaje
-        .toUpperCase() /* Convertir a mayúsculas */
-        .normalize("NFD") /* Descomponer caracteres Unicode */
-        .replace(/[\u0300-\u036f]/g, "") /* Eliminar los acentos */
-        .replace(/[^A-Z0-9 ]/g, ""); /* Eliminar todos los símbolos excepto letras, números y espacios */
+        .toUpperCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^A-Z0-9 ]/g, "");
 
     /* Añade el mensaje del usuario al chat */
     const userMessage = `<div class="direct-chat-msg right">

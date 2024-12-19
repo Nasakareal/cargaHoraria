@@ -93,15 +93,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <i class="far fa-bell"></i>
         <span class="badge badge-warning navbar-badge" id="notification-count" style="display: none;">0</span>
     </a>
-    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-        <span class="dropdown-header" id="notification-header">0 Notificaciones</span>
-        <div class="dropdown-divider"></div>
-        <div id="notification-list">
-            <!-- Aquí se cargarán las notificaciones dinámicamente -->
-        </div>
-        <div class="dropdown-divider"></div>
-        <a href="<?= APP_URL; ?>/admin/reportes/" class="dropdown-item dropdown-footer">Ver todas las Notificaciones</a>
-    </div>
 </li>
 <?php endif; ?>
 
