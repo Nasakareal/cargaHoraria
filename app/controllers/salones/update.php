@@ -18,7 +18,6 @@ if ($classroom_name == "" || $capacity == "" || $building == "" || $floor == "")
     exit;
 }
 
-/* Preparamos la consulta */
 $sentencia = $pdo->prepare("UPDATE `classrooms` 
                             SET classroom_name = :classroom_name, 
                                 capacity = :capacity, 

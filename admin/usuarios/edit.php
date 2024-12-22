@@ -3,7 +3,6 @@
 $id_usuario = $_GET['id'];
 
 include ('../../app/config.php');
-include('../../app/helpers/verificar_admin.php');
 include ('../../admin/layout/parte1.php');
 include ('../../app/controllers/usuarios/datos_del_usuario.php');
 include ('../../app/controllers/roles/listado_de_roles.php');
@@ -12,10 +11,7 @@ $sql_areas = "SELECT DISTINCT area FROM programs";
 $query_areas = $pdo->prepare($sql_areas);
 $query_areas->execute();
 $areas = $query_areas->fetchAll(PDO::FETCH_ASSOC);
-
-// Obtener las áreas actuales del usuario, suponiendo que están almacenadas como una cadena separada por comas
 $user_areas = !empty($area) ? explode(',', $area) : [];
-
 ?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -35,6 +31,7 @@ $user_areas = !empty($area) ? explode(',', $area) : [];
                     <div class="card-body">
                     <form action="<?= APP_URL;?>/app/controllers/usuarios/update.php" method="post">
                     <div class="row">
+                      <?php if ($rol_id == 1): ?>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="">Nombre del rol</label>
@@ -55,6 +52,7 @@ $user_areas = !empty($area) ? explode(',', $area) : [];
                           </div>
                         </div>
                       </div>
+                      <?php endif; ?>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="">Nombres del usuario</label>
@@ -83,6 +81,7 @@ $user_areas = !empty($area) ? explode(',', $area) : [];
                           <input type="password" name="password_repet" class="form-control">
                         </div>
                       </div>
+                      <?php if ($rol_id == 1): ?>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="">Áreas</label>
@@ -99,6 +98,7 @@ $user_areas = !empty($area) ? explode(',', $area) : [];
                           </div>
                         </div>
                       </div>
+                      <?php endif; ?>
                     </div>
 
                         <div class="col-md-4">

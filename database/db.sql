@@ -672,7 +672,6 @@ END
 WHERE subject_id IN (1500, 1501, 1600);
 
 
-
 ALTER TABLE manual_schedule_assignments
 DROP INDEX schedule_id;
 
@@ -682,17 +681,7 @@ ADD COLUMN lab1_assigned BOOLEAN DEFAULT 0,
 ADD COLUMN lab2_assigned BOOLEAN DEFAULT 0;
 
 
-
-
-
-
-
-
-
-
 ALTER TABLE labs ADD COLUMN area VARCHAR(255) NULL;
-
-
 
 
 ALTER TABLE usuarios
@@ -705,6 +694,38 @@ ADD COLUMN area VARCHAR(255) COLLATE utf8mb4_spanish_ci NULL;
 
 
 
+
+
+
+
+
+
+ALTER TABLE `groups` DROP FOREIGN KEY groups_ibfk_2;
+
+
+ALTER TABLE `groups`
+ADD CONSTRAINT groups_ibfk_2 FOREIGN KEY (area) REFERENCES programs(area) ON UPDATE CASCADE;
+
+
+ALTER TABLE teachers DROP FOREIGN KEY teachers_ibfk_3;
+
+
+ALTER TABLE teachers
+ADD CONSTRAINT teachers_ibfk_3 FOREIGN KEY (area) REFERENCES programs(area) ON UPDATE CASCADE;
+
+
+ALTER TABLE `building_programs` 
+ADD COLUMN `fyh_actualizacion` DATETIME NULL DEFAULT NULL 
+AFTER `planta_baja`;
+
+
+ALTER TABLE `building_programs` 
+ADD COLUMN `fyh_creacion` DATETIME NULL DEFAULT NULL 
+AFTER `planta_baja`;
+
+
+ALTER TABLE programs MODIFY COLUMN area VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci;
+ALTER TABLE building_programs MODIFY COLUMN area VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci;
 
 
 

@@ -10,7 +10,7 @@ if( (isset($_SESSION['mensaje'])) && (isset($_SESSION['icono'])) ){
             icon: "<?=$icono;?>",
             title: "<?=$mensaje;?>",
             showConfirmButton: false,
-            timer: 8000
+            timer: 16000
         });
     </script>
     <?php

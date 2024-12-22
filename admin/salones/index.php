@@ -74,7 +74,6 @@ include('../../app/controllers/salones/listado_de_salones.php');
                                     $contador_classrooms++; ?>
                                     <tr>
                                         <td style="text-align: center"><?= $contador_classrooms; ?></td>
-                                        <!-- Usar nombre_salon correctamente -->
                                         <td><center><?= $classroom['nombre_salon']; ?></center></td>
                                         <td style="text-align: center"><?= $classroom['capacidad']; ?></td>
                                         <td style="text-align: center"><?= $classroom['edificio']; ?></td>
@@ -139,10 +138,11 @@ include('../../layout/mensajes.php');
             "pageLength": 5,
             "language": {
                 "emptyTable": "No hay información",
-                "info": "Mostrando _START_ a _END_ de _TOTAL_ Salones",
-                "infoEmpty": "Mostrando 0 a 0 de 0 Salones",
-                "infoFiltered": "(Filtrado de _Max_ total Salones)",
-                "lengthMenu": "Mostrar _MENU_ Salones",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ Materias",
+                "infoEmpty": "Mostrando 0 a 0 de 0 Materias",
+                "infoFiltered": "(Filtrado de _MAX_ total Materias)",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ Materias",
                 "loadingRecord": "Cargando...",
                 "processing": "Procesando...",
                 "search": "Buscador:",
@@ -154,8 +154,8 @@ include('../../layout/mensajes.php');
                     "previous": "Anterior"
                 }
             },
-            "responsive": true,
-            "lengthChange": true,
+            "responsive": true, 
+            "lengthChange": true, 
             "autoWidth": false,
             buttons: [{
                 extend: 'collection',

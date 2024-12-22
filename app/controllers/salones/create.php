@@ -2,21 +2,16 @@
 
 include('../../../app/config.php');
 
-/* Datos del formulario */
 $nombre_salon = $_POST['nombre_salon'];
 $capacidad = $_POST['capacidad'];
 $edificio = $_POST['edificio'];
 $planta = $_POST['planta'];
-
-/* Estado inicial del registro */
 $estado_de_registro = "ACTIVO";
 
-/* Prepara la sentencia para insertar el salón en la base de datos */
 $sentencia = $pdo->prepare('INSERT INTO salones
 (nombre_salon, capacidad, edificio, planta, fyh_creacion, estado)
 VALUES (:nombre_salon, :capacidad, :edificio, :planta, :fyh_creacion, :estado)');
 
-/* Enlaza los valores a los parámetros de la consulta */
 $sentencia->bindParam(':nombre_salon', $nombre_salon);
 $sentencia->bindParam(':capacidad', $capacidad);
 $sentencia->bindParam(':edificio', $edificio);
@@ -25,7 +20,6 @@ $sentencia->bindParam(':fyh_creacion', $fechaHora);
 $sentencia->bindParam(':estado', $estado_de_registro);
 
 try {
-    /* Ejecuta la consulta */
     if ($sentencia->execute()) {
         session_start();
         $_SESSION['mensaje'] = "El salón se ha registrado con éxito";

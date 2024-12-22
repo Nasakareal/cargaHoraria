@@ -76,24 +76,24 @@ try {
         throw new Exception("No se pudo actualizar o insertar el nivel educativo en la tabla `educational_levels`.");
     }
 
+    $stmt_delete_subjects = $pdo->prepare("DELETE FROM group_subjects WHERE group_id = :group_id");
+    $stmt_delete_subjects->bindParam(':group_id', $group_id);
+    $stmt_delete_subjects->execute();
+
     $stmt_subjects = $pdo->prepare("SELECT subject_id FROM subjects WHERE program_id = :program_id AND term_id = :term_id");
     $stmt_subjects->execute([':program_id' => $program_id, ':term_id' => $term_id]);
     $subjects = $stmt_subjects->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($subjects as $subject) {
-        $stmt_check_subject = $pdo->prepare("SELECT * FROM group_subjects WHERE group_id = :group_id AND subject_id = :subject_id");
-        $stmt_check_subject->execute([':group_id' => $group_id, ':subject_id' => $subject['subject_id']]);
-        if (!$stmt_check_subject->fetch(PDO::FETCH_ASSOC)) {
-            $stmt_group_subject = $pdo->prepare("INSERT INTO group_subjects (group_id, subject_id, fyh_creacion, estado) 
-                                                 VALUES (:group_id, :subject_id, NOW(), '1')");
-            $stmt_group_subject->execute([':group_id' => $group_id, ':subject_id' => $subject['subject_id']]);
-        }
+        $stmt_group_subject = $pdo->prepare("INSERT INTO group_subjects (group_id, subject_id, fyh_creacion, estado) 
+                                             VALUES (:group_id, :subject_id, NOW(), '1')");
+        $stmt_group_subject->execute([':group_id' => $group_id, ':subject_id' => $subject['subject_id']]);
     }
 
     $pdo->commit();
 
     session_start();
-    $_SESSION['mensaje'] = "El grupo ha sido actualizado correctamente y las materias se han añadido.";
+    $_SESSION['mensaje'] = "El grupo ha sido actualizado correctamente y las materias se han actualizado.";
     $_SESSION['icono'] = "success";
     header('Location:' . APP_URL . "/admin/grupos");
     exit();

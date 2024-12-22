@@ -2,18 +2,18 @@
 
 $sql_group = "
     SELECT g.group_name, g.program_id, g.term_id, g.volume, 
-           g.turn_id, /* Turno directamente desde la tabla groups */
+           g.turn_id,
            p.program_name, t.term_name, s.shift_name AS turno, 
-           el.level_id AS nivel_id, /* ID del nivel educativo */
-           el.level_name AS nivel_educativo, /* Nombre del nivel educativo */
-           GROUP_CONCAT(sj.subject_name SEPARATOR ', ') AS materias  /* Materias asociadas al grupo */
+           el.level_id AS nivel_id,
+           el.level_name AS nivel_educativo,
+           GROUP_CONCAT(sj.subject_name SEPARATOR ', ') AS materias
     FROM `groups` g 
     LEFT JOIN programs p ON g.program_id = p.program_id 
-    LEFT JOIN terms t ON g.term_id = t.term_id  /* Unimos con terms para obtener el cuatrimestre */
-    LEFT JOIN shifts s ON g.turn_id = s.shift_id  /* Turno del grupo */
-    LEFT JOIN educational_levels el ON g.group_id = el.group_id  /* Relación con la tabla de niveles educativos */
-    LEFT JOIN group_subjects gs ON g.group_id = gs.group_id  /* Relación con las materias del grupo */
-    LEFT JOIN subjects sj ON gs.subject_id = sj.subject_id  /* Relación para obtener los nombres de las materias */
+    LEFT JOIN terms t ON g.term_id = t.term_id
+    LEFT JOIN shifts s ON g.turn_id = s.shift_id
+    LEFT JOIN educational_levels el ON g.group_id = el.group_id
+    LEFT JOIN group_subjects gs ON g.group_id = gs.group_id
+    LEFT JOIN subjects sj ON gs.subject_id = sj.subject_id
     WHERE g.group_id = :group_id AND g.estado = '1'
     GROUP BY g.group_id, g.program_id, g.term_id, g.volume, 
              g.turn_id, p.program_name, t.term_name, s.shift_name, el.level_id, el.level_name

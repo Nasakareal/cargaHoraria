@@ -8,8 +8,8 @@ include('../../app/controllers/programas/listado_de_programas.php');
 include('../../app/controllers/laboratorios/listado_de_laboratorios.php');
 
 
-if (!verificarPermiso($_SESSION['sesion_id_usuario'], 8, $pdo)) {
-    $_SESSION['mensaje'] = "No tienes permiso para ver las materias.";
+if (!verificarPermiso($_SESSION['sesion_id_usuario'], 'subject_view', $pdo)) {
+    $_SESSION['mensaje'] = "No tienes permiso para ver materias.";
     $_SESSION['icono'] = "error";
     ?>
     <script>

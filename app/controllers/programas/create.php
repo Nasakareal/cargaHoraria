@@ -6,11 +6,10 @@ $nombre_programa = $_POST['program_name'];
 $area_programa = $_POST['program_area'];
 
 $fecha_creacion = date('Y-m-d H:i:s');
-$estado = 'ACTIVO'; // Cambiado a texto, ya que debe manejarse como string según tus preferencias previas
+$estado = '1';
 
 $sentencia = $pdo->prepare('INSERT INTO programs (program_name, area, fyh_creacion, estado) VALUES (:program_name, :area, :fyh_creacion, :estado)');
 
-/* Víncula las variables */
 $sentencia->bindParam(':program_name', $nombre_programa);
 $sentencia->bindParam(':area', $area_programa);
 $sentencia->bindParam(':fyh_creacion', $fecha_creacion);

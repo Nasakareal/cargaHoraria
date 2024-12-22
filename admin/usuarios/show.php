@@ -30,7 +30,7 @@ include('../../app/controllers/usuarios/datos_del_usuario.php');
                         <div class="form-group">
                           <label for="">Foto de perfil</label>
                           <div style="position: relative; display: inline-block;">
-                            <img src="<?= htmlspecialchars($foto_perfil); ?>" alt="Foto de perfil" class="img-thumbnail" style="width: 150px; height: 150px;">
+                            <img src="<?= htmlspecialchars($foto_perfil ?? '/cargaHoraria/public/dist/img/user.png'); ?>" alt="Foto de perfil" class="img-thumbnail" style="width: 150px; height: 150px;">
                             <a href="<?= APP_URL; ?>/admin/usuarios/cambiar_foto.php?id=<?= $id_usuario; ?>" 
                                style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.5); border-radius: 50%; padding: 5px;">
                               <i class="bi bi-pencil text-white"></i>
@@ -63,7 +63,7 @@ include('../../app/controllers/usuarios/datos_del_usuario.php');
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="">Área</label>
-                          <p><?= $area; ?></p> <!-- Mostrar el área -->
+                          <p><?= $area; ?></p>
                         </div>
                       </div>
                       <div class="col-md-4">

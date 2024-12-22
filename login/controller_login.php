@@ -3,9 +3,10 @@ include('../app/config.php');
 
 session_start();
 
-/* Configuración inicial */
+/* 1. Cargar mensajes de éxito */
+$mensajesExito = include('mensajes_exito.php');
 $intentosMaximos = 5;
-$tiempoBaseEspera = 600; // 10 minutos
+$tiempoBaseEspera = 600;
 
 /* Obtener y validar el email del usuario */
 $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
@@ -75,7 +76,10 @@ if ($usuario) {
 
         session_regenerate_id(true);
 
-        $_SESSION['mensaje'] = "Bienvenido al sistema";
+        /* 2. Seleccionar un mensaje de éxito aleatorio */
+        $mensajeAleatorio = $mensajesExito[array_rand($mensajesExito)];
+        $_SESSION['mensaje'] = $mensajeAleatorio;
+
         $_SESSION['icono'] = "success";
         $_SESSION['sesion_email'] = $email;
         $_SESSION['sesion_rol'] = $usuario['rol_id'];

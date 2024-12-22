@@ -91,9 +91,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
       
-      
 
-<!-- Mostrar notificaciones solo si el rol es ADMINISTRADOR -->
+    <!-- Mostrar notificaciones solo si el rol es ADMINISTRADOR -->
 <?php if ($rol_id == 1): ?>
 <li class="nav-item dropdown">
     <a class="nav-link" data-toggle="dropdown" href="#">
@@ -111,6 +110,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
     </div>
 </li>
 <?php endif; ?>
+
+
+
+      
+
+
 
 <!-- Script para cargar notificaciones -->
 <script>
@@ -168,8 +173,35 @@ document.addEventListener('DOMContentLoaded', function () {
         </a>
         
       </li>
+
+          <!-- Right navbar links -->
+<ul class="navbar-nav ml-auto">
+  <!-- User Dropdown -->
+  <li class="nav-item dropdown">
+    <a class="nav-link" data-toggle="dropdown" href="#" role="button">
+      <img src="<?= $_SESSION['sesion_foto_usuario'] ?: '/cargaHoraria/public/dist/img/user.png'; ?>" class="img-circle elevation-2" alt="User Image" style="width: 30px; height: 30px; object-fit: cover; margin-right: 8px;">
+      <span><?= $nombre_sesion_usuario; ?></span>
+    </a>
+    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+      <a href="<?= APP_URL; ?>/admin/usuarios/show.php?id=<?= $_SESSION['sesion_id_usuario']; ?>" class="dropdown-item">
+        <i class="bi bi-person-fill mr-2"></i> Ver Perfil
+      </a>
+      <div class="dropdown-divider"></div>
+      <a href="<?= APP_URL; ?>/admin/usuarios/edit.php?id=<?= $_SESSION['sesion_id_usuario']; ?>" class="dropdown-item">
+        <i class="bi bi-pencil-fill mr-2"></i> Editar Perfil
+      </a>
+      <div class="dropdown-divider"></div>
+      <a href="<?= APP_URL; ?>/login/logout.php" class="dropdown-item text-danger">
+        <i class="bi bi-door-open-fill mr-2"></i> Cerrar Sesión
+      </a>
+    </div>
+  </li>
+</ul>
+
     </ul>
+
   </nav>
+
   <!-- /.navbar -->
 
   <!-- Main Sidebar Container -->
@@ -184,14 +216,6 @@ document.addEventListener('DOMContentLoaded', function () {
     <!-- Sidebar -->
     <div class="sidebar" style="background-color: #008080">
       <!-- Sidebar user panel (optional) -->
-      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-        <div class="image">
-            <img src="<?= $_SESSION['sesion_foto_usuario'] ?: 'https://cdn-icons-png.flaticon.com/512/74/74472.png'; ?>" class="img-circle elevation-2" alt="User Image">
-        </div>
-        <div class="info">
-          <a href="<?= APP_URL; ?>/admin/usuarios/show.php?id=<?= $_SESSION['sesion_id_usuario']; ?>" class="d-block"><?= $nombre_sesion_usuario; ?></a>
-        </div>
-      </div>
 
       <!-- Sidebar Menu -->
       <nav class="mt-2">
@@ -309,6 +333,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
+
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?= APP_URL; ?>/admin/edificios" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Listado de Edificios</p>
+                </a>
+              </li>
+            </ul>
+
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="<?= APP_URL; ?>/admin/salones" class="nav-link">
@@ -364,64 +398,49 @@ document.addEventListener('DOMContentLoaded', function () {
           </li>
 
           
-            <li class="nav-item">
-            <a href="#" class="nav-link" style= "background-color: #3688f4">
-              <i class="nav-icon fas"><i class="bi bi-gear"></i></i>
-              <p>
-                Configuraciones
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="<?= APP_URL; ?>/admin/configuraciones" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Listado de Configuraciones</p>
-                </a>
-              </li>
-            </ul>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="<?= APP_URL; ?>/admin/roles" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Listado de Roles</p>
-                </a>
-              </li>
-            </ul>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="<?= APP_URL; ?>/admin/usuarios" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Listado de Usuarios</p>
-                </a>
-              </li>
-            </ul>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="<?= APP_URL; ?>/admin/configuraciones/calendarios" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Calendario</p>
-                </a>
-              </li>
-            </ul>
-
-          </li>
-
-            
-
-
-
-          <br>
-          <li class="nav-item">
-            <a href="<?=APP_URL;?>/login/logout.php" class="nav-link" style= "background-color: #f44336;color: black">
-              <i class="nav-icon fas"><i class="bi bi-door-open"></i></i>
-              <p>
-                Cerrar Sesión
-              </p>
-            </a>
-          </li>
-<br>
-
+            <?php if (isset($_SESSION['sesion_rol']) && $_SESSION['sesion_rol'] == 1): ?>
+  <li class="nav-item">
+    <a href="#" class="nav-link" style= "background-color: #3688f4">
+      <i class="nav-icon fas"><i class="bi bi-gear"></i></i>
+      <p>
+        Configuraciones
+        <i class="right fas fa-angle-left"></i>
+      </p>
+    </a>
+    <ul class="nav nav-treeview">
+      <li class="nav-item">
+        <a href="<?= APP_URL; ?>/admin/configuraciones" class="nav-link">
+          <i class="far fa-circle nav-icon"></i>
+          <p>Listado de Configuraciones</p>
+        </a>
+      </li>
+    </ul>
+    <ul class="nav nav-treeview">
+      <li class="nav-item">
+        <a href="<?= APP_URL; ?>/admin/roles" class="nav-link">
+          <i class="far fa-circle nav-icon"></i>
+          <p>Listado de Roles</p>
+        </a>
+      </li>
+    </ul>
+    <ul class="nav nav-treeview">
+      <li class="nav-item">
+        <a href="<?= APP_URL; ?>/admin/usuarios" class="nav-link">
+          <i class="far fa-circle nav-icon"></i>
+          <p>Listado de Usuarios</p>
+        </a>
+      </li>
+    </ul>
+    <ul class="nav nav-treeview">
+      <li class="nav-item">
+        <a href="<?= APP_URL; ?>/admin/configuraciones/calendarios" class="nav-link">
+          <i class="far fa-circle nav-icon"></i>
+          <p>Calendario</p>
+        </a>
+      </li>
+    </ul>
+  </li>
+<?php endif; ?>
 
 
         </ul>

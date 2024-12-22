@@ -28,164 +28,116 @@ $nivel_id = isset($nivel_id) ? $nivel_id : null;
     <br>
     <div class="content">
         <div class="container">
-            <div class="row">
-                <h1>Editar Grupo: <?= htmlspecialchars($group_name); ?></h1>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card card-outline card-success">
-                        <div class="card-header">
-                            <h3 class="card-title">Datos registrados</h3>
+            <div class="card card-outline card-success">
+                <div class="card-header">
+                    <h3 class="card-title">Editar Grupo: <?= htmlspecialchars($group_name); ?></h3>
+                </div>
+                <div class="card-body">
+                    <form action="<?= APP_URL; ?>/app/controllers/grupos/update.php" method="post">
+                        <!-- Campo oculto para el ID del grupo -->
+                        <input type="hidden" name="group_id" value="<?= htmlspecialchars($group_id); ?>">
+
+                        <div class="row">
+                            <!-- Primera columna -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="">Nombre del grupo</label>
+                                    <input type="text" class="form-control" name="group_name" value="<?= htmlspecialchars($group_name); ?>" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="">Programa Educativo</label>
+                                    <select name="program_id" class="form-control" required>
+                                        <option value="">Seleccione un programa</option>
+                                        <?php foreach ($programs as $program): ?>
+                                            <option value="<?= $program['program_id']; ?>" <?= ($program['program_id'] == $program_id) ? 'selected' : ''; ?>>
+                                                <?= htmlspecialchars($program['program_name'], ENT_QUOTES, 'UTF-8'); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="">Cuatrimestre</label>
+                                    <select name="term_id" class="form-control" required>
+                                        <option value="">Seleccione un cuatrimestre</option>
+                                        <?php foreach ($terms as $term): ?>
+                                            <option value="<?= $term['term_id']; ?>" <?= ($term['term_id'] == $term_id) ? 'selected' : ''; ?>>
+                                                <?= htmlspecialchars($term['term_name'], ENT_QUOTES, 'UTF-8'); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="">Volumen del grupo</label>
+                                    <input type="number" class="form-control" name="volume" value="<?= htmlspecialchars($volumen_grupo); ?>" required>
+                                </div>
+                            </div>
+
+                            <!-- Segunda columna -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="">Turno</label>
+                                    <select name="turn_id" class="form-control" required>
+                                        <option value="">Seleccione un turno</option>
+                                        <?php foreach ($turns as $turn): ?>
+                                            <option value="<?= $turn['shift_id']; ?>" <?= ($turn['shift_id'] == $turn_id) ? 'selected' : ''; ?>>
+                                                <?= htmlspecialchars($turn['shift_name'], ENT_QUOTES, 'UTF-8'); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="">Nivel Educativo</label>
+                                    <select name="nivel_id" class="form-control" required>
+                                        <option value="">Seleccione un nivel educativo</option>
+                                        <?php foreach ($levels as $level): ?>
+                                            <option value="<?= $level['level_id']; ?>" <?= ($level['level_id'] == $nivel_id) ? 'selected' : ''; ?>>
+                                                <?= htmlspecialchars($level['level_name'], ENT_QUOTES, 'UTF-8'); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="building_id">Edificio</label>
+                                    <select id="building_id" name="building_id" class="form-control">
+                                        <option value="">Seleccione un Edificio</option>
+                                        <?php 
+                                        $buildings = array_unique(array_column($classrooms, 'edificio'));
+                                        foreach ($buildings as $building): ?>
+                                            <option value="<?= htmlspecialchars($building, ENT_QUOTES, 'UTF-8'); ?>">
+                                                <?= htmlspecialchars($building, ENT_QUOTES, 'UTF-8'); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="floor_id">Planta</label>
+                                    <select id="floor_id" name="floor_id" class="form-control" disabled>
+                                        <option value="">Seleccione una Planta</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="classroom_id">Salón</label>
+                                    <select id="classroom_id" name="classroom_id" class="form-control" disabled>
+                                        <option value="">Seleccione un Salón</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <form action="<?= APP_URL; ?>/app/controllers/grupos/update.php" method="post">
-                                <!-- Campo oculto para el ID del grupo -->
-                                <input type="hidden" name="group_id" value="<?= htmlspecialchars($group_id); ?>">
 
-                                <!-- Campo para el nombre del grupo -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="">Nombre del grupo</label>
-                                            <input type="text" class="form-control" name="group_name" value="<?= htmlspecialchars($group_name); ?>" required>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Campo para el programa educativo -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="">Programa Educativo</label>
-                                            <select name="program_id" class="form-control" required>
-                                                <option value="">Seleccione un programa</option>
-                                                <?php foreach ($programs as $program): ?>
-                                                    <option value="<?= $program['program_id']; ?>" <?= ($program['program_id'] == $program_id) ? 'selected' : ''; ?>>
-                                                        <?= htmlspecialchars($program['program_name'], ENT_QUOTES, 'UTF-8'); ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Campo para el cuatrimestre -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="">Cuatrimestre</label>
-                                            <select name="term_id" class="form-control" required>
-                                                <option value="">Seleccione un cuatrimestre</option>
-                                                <?php foreach ($terms as $term): ?>
-                                                    <option value="<?= $term['term_id']; ?>" <?= ($term['term_id'] == $term_id) ? 'selected' : ''; ?>>
-                                                        <?= htmlspecialchars($term['term_name'], ENT_QUOTES, 'UTF-8'); ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                                               
-                                <!-- Campo para el volumen del grupo -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="">Volumen del grupo</label>
-                                            <input type="number" class="form-control" name="volume" value="<?= htmlspecialchars($volumen_grupo); ?>" required>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Campo para el turno -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="">Turno</label>
-                                            <select name="turn_id" class="form-control" required>
-                                                <option value="">Seleccione un turno</option>
-                                                <?php foreach ($turns as $turn): ?>
-                                                    <option value="<?= $turn['shift_id']; ?>" <?= ($turn['shift_id'] == $turn_id) ? 'selected' : ''; ?>>
-                                                        <?= htmlspecialchars($turn['shift_name'], ENT_QUOTES, 'UTF-8'); ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Campo para el nivel educativo -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="">Nivel Educativo</label>
-                                            <select name="nivel_id" class="form-control" required>
-                                                <option value="">Seleccione un nivel educativo</option>
-                                                <?php foreach ($levels as $level): ?>
-                                                    <option value="<?= $level['level_id']; ?>" <?= ($level['level_id'] == $nivel_id) ? 'selected' : ''; ?>>
-                                                        <?= htmlspecialchars($level['level_name'], ENT_QUOTES, 'UTF-8'); ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Campo para seleccionar Edificio -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="building_id">Edificio</label>
-                                            <select id="building_id" name="building_id" class="form-control">
-                                            <option value="">Seleccione un Edificio</option>
-                                                <?php 
-                                                $buildings = array_unique(array_column($classrooms, 'edificio'));
-                                                foreach ($buildings as $building): ?>
-                                                    <option value="<?= htmlspecialchars($building, ENT_QUOTES, 'UTF-8'); ?>">
-                                                        <?= htmlspecialchars($building, ENT_QUOTES, 'UTF-8'); ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Campo para seleccionar Planta -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="floor_id">Planta</label>
-                                            <select id="floor_id" name="floor_id" class="form-control" disabled>
-                                                <option value="">Seleccione una Planta</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Campo para seleccionar Salón -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="classroom_id">Salón</label>
-                                            <select id="classroom_id" name="classroom_id" class="form-control" disabled>
-                                                <option value="">Seleccione un Salón</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                                <hr>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <button type="submit" class="btn btn-primary">Guardar</button>
-                                            <a href="<?= APP_URL; ?>/admin/grupos" class="btn btn-secondary">Cancelar</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
+                        <div class="row">
+                            <div class="col-md-12 text-right">
+                                <button type="submit" class="btn btn-primary">Guardar</button>
+                                <a href="<?= APP_URL; ?>/admin/grupos" class="btn btn-secondary">Cancelar</a>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -196,6 +148,7 @@ $nivel_id = isset($nivel_id) ? $nivel_id : null;
 include('../../admin/layout/parte2.php');
 include('../../layout/mensajes.php');
 ?>
+
 
 <!-- Scripts para manejar la interactividad -->
 <script>

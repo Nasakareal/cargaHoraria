@@ -20,6 +20,8 @@ include('../../app/controllers/programas/datos_del_programa.php');
                         </div>
                         <div class="card-body">
                             <form action="<?= APP_URL; ?>/app/controllers/programas/update.php" method="post">
+
+                            <!-- Campo para el Nombre del Programa -->
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
@@ -29,6 +31,17 @@ include('../../app/controllers/programas/datos_del_programa.php');
                                         </div>
                                     </div>
                                 </div>
+                                <!-- Campo para el Area -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="area">Área</label>
+                                            <input type="text" class="form-control" name="area" id="area" placeholder="Ingrese el área" value="<?= isset($area) ? $area : ''; ?>" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+
                                 <hr>
                                 <div class="row">
                                     <div class="col-md-12">

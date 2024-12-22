@@ -17,7 +17,7 @@ $sql = "SELECT
         LEFT JOIN 
             terms t ON g.term_id = t.term_id
         LEFT JOIN 
-            educational_levels el ON g.group_id = el.group_id";  /* Relacionar con la tabla de niveles educativos */
+            educational_levels el ON g.group_id = el.group_id";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute();
