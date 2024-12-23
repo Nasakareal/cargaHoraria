@@ -61,7 +61,7 @@ include('../../app/controllers/edificios/listado_de_edificios.php');
                                             <div class="btn-group" role="group" aria-label="Basic example">
                                                 <a href="show.php?id=<?= $building_id; ?>" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>
                                                 <a href="edit.php?id=<?= $building_id; ?>" class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></a>
-                                                <form action="<?= APP_URL; ?>/app/controllers/buildings/delete.php" method="post" onsubmit="return confirmarEliminar(event, <?= $building_id; ?>);">
+                                                <form action="<?= APP_URL; ?>/app/controllers/edificios/delete.php" method="post" onsubmit="return confirmarEliminar(event, <?= $building_id; ?>);">
                                                     <input type="hidden" name="building_id" value="<?= $building_id; ?>">
                                                     <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
                                                 </form>

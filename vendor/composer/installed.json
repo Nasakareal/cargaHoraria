@@ -42,16 +42,16 @@
             "time": "2024-10-21T09:59:11+00:00",
             "type": "library",
             "extra": {
-                "branch-alias": {
-                    "dev-master": "2.1-dev"
-                },
                 "laravel": {
-                    "providers": [
-                        "BotMan\\BotMan\\BotManServiceProvider"
-                    ],
                     "aliases": {
                         "BotMan": "BotMan\\BotMan\\Facades\\BotMan"
-                    }
+                    },
+                    "providers": [
+                        "BotMan\\BotMan\\BotManServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-master": "2.1-dev"
                 }
             },
             "installation-source": "dist",
@@ -113,13 +113,13 @@
             "time": "2022-05-01T20:39:28+00:00",
             "type": "library",
             "extra": {
-                "branch-alias": {
-                    "dev-master": "2.0-dev"
-                },
                 "laravel": {
                     "providers": [
                         "BotMan\\Drivers\\Web\\Providers\\WebServiceProvider"
                     ]
+                },
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
                 }
             },
             "installation-source": "dist",
