@@ -688,18 +688,6 @@ ALTER TABLE usuarios
 ADD COLUMN area VARCHAR(255) COLLATE utf8mb4_spanish_ci NULL;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 ALTER TABLE `groups` DROP FOREIGN KEY groups_ibfk_2;
 
 
@@ -728,6 +716,48 @@ ALTER TABLE programs MODIFY COLUMN area VARCHAR(255) CHARACTER SET utf8mb4 COLLA
 ALTER TABLE building_programs MODIFY COLUMN area VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci;
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ALTER TABLE schedule_assignments
+ADD COLUMN lab_id INT NULL AFTER classroom_id;
+
+
+ALTER TABLE schedule_assignments
+ADD CONSTRAINT fk_lab_id
+FOREIGN KEY (lab_id) REFERENCES labs(lab_id)
+ON DELETE SET NULL
+ON UPDATE CASCADE;
+
+
+ALTER TABLE subjects
+DROP COLUMN class_hours,
+DROP COLUMN lab_hours,
+DROP COLUMN lab1_hours,
+DROP COLUMN lab2_hours,
+DROP COLUMN lab3_hours,
+DROP COLUMN max_consecutive_lab_hours;
+
+
+UPDATE `subjects`
+SET `max_consecutive_class_hours` = 2;
+
+
+ALTER TABLE schedule_assignments
+DROP INDEX unique_teacher_schedule,
+ADD UNIQUE KEY unique_teacher_schedule (teacher_id, schedule_day, start_time, end_time, tipo_espacio);
 
 
 

@@ -70,14 +70,14 @@ $user_areas = !empty($area) ? explode(',', $area) : [];
                     <div class="row">
                       <div class="col-md-4">
                         <div class="form-group">
-                          <label for="">Password</label>
+                          <label for="">Contraseña</label>
                           <input type="password" name="password" class="form-control">
                           <small class="text-muted">Deje en blanco si no desea cambiar la contraseña</small>
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
-                          <label for="">Repetir Password</label>
+                          <label for="">Repetir Contraseña</label>
                           <input type="password" name="password_repet" class="form-control">
                         </div>
                       </div>

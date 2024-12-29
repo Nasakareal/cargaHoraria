@@ -59,30 +59,6 @@ include('../../app/controllers/materias/datos_de_materias.php');
                                         <p><?= htmlspecialchars($term_name); ?></p> 
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="">Horas en Aula</label>
-                                        <p><?= $class_hours; ?></p> 
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="">Horas en Laboratorio 1</label>
-                                        <p><?= $lab1_hours; ?></p> 
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="">Horas en Laboratorio 2</label>
-                                        <p><?= $lab2_hours; ?></p> 
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="">Horas en Laboratorio 3</label>
-                                        <p><?= $lab3_hours; ?></p> 
-                                    </div>
-                                </div>
                             </div>
 
                             <hr>

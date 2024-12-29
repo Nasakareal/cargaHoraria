@@ -1,14 +1,16 @@
 <?php
 
 $sql_materias = "SELECT 
+                    s.subject_id,
                     s.subject_name, 
-                    s.class_hours, 
-                    s.lab_hours, 
-                    s.lab1_hours, 
-                    s.lab2_hours, 
-                    s.lab3_hours, 
+                    s.weekly_hours,
                     s.max_consecutive_class_hours AS hours_consecutive,
+                    s.fyh_creacion,
+                    s.fyh_actualizacion,
+                    s.estado,
+                    p.program_id,
                     p.program_name, 
+                    t.term_id,
                     t.term_name 
                  FROM 
                     subjects s 
@@ -30,11 +32,12 @@ if (!$materia) {
 
 $subject_name = $materia['subject_name'];
 $hours_consecutive = $materia['hours_consecutive'];
-$weekly_hours = $materia['class_hours'] + $materia['lab_hours'];
+$weekly_hours = $materia['weekly_hours'];
+$program_id = $materia['program_id'];
 $program_name = $materia['program_name'] ?? 'No asignado';
+$term_id = $materia['term_id'];
 $term_name = $materia['term_name'] ?? 'No asignado';
-$class_hours = $materia['class_hours'];
-$lab_hours = $materia['lab_hours'];
-$lab1_hours = $materia['lab1_hours'];
-$lab2_hours = $materia['lab2_hours'];
-$lab3_hours = $materia['lab3_hours'];
+$estado = $materia['estado'];
+$fyh_creacion = $materia['fyh_creacion'];
+$fyh_actualizacion = $materia['fyh_actualizacion'];
+?>

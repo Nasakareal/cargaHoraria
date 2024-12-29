@@ -64,8 +64,27 @@ foreach ($params as $key => $value) {
 $queryAsignaciones->execute();
 $asignaciones = $queryAsignaciones->fetchAll(PDO::FETCH_ASSOC);
 
+$colorPalette = [
+    '#1f77b4',
+    '#2ca02c',
+    '#ff7f0e',
+    '#d62728',
+    '#9467bd',
+    '#8c564b',
+    '#e377c2',
+    '#7f7f7f',
+    '#bcbd22',
+    '#17becf'
+];
+
+$subjectColors = [];
+foreach ($materias as $index => $materia) {
+    $colorIndex = $index % count($colorPalette);
+    $subjectColors[$materia['subject_id']] = $colorPalette[$colorIndex];
+}
+
 $events = [];
-$daysOfWeek = ['lunes' => 1, 'martes' => 2, 'miércoles' => 3, 'jueves' => 4, 'viernes' => 5, 'sábado' => 6];
+$daysOfWeek = ['lunes' => 1, 'martes' => 2, 'miércoles' => 3, 'jueves' => 4, 'viernes' => 5, 'sábado' => 6, 'Sábado' => 6, 'sabado' => 6, 'Sabado' => 6];
 
 foreach ($asignaciones as $asignacion) {
     $schedule_day_lower = strtolower($asignacion['schedule_day']);
@@ -79,24 +98,41 @@ foreach ($asignaciones as $asignacion) {
     $end_date = clone $start_date;
     $end_date->setTime((int)substr($asignacion['end_time'], 0, 2), (int)substr($asignacion['end_time'], 3, 2));
 
+    $color = isset($subjectColors[$asignacion['subject_id']]) ? $subjectColors[$asignacion['subject_id']] : '#000000';
+
     $events[] = [
         'title' => htmlspecialchars($asignacion['subject_name'] . ' - Grupo ' . $asignacion['group_name']),
         'start' => $start_date->format('Y-m-d\TH:i:s'),
         'end' => $end_date->format('Y-m-d\TH:i:s'),
-        'backgroundColor' => '#8B0000',
-        'borderColor' => '#660000',
+        'color' => $color,
         'textColor' => '#fff',
         'editable' => false,
         'extendedProps' => [
             'assignment_id' => $asignacion['assignment_id'],
             'group_id' => $asignacion['group_id'],
+            'subject_id' => $asignacion['subject_id'],
             'assignment_type' => $assignment_type
         ]
     ];
 }
 
+function darkenColor($hexColor, $percent) {
+    $hexColor = ltrim($hexColor, '#');
+
+    $r = hexdec(substr($hexColor, 0, 2));
+    $g = hexdec(substr($hexColor, 2, 2));
+    $b = hexdec(substr($hexColor, 4, 2));
+
+    $r = max(0, min(255, $r - ($r * $percent / 100)));
+    $g = max(0, min(255, $g - ($g * $percent / 100)));
+    $b = max(0, min(255, $b - ($b * $percent / 100)));
+
+    return sprintf("#%02x%02x%02x", $r, $g, $b);
+}
+
 $events_json = json_encode($events);
 ?>
+
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 
@@ -166,22 +202,23 @@ $events_json = json_encode($events);
                         </div>
                         <div class="card-body">
                             <div id="external-events">
-                                <?php if (!empty($materias)): ?>
-                                    <p class="text-muted">Arrastra las materias al calendario para programarlas.</p>
-                                    <?php foreach ($materias as $materia): ?>
-                                        <div class="external-event bg-success" data-event='{"title":"<?= htmlspecialchars($materia['subject_name']); ?>", "subject_id":"<?= htmlspecialchars($materia['subject_id']); ?>"}'>
-                                            <?= htmlspecialchars($materia['subject_name']); ?>
-                                        </div>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <p class="text-muted">Seleccione un grupo para ver las materias disponibles.</p>
-                                <?php endif; ?>
+    <?php if (!empty($materias)): ?>
+        <p class="text-muted">Arrastra las materias al calendario para programarlas.</p>
+        <?php foreach ($materias as $materia): ?>
+            <div class="external-event" style="background-color: <?= htmlspecialchars($subjectColors[$materia['subject_id']]); ?>;" data-event='{"title":"<?= htmlspecialchars($materia['subject_name']); ?>", "subject_id":"<?= htmlspecialchars($materia['subject_id']); ?>"}'>
+                <?= htmlspecialchars($materia['subject_name']); ?>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p class="text-muted">Seleccione un grupo para ver las materias disponibles.</p>
+    <?php endif; ?>
 
-                                <p>
-                                    <input type="checkbox" id="drop-remove">
-                                    <label for="drop-remove">Eliminar al arrastrar</label>
-                                </p>
-                            </div>
+    <p>
+        <input type="checkbox" id="drop-remove">
+        <label for="drop-remove">Eliminar al arrastrar</label>
+    </p>
+</div>
+
                         </div>
                     </div>
                 </div>
@@ -230,6 +267,32 @@ include('../../layout/mensajes.php');
     console.log("Aula seleccionada:", aula_id);
     console.log("Tipo de Asignación:", assignment_type);
 
+    const colorPalette = [
+        '#1f77b4',
+        '#2ca02c',
+        '#ff7f0e',
+        '#d62728',
+        '#9467bd',
+        '#8c564b',
+        '#e377c2',
+        '#7f7f7f',
+        '#bcbd22',
+        '#17becf'
+    ];
+
+    const subjectColorMap = {};
+    materias.forEach((materia, index) => {
+        subjectColorMap[materia.subject_id] = colorPalette[index % colorPalette.length];
+    });
+
+    const eventsWithColors = events.map(event => {
+        return {
+            ...event,
+            color: subjectColorMap[event.extendedProps.subject_id] || '#000000',
+            textColor: '#fff'
+        };
+    });
+
     $(function () {
         function ini_events(ele) {
             ele.each(function () {
@@ -260,8 +323,7 @@ include('../../layout/mensajes.php');
                 return {
                     title: eventEl.innerText.trim(),
                     subject_id: $(eventEl).data('event').subject_id,
-                    backgroundColor: window.getComputedStyle(eventEl, null).getPropertyValue('background-color'),
-                    borderColor: window.getComputedStyle(eventEl, null).getPropertyValue('background-color'),
+                    color: window.getComputedStyle(eventEl, null).getPropertyValue('background-color'),
                     textColor: window.getComputedStyle(eventEl, null).getPropertyValue('color')
                 };
             }
@@ -289,7 +351,7 @@ include('../../layout/mensajes.php');
                 }
             },
 
-            events: events,
+            events: eventsWithColors,
 
             eventReceive: function (info) {
                 Swal.fire({
@@ -510,12 +572,6 @@ include('../../layout/mensajes.php');
                     }
                 });
             },
-
-            eventDidMount: function(info) {
-                if(info.event.start && info.event.start < new Date()) {
-                    info.el.style.backgroundColor = "#FF6F61";
-                }
-            }
         });
 
         calendar.render();
@@ -530,7 +586,6 @@ include('../../layout/mensajes.php');
         document.getElementById('aulaSelector').value = '';
         document.forms[0].submit();
     }
-
 </script>
 
 <style>
@@ -542,18 +597,14 @@ include('../../layout/mensajes.php');
         text-align: center;
         border-radius: 3px;
     }
-</style>
 
-<style>
     .fc-event {
-        cursor: not-allowed;
-        opacity: 0.8;
+        cursor: pointer;
+        opacity: 1;
     }
 
     .fc-timegrid-event {
         font-size: 8px;
-        background-color: #8B0000 !important;
-        border-color: #660000 !important;
         color: white !important;
     }
 </style>

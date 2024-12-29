@@ -1,10 +1,12 @@
 <?php
 session_start();
 
+ob_start();
+
 include_once('../../../app/config.php');
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 
 set_time_limit(100);
@@ -23,7 +25,6 @@ try {
     exit();
 }
 
-// 2. Restaurar asignaciones de laboratorio
 function restaurarAsignacionesLaboratorio($pdo)
 {
     try {
@@ -46,7 +47,7 @@ function restaurarAsignacionesLaboratorio($pdo)
             FROM manual_schedule_assignments m
             LEFT JOIN teachers t ON m.teacher_id = t.teacher_id
             LEFT JOIN classrooms c ON m.classroom_id = c.classroom_id
-            WHERE m.tipo_espacio = 'Laboratorio'
+            WHERE m.estado = 'activo'
         ";
 
         error_log("Consulta de restauración ejecutada: $sql_restore");
@@ -75,6 +76,7 @@ include('../../../app/controllers/horarios_grupos/horarios_disponibles.php');
 
 $mensajes_error = [];
 
+// Función para eliminar acentos y normalizar cadenas
 function remove_accents($string)
 {
     return iconv('UTF-8', 'ASCII//TRANSLIT', $string);
@@ -91,6 +93,7 @@ $turn_id_to_turno = [
 ];
 
 try {
+    // 4. Obtener grupos activos
     $groups = $pdo->query("SELECT *, classroom_assigned, lab_assigned FROM `groups` WHERE estado = '1'")->fetchAll(PDO::FETCH_ASSOC);
     error_log("Grupos obtenidos: " . count($groups));
 } catch (PDOException $e) {
@@ -120,8 +123,8 @@ $groups = array_filter($groups, function ($group) use ($turn_id_to_turno, $exclu
 $groups = array_values($groups);
 error_log("Grupos después del filtrado: " . count($groups));
 
-// 6. Incluir materias por grupo
-include('../../../app/controllers/grupos/materias_grupos.php');
+// 6. Incluir materias por grupo y calcular horas restantes
+include('../../../app/controllers/grupos/materias_grupos.php'); // Este archivo ya está bien según el usuario
 
 // 7. Función para asignar bloques de horario (Solo Aula)
 function asignarBloqueHorario($pdo, $subject, $group, $dia, $start_time, $end_time, &$mensajes_error)
@@ -139,6 +142,8 @@ function asignarBloqueHorario($pdo, $subject, $group, $dia, $start_time, $end_ti
     $formatted_end_time = date('H:i:s', $end_time);
 
     $espacio_id = $group['classroom_assigned'];
+    // Para 'Aula', asegurarse de que 'teacher_id' sea NULL
+    $teacher_id = null;
 
     // Verificar disponibilidad del espacio
     $check_availability_sql = "SELECT COUNT(*) FROM schedule_assignments 
@@ -187,6 +192,7 @@ function asignarBloqueHorario($pdo, $subject, $group, $dia, $start_time, $end_ti
         return false;
     }
 
+    // Insertar la asignación
     $sql_insert = "INSERT INTO schedule_assignments 
                    (subject_id, group_id, teacher_id, classroom_id, schedule_day, start_time, end_time, estado, fyh_creacion, tipo_espacio)
                    VALUES (:subject_id, :group_id, :teacher_id, :classroom_id, :schedule_day, :start_time, :end_time, 'activo', NOW(), :tipo_espacio)";
@@ -196,7 +202,7 @@ function asignarBloqueHorario($pdo, $subject, $group, $dia, $start_time, $end_ti
         $stmt_insert->execute([
             ':subject_id' => $subject['subject_id'],
             ':group_id' => $group['group_id'],
-            ':teacher_id' => $subject['teacher_id'] ?? null,
+            ':teacher_id' => $teacher_id, // Siempre NULL para 'Aula'
             ':classroom_id' => $espacio_id,
             ':schedule_day' => $dia,
             ':start_time' => $formatted_start_time,
@@ -225,15 +231,15 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
         return;
     }
 
-    // Ordenar las materias por horas restantes descendente
+    // Inicializar seguimiento de asignaciones por materia por día
+    $horas_asignadas_por_materia_dia = [];
+
+    // Ordenar las materias por *más* horas restantes primero para evitar que se queden sin asignar
     usort($subjects, function ($a, $b) {
         return $b['remaining_hours'] - $a['remaining_hours'];
     });
 
-    // Inicializar seguimiento de asignaciones por materia por día
-    $horas_asignadas_por_materia_dia = [];
-
-    // Primera Pasada: Asignación Respetando Restricciones
+    // Asignar bloques de tiempo consecutivos
     foreach ($dias_turno as $dia) {
         if (!isset($horarios_disponibles[$grupo_turno][$dia])) {
             continue;
@@ -247,8 +253,6 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
         $hora = $inicio_turno;
 
         while ($hora < $fin_turno) {
-            $asignado = false;
-
             foreach ($subjects as &$subject) {
                 if ($subject['remaining_hours'] <= 0) {
                     continue;
@@ -257,53 +261,37 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
                 // Verificar si el día está sin restricción
                 $sin_restriccion = in_array(strtolower($dia), $dias_sin_restriccion);
 
-                // Determinar las horas que pueden ser asignadas en este bloque
-                if ($sin_restriccion) {
-                    // En días sin restricción, intentar asignar bloques de hasta 'max_consecutive_hours'
-                    $bloque_duracion = min($subject['max_consecutive_hours'], $subject['remaining_hours']);
-                } else {
-                    // En días con restricción, respetar 'max_consecutive_hours'
-                    $max_consecutive_hours = $subject['max_consecutive_hours'];
-                    $min_consecutive_hours = $subject['min_consecutive_hours'];
+                // Verificar si se puede asignar sin exceder el máximo de horas consecutivas
+                $max_consecutive_hours = $subject['max_consecutive_hours'] ?? 2; // Valor por defecto
+                $min_consecutive_hours = $subject['min_consecutive_hours'] ?? 1;
 
-                    // Obtener las horas ya asignadas para esta materia en este día
-                    if (!isset($horas_asignadas_por_materia_dia[$dia][$subject['subject_id']])) {
-                        $horas_asignadas_por_materia_dia[$dia][$subject['subject_id']] = 0;
-                    }
-
-                    $bloque_duracion = min($max_consecutive_hours - $horas_asignadas_por_materia_dia[$dia][$subject['subject_id']], $subject['remaining_hours']);
-
-                    if ($bloque_duracion < $min_consecutive_hours) {
-                        continue;
-                    }
+                if (!isset($horas_asignadas_por_materia_dia[$dia][$subject['subject_id']])) {
+                    $horas_asignadas_por_materia_dia[$dia][$subject['subject_id']] = 0;
                 }
+
+                if ($horas_asignadas_por_materia_dia[$dia][$subject['subject_id']] >= $max_consecutive_hours) {
+                    continue;
+                }
+
+                // Definir la duración del bloque (1 hora)
+                $bloque_duracion = 1;
 
                 // Verificar que el bloque no exceda el horario del día
                 $proxima_hora = $hora + ($bloque_duracion * 3600);
                 if ($proxima_hora > $fin_turno) {
-                    $bloque_duracion = ($fin_turno - $hora) / 3600;
-                    if ($bloque_duracion < 1) {
-                        continue;
-                    }
-                    $proxima_hora = $fin_turno;
+                    continue;
                 }
 
                 // Intentar asignar el bloque
                 if (asignarBloqueHorario($pdo, $subject, $group, $dia, $hora, $proxima_hora, $mensajes_error)) {
                     $subject['remaining_hours'] -= $bloque_duracion;
-                    if (!$sin_restriccion) {
-                        $horas_asignadas_por_materia_dia[$dia][$subject['subject_id']] += $bloque_duracion;
-                    }
+                    $horas_asignadas_por_materia_dia[$dia][$subject['subject_id']] += $bloque_duracion;
                     $hora += $bloque_duracion * 3600;
-                    $asignado = true;
-                    break;
+                    break; // Avanzar al siguiente bloque de tiempo
                 }
             }
 
-            if (!$asignado) {
-                // No se pudo asignar ninguna materia en este bloque, avanzar una hora
-                $hora += 3600;
-            }
+            $hora += 3600; // Avanzar una hora si no se pudo asignar ninguna materia
         }
     }
 
@@ -376,14 +364,21 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
                         continue;
                     }
 
-                    // Determinar la duración que se puede asignar (hasta 1 hora en segunda pasada)
+                    // Definir la duración del bloque (1 hora)
                     $bloque_duracion = 1;
 
+                    // Verificar que el bloque no exceda el horario del día
+                    $proxima_hora = $hora + ($bloque_duracion * 3600);
+                    if ($proxima_hora > $fin_turno) {
+                        $hora += 3600;
+                        continue;
+                    }
+
                     // Intentar asignar el bloque
-                    if (asignarBloqueHorario($pdo, $subject, $group, $dia, $hora, $hora + ($bloque_duracion * 3600), $mensajes_error)) {
+                    if (asignarBloqueHorario($pdo, $subject, $group, $dia, $hora, $proxima_hora, $mensajes_error)) {
                         $subject['remaining_hours'] -= $bloque_duracion;
                         $asignado = true;
-                        break 2;
+                        break 2; // Salir de los dos bucles
                     }
 
                     $hora += 3600;
@@ -480,6 +475,9 @@ if (!empty($mensajes_error)) {
     $_SESSION['mensaje'] = "Todas las materias fueron asignadas exitosamente.";
     $_SESSION['icono'] = "success";
 }
+
+// Finalizar el buffer de salida y limpiarlo
+ob_end_clean();
 
 // 12. Redireccionar al usuario
 header('Location:' . APP_URL . "/admin/horarios_grupos/");

@@ -3,13 +3,8 @@
 $sql_subjects = "SELECT 
     s.subject_id,
     s.subject_name,
-    s.class_hours,
-    s.lab_hours, /* Total de horas en laboratorio */
-    s.lab1_hours, /* Horas en el primer laboratorio */
-    s.lab2_hours, /* Horas en el segundo laboratorio */
-    s.lab3_hours, /* Horas en el tercer laboratorio */
+    s.weekly_hours,
     s.max_consecutive_class_hours AS hours_consecutive,
-    s.max_consecutive_lab_hours,
     s.program_id,
     s.term_id
 FROM

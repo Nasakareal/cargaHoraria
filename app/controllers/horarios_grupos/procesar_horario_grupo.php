@@ -64,7 +64,6 @@ function procesarHorarioGrupo($group_id, $pdo)
         $materia = $horario['subject_name'];
         $salon = $horario['room_name'] ?? 'Sin salón';
         $profesor = $horario['teacher_name'] ?? 'Sin profesor';
-        $tipo_espacio = ($horario['lab_hours'] > 0) ? 'Laboratorio' : 'Aula';
 
         $building_last_char = $horario['building_last_char'] ?? '';
         if ($building_last_char !== '') {
@@ -75,7 +74,7 @@ function procesarHorarioGrupo($group_id, $pdo)
             $hora = date("H:i", $current_time);
 
             if (in_array($hora, $horas) && in_array($dia, $dias)) {
-                $contenido = "{$materia} - {$tipo_espacio} - {$salon} - {$profesor}";
+                $contenido = "{$materia} - {$salon} - {$profesor}";
 
                 if (empty($tabla_horarios[$hora][$dia])) {
                     $tabla_horarios[$hora][$dia] = $contenido;

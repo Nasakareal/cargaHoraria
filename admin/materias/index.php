@@ -94,9 +94,6 @@ function obtenerLaboratoriosAsignados($pdo, $subject_id)
                                         <th><center>Horas Semanales</center></th>
                                         <th><center>Programa</center></th>
                                         <th><center>Cuatrimestre</center></th>
-                                        <th><center>Laboratorios Asignados</center></th>
-                                        <th><center>Horas Aula</center></th>
-                                        <th><center>Horas Laboratorio</center></th>
                                         <th><center>Acciones</center></th>
                                     </tr>
                                 </thead>
@@ -131,12 +128,9 @@ function obtenerLaboratoriosAsignados($pdo, $subject_id)
                                         <td style="text-align: center"><?= $contador_subjects; ?></td>
                                         <td style="text-align: center"><?= htmlspecialchars($subject['subject_name']); ?></td>
                                         <td><center><?= htmlspecialchars($subject['hours_consecutive']); ?></center></td>
-                                        <td><center><?= htmlspecialchars($subject['class_hours'] + $subject['lab_hours']); ?></center></td>
+                                        <td><center><?= htmlspecialchars($subject['weekly_hours']); ?></center></td>
                                         <td><center><?= $program_name; ?></center></td>
                                         <td><center><?= $term_name; ?></center></td>
-                                        <td><center><?= $laboratorios_asignados; ?></center></td>
-                                        <td><center><?= htmlspecialchars($subject['class_hours']); ?></center></td>
-                                        <td><center><?= htmlspecialchars($subject['lab_hours']); ?></center></td>
                                         <td style="text-align: center">
                                             <div class="btn-group" role="group">
                                                 <a href="show.php?id=<?= $subject['subject_id']; ?>" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>
