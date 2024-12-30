@@ -542,7 +542,6 @@ CREATE TABLE group_schedule_teacher (
 
 
 
-
 CREATE TABLE building_areas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     building_name VARCHAR(50) NOT NULL,         /* Nombre del edificio */
@@ -552,9 +551,6 @@ CREATE TABLE building_areas (
     FOREIGN KEY (area) REFERENCES programs(area) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
-
-
-
 ALTER TABLE teacher_subjects ADD COLUMN group_id INT AFTER subject_id;
 on los grupos
 
@@ -562,17 +558,14 @@ ALTER TABLE teacher_subjects ADD CONSTRAINT fk_group_teacher_subject
 FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
 
-
 ALTER TABLE teacher_subjects ADD CONSTRAINT fk_group_teacher_subject
 FOREIGN KEY (group_id) REFERENCES `groups`(group_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
 
 
 /* Agregar columna planta_alta y planta_baja en classrooms */
 ALTER TABLE classrooms
 ADD planta_alta BOOLEAN NOT NULL DEFAULT 0 AFTER floor,
 ADD planta_baja BOOLEAN NOT NULL DEFAULT 0 AFTER planta_alta;
-
 
 
 CREATE TABLE calendario_escolar (
@@ -625,18 +618,15 @@ CREATE TABLE manual_schedule_assignments (
 ) ENGINE=InnoDB;
 
 
-
 ALTER TABLE shifts
 MODIFY shift_name ENUM('MATUTINO', 'VESPERTINO', 'MIXTO', 'ZINAPÉCUARO', 'ENFERMERIA', 'MATUTINO AVANZADO', 'VESPERTINO AVANZADO') 
 CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci NOT NULL;
-
 
 
 INSERT INTO shifts (shift_name, schedule_details, fyh_creacion, estado)
 VALUES
 ('MATUTINO AVANZADO', 'LUNES A VIERNES de 07:00 A 12:00', NOW(), 'ACTIVO'),
 ('VESPERTINO AVANZADO', 'LUNES A VIERNES de 12:00 A 17:00', NOW(), 'ACTIVO');
-
 
 UPDATE `groups`
 SET turn_id = CASE
@@ -645,6 +635,7 @@ SET turn_id = CASE
     ELSE turn_id
 END
 WHERE term_id >= 7;
+
 
 UPDATE subjects
 SET weekly_hours = CASE
@@ -716,21 +707,6 @@ ALTER TABLE programs MODIFY COLUMN area VARCHAR(255) CHARACTER SET utf8mb4 COLLA
 ALTER TABLE building_programs MODIFY COLUMN area VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ALTER TABLE schedule_assignments
 ADD COLUMN lab_id INT NULL AFTER classroom_id;
 
@@ -758,6 +734,14 @@ SET `max_consecutive_class_hours` = 2;
 ALTER TABLE schedule_assignments
 DROP INDEX unique_teacher_schedule,
 ADD UNIQUE KEY unique_teacher_schedule (teacher_id, schedule_day, start_time, end_time, tipo_espacio);
+
+
+
+
+
+
+
+
 
 
 
