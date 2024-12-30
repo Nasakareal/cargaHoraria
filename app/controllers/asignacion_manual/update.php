@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit;
         }
 
-        // **Nueva Sección: Verificación de horas semanales**
+        // **Nueva Sección: Verificación de horas semanales por grupo**
 
         // 1. Obtener las horas semanales permitidas para la materia
         $query_weekly_hours = $pdo->prepare("SELECT weekly_hours FROM subjects WHERE subject_id = :subject_id");
@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit;
         }
 
-        $weekly_hours = (int)$subject['weekly_hours'];
+        $weekly_hours = (float)$subject['weekly_hours']; // Usar float para mayor precisión
 
         // 2. Calcular la duración de la nueva asignación en horas
         $start = new DateTime($start_time);
@@ -114,22 +114,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $interval = $start->diff($end);
         $duration_hours = (int)$interval->h + ($interval->i / 60) + ($interval->s / 3600);
 
-        // 3. Obtener las horas actualmente asignadas a la materia, excluyendo la asignación actual si se está actualizando
+        // 3. Obtener las horas actualmente asignadas a la materia en el mismo grupo, excluyendo la asignación actual si se está actualizando
         if ($assignment_id) {
             $query_current_hours = $pdo->prepare("
                 SELECT start_time, end_time 
                 FROM manual_schedule_assignments 
-                WHERE subject_id = :subject_id AND assignment_id != :assignment_id AND estado = 'activo'
+                WHERE subject_id = :subject_id 
+                  AND group_id = :group_id
+                  AND assignment_id != :assignment_id 
+                  AND estado = 'activo'
             ");
             $query_current_hours->bindParam(':subject_id', $subject_id, PDO::PARAM_INT);
+            $query_current_hours->bindParam(':group_id', $group_id, PDO::PARAM_INT);
             $query_current_hours->bindParam(':assignment_id', $assignment_id, PDO::PARAM_INT);
         } else {
             $query_current_hours = $pdo->prepare("
                 SELECT start_time, end_time 
                 FROM manual_schedule_assignments 
-                WHERE subject_id = :subject_id AND estado = 'activo'
+                WHERE subject_id = :subject_id 
+                  AND group_id = :group_id
+                  AND estado = 'activo'
             ");
             $query_current_hours->bindParam(':subject_id', $subject_id, PDO::PARAM_INT);
+            $query_current_hours->bindParam(':group_id', $group_id, PDO::PARAM_INT);
         }
 
         $query_current_hours->execute();
@@ -148,10 +155,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $new_total = $total_assigned_hours + $duration_hours;
 
         if ($new_total > $weekly_hours) {
-            echo json_encode(['status' => 'error', 'message' => 'La asignación excede las horas semanales permitidas para la materia.']);
+            echo json_encode(['status' => 'error', 'message' => 'La asignación excede las horas semanales permitidas para la materia en este grupo.']);
             $pdo->rollBack();
             exit;
         }
+
+        // **Fin de la Nueva Sección**
 
         // Proceder con la actualización o inserción de la asignación
         if ($assignment_id) { 
