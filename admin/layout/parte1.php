@@ -240,16 +240,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 </a>
               </li>
             </ul>
-
-              <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="<?= APP_URL; ?>/admin/horarios_profesores" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Horario de Profesores</p>
-                </a>
-              </li>
-            </ul>
-
           </li>
 
           <li class="nav-item">
@@ -311,15 +301,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 <a href="<?= APP_URL; ?>/admin/grupos" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Listado de Grupos</p>
-                </a>
-              </li>
-            </ul>
-
-             <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="<?= APP_URL; ?>/admin/horarios_grupos" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Horarios de Grupos</p>
                 </a>
               </li>
             </ul>
@@ -392,6 +373,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 <a href="<?= APP_URL; ?>/admin/intercambios" class="nav-link">
                 <i class="far fa-circle nav-icon"></i>
                   <p>Intercambiar Horarios</p>
+                </a>
+              </li>
+            </ul>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?= APP_URL; ?>/admin/horarios_grupos" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Horarios de Grupos</p>
+                </a>
+              </li>
+            </ul>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="<?= APP_URL; ?>/admin/horarios_profesores" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Horario de Profesores</p>
                 </a>
               </li>
             </ul>

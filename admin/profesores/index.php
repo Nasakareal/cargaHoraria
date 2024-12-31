@@ -99,6 +99,9 @@ include('../../app/controllers/profesores/listado_de_profesores.php');
                                                 <a href="asignar_horario_profesor.php?teacher_id=<?= $teacher_id; ?>" class="btn btn-secondary btn-sm" style="background-color: #fd7e14;">
                                                     <i class="bi bi-journal-text"></i>
                                                 </a>
+                                                <a href="<?= APP_URL; ?>/admin/horarios_profesores" class="btn btn-secondary btn-sm" style="background-color: #6f42c1;">
+                                                    <i class="bi bi-clock"></i>
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>
