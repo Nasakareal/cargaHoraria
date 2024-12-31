@@ -335,6 +335,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
             <ul class="nav nav-treeview">
               <li class="nav-item">
+                <a href="<?= APP_URL; ?>/admin/laboratorios" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Listado de Laboratorios</p>
+                </a>
+              </li>
+            </ul>
+
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
                 <a href="<?= APP_URL; ?>/admin/autoSalones" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Autoasignación de salones</p>
@@ -342,14 +351,6 @@ document.addEventListener('DOMContentLoaded', function () {
               </li>
             </ul>
 
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="<?= APP_URL; ?>/admin/laboratorios" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Listado de Laboratorios</p>
-                </a>
-              </li>
-            </ul>
           </li>
 
             <li class="nav-item">

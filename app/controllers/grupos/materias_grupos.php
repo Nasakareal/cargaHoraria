@@ -21,11 +21,10 @@ foreach ($groups as $group) {
 
     // Paso 2: Obtener las materias del grupo actual
     $subjectsStmt = $pdo->prepare("
-        SELECT s.*, gs.group_id, COALESCE(g.classroom_assigned, 0) AS classroom_assigned, ts.teacher_id
+        SELECT s.*, gs.group_id, COALESCE(g.classroom_assigned, 0) AS classroom_assigned
         FROM subjects s 
         JOIN group_subjects gs ON gs.subject_id = s.subject_id 
         JOIN `groups` g ON g.group_id = gs.group_id
-        LEFT JOIN teacher_subjects ts ON ts.subject_id = s.subject_id AND ts.group_id = gs.group_id
         WHERE gs.group_id = :group_id 
           AND s.estado = '1'
     ");
@@ -43,10 +42,35 @@ foreach ($groups as $group) {
         $remaining_hours = $total_hours - $assigned_hours;
 
         if ($remaining_hours > 0) {
+            // Paso 3: Seleccionar el profesor con menos horas asignadas
+            $teacherStmt = $pdo->prepare("
+                SELECT ts.teacher_id
+                FROM teacher_subjects ts
+                WHERE ts.subject_id = :subject_id 
+                  AND ts.group_id = :group_id 
+                  AND ts.estado = 'activo'
+                ORDER BY (
+                    SELECT COUNT(*) 
+                    FROM schedule_assignments sa 
+                    WHERE sa.teacher_id = ts.teacher_id 
+                      AND sa.estado = 'activo'
+                ) ASC
+                LIMIT 1
+            ");
+            $teacherStmt->execute([':subject_id' => $subject_id, ':group_id' => $group_id]);
+            $teacher = $teacherStmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($teacher) {
+                $teacher_id = $teacher['teacher_id'];
+            } else {
+                // Si no hay profesor asignado, continuar sin asignar
+                $teacher_id = null;
+            }
+
             $class_subject = [
                 'subject_id' => $subject_id,
                 'subject_name' => $subject['subject_name'] . " (Aula)",
-                'teacher_id' => $subject['teacher_id'],
+                'teacher_id' => $teacher_id,
                 'remaining_hours' => $remaining_hours,
                 'type' => 'Aula',
                 'max_consecutive_hours' => isset($subject['max_consecutive_class_hours']) ? (int)$subject['max_consecutive_class_hours'] : 2, // Valor por defecto si no existe

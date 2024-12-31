@@ -271,7 +271,7 @@ include('../../layout/mensajes.php');
         '#1f77b4',
         '#2ca02c',
         '#ff7f0e',
-        '#d62728',
+        '#ffc107',
         '#9467bd',
         '#8c564b',
         '#e377c2',
@@ -288,7 +288,7 @@ include('../../layout/mensajes.php');
     const eventsWithColors = events.map(event => {
         return {
             ...event,
-            color: subjectColorMap[event.extendedProps.subject_id] || '#000000',
+            color: subjectColorMap[event.extendedProps.subject_id] || '#4F4F4F',
             textColor: '#fff'
         };
     });

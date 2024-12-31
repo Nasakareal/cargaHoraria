@@ -8,12 +8,10 @@ include('../../app/controllers/grupos/listado_de_grupos.php');
 include('../../app/controllers/materias/listado_de_materias.php');
 include('../../app/controllers/profesores/listado_de_profesores.php');
 
-// Variables existentes
 $total_groups = count($groups);
 $total_subjects = count($subjects);
 $total_teachers = count($teachers);
 
-// Consulta para contar las asignaciones de materias a profesores
 $query_assignments = $pdo->query("SELECT COUNT(*) AS total FROM teacher_subjects");
 $total_assignments = $query_assignments->fetch(PDO::FETCH_ASSOC)['total'];
 ?>
