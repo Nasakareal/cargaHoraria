@@ -747,6 +747,23 @@ ADD UNIQUE KEY unique_teacher_schedule (teacher_id, schedule_day, start_time, en
 
 
 
+ALTER TABLE schedule_assignments
+ADD CONSTRAINT unique_group_schedule UNIQUE (group_id, schedule_day, start_time);
+
+ALTER TABLE manual_schedule_assignments
+ADD CONSTRAINT unique_manual_group_schedule UNIQUE (group_id, schedule_day, start_time);
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

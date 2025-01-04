@@ -94,6 +94,27 @@ $total_assignments = $query_assignments->fetch(PDO::FETCH_ASSOC)['total'];
                                             </form>
                                         </td>
                                     </tr>
+
+                                    <!-- Fila para Schedule Assignments -->
+                                    <tr>
+                                        <td class="text-center">5</td>
+                                        <td class="text-center">Horario Escolar</td>
+                                        <td class="text-center">
+                                            <?php
+                                            $query_schedule_assignments = $pdo->query("SELECT COUNT(*) AS total FROM schedule_assignments");
+                                            $total_schedule_assignments = $query_schedule_assignments->fetch(PDO::FETCH_ASSOC)['total'];
+                                            echo $total_schedule_assignments;
+                                            ?>
+                                        </td>
+                                        <td class="text-center">
+                                            <form action="../../app/controllers/vaciados/vaciar_horarios.php" method="post" id="formVaciarScheduleAssignments">
+                                                <button type="button" class="btn btn-danger" onclick="confirmarVaciado('formVaciarScheduleAssignments', 'Schedule Assignments')">
+                                                    <i class="bi bi-trash"></i> Vaciar Horarios
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+
                                 </tbody>
                             </table>
                         </div>

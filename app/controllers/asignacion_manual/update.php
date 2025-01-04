@@ -21,6 +21,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
     }
 
+    if ($tipo_espacio === 'Laboratorio') {
+        if (empty($lab_id) || $lab_id == 0) {
+            echo json_encode(['status' => 'error', 'message' => 'Debe seleccionar un laboratorio para asignar.']);
+            exit;
+        }
+    } elseif ($tipo_espacio === 'Aula') {
+        if (empty($aula_id) || $aula_id == 0) {
+            echo json_encode(['status' => 'error', 'message' => 'Debe seleccionar un aula para asignar.']);
+            exit;
+        }
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Tipo de espacio inválido.']);
+        exit;
+    }
+
     if (empty($end_time)) {
         $start_time_obj = new DateTime($start_time);
         $start_time_obj->modify('+1 hour');
@@ -33,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     try {
         $pdo->beginTransaction();
 
-        // Obtener el ID del profesor
         $query_teacher = $pdo->prepare("
             SELECT ts.teacher_id 
             FROM teacher_subjects ts
@@ -53,7 +67,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $teacher_id = $teacher['teacher_id'];
         }
 
-        // Verificar si el espacio está ocupado
         if ($tipo_espacio === 'Laboratorio') {
             $query_verificar = $pdo->prepare("
                 SELECT assignment_id 
@@ -92,9 +105,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit;
         }
 
-        // **Nueva Sección: Verificación de horas semanales por grupo**
-
-        // 1. Obtener las horas semanales permitidas para la materia
         $query_weekly_hours = $pdo->prepare("SELECT weekly_hours FROM subjects WHERE subject_id = :subject_id");
         $query_weekly_hours->bindParam(':subject_id', $subject_id, PDO::PARAM_INT);
         $query_weekly_hours->execute();
@@ -106,15 +116,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit;
         }
 
-        $weekly_hours = (float)$subject['weekly_hours']; // Usar float para mayor precisión
+        $weekly_hours = (float)$subject['weekly_hours'];
 
-        // 2. Calcular la duración de la nueva asignación en horas
         $start = new DateTime($start_time);
         $end = new DateTime($end_time);
         $interval = $start->diff($end);
         $duration_hours = (int)$interval->h + ($interval->i / 60) + ($interval->s / 3600);
 
-        // 3. Obtener las horas actualmente asignadas a la materia en el mismo grupo, excluyendo la asignación actual si se está actualizando
         if ($assignment_id) {
             $query_current_hours = $pdo->prepare("
                 SELECT start_time, end_time 
@@ -151,7 +159,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $total_assigned_hours += $hours;
         }
 
-        // 4. Verificar que no se exceda el límite de horas semanales
         $new_total = $total_assigned_hours + $duration_hours;
 
         if ($new_total > $weekly_hours) {
@@ -159,10 +166,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $pdo->rollBack();
             exit;
         }
-
-        // **Fin de la Nueva Sección**
-
-        // Proceder con la actualización o inserción de la asignación
         if ($assignment_id) { 
             if ($tipo_espacio === 'Laboratorio') {
                 $sentencia_actualizar = $pdo->prepare("

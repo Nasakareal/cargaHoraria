@@ -48,12 +48,10 @@ foreach ($groups as $group) {
                 FROM teacher_subjects ts
                 WHERE ts.subject_id = :subject_id 
                   AND ts.group_id = :group_id 
-                  AND ts.estado = 'activo'
                 ORDER BY (
                     SELECT COUNT(*) 
                     FROM schedule_assignments sa 
                     WHERE sa.teacher_id = ts.teacher_id 
-                      AND sa.estado = 'activo'
                 ) ASC
                 LIMIT 1
             ");
