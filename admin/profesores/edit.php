@@ -147,7 +147,7 @@ foreach ($programs as $program) {
                                 <div class="row" style="margin-top:20px;">
                                     <div class="col-md-12">
                                         <button type="submit" class="btn btn-primary">Actualizar</button>
-                                        <a href="<?= APP_URL; ?>/admin/profesores" class="btn btn-secondary">Cancelar</a>
+                                        <button type="button" class="btn btn-secondary" onclick="history.back()">Cancelar</button>
                                     </div>
                                 </div>
                             </form>

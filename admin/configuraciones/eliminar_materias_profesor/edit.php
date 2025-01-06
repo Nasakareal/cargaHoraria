@@ -23,6 +23,9 @@ if (!$teacher_id) {
     exit;
 }
 
+$materias_disponibles = [];
+$materias_asignadas = [];
+
 include('../../../admin/layout/parte1.php');
 include('../../../app/controllers/profesores/datos_del_profesor_en_subjects.php');
 ?>

@@ -736,17 +736,6 @@ DROP INDEX unique_teacher_schedule,
 ADD UNIQUE KEY unique_teacher_schedule (teacher_id, schedule_day, start_time, end_time, tipo_espacio);
 
 
-
-
-
-
-
-
-
-
-
-
-
 ALTER TABLE schedule_assignments
 ADD CONSTRAINT unique_group_schedule UNIQUE (group_id, schedule_day, start_time);
 

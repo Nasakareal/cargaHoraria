@@ -1,6 +1,5 @@
 <?php
 
-include('../../config.php');
 
 /* Obtener el ID del profesor */
 $teacher_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
@@ -17,7 +16,6 @@ $sql = "
     FROM `groups` g
     INNER JOIN teacher_subjects ts ON g.group_id = ts.group_id
     WHERE ts.teacher_id = :teacher_id
-      AND g.estado = '1'
 ";
 
 try {
@@ -36,5 +34,4 @@ try {
     }
 } catch (PDOException $e) {
     echo "<option value=''>Error al cargar grupos</option>";
-    error_log("Error en la consulta: " . $e->getMessage());
 }

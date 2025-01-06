@@ -91,7 +91,8 @@ foreach ($horarios as $horario) {
                     <div class="card card-outline card-info">
                         <div class="card-header">
                             <h3 class="card-title">Detalles del Horario</h3>
-                            <a href="<?= APP_URL; ?>/admin/horarios_profesores" class="btn btn-secondary" style="float: right;">Volver</a>
+                            <a href="javascript:history.back();" class="btn btn-secondary" style="float: right;">Volver</a>
+
 
                         </div>
 

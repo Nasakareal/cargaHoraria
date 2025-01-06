@@ -48,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     try {
         $pdo->beginTransaction();
 
+        // Obtener el ID del profesor asignado a la materia y grupo
         $query_teacher = $pdo->prepare("
             SELECT ts.teacher_id 
             FROM teacher_subjects ts
@@ -67,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $teacher_id = $teacher['teacher_id'];
         }
 
+        // Verificación de disponibilidad de espacio (Laboratorio o Aula)
         if ($tipo_espacio === 'Laboratorio') {
             $query_verificar = $pdo->prepare("
                 SELECT assignment_id 
@@ -100,11 +102,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $query_verificar->execute();
 
         if ($query_verificar->rowCount() > 0) {
-            echo json_encode(['status' => 'error', 'message' => 'El horario seleccionado ya está ocupado.']);
+            echo json_encode(['status' => 'error', 'message' => 'El espacio seleccionado ya está ocupado en el horario indicado.']);
             $pdo->rollBack();
             exit;
         }
 
+        // Verificación de disponibilidad del profesor
+        if ($teacher_id !== null) {
+            $query_teacher_conflict = $pdo->prepare("
+                SELECT assignment_id 
+                FROM manual_schedule_assignments 
+                WHERE teacher_id = :teacher_id 
+                  AND schedule_day = :schedule_day 
+                  AND ((:start_time < end_time AND :end_time > start_time))
+                  AND estado = 'activo'
+                  AND assignment_id != :assignment_id
+            ");
+            $query_teacher_conflict->bindParam(':teacher_id', $teacher_id, PDO::PARAM_INT);
+            $query_teacher_conflict->bindParam(':schedule_day', $schedule_day, PDO::PARAM_STR);
+            $query_teacher_conflict->bindParam(':start_time', $start_time, PDO::PARAM_STR);
+            $query_teacher_conflict->bindParam(':end_time', $end_time, PDO::PARAM_STR);
+            $query_teacher_conflict->bindParam(':assignment_id', $assignment_id, PDO::PARAM_INT);
+            $query_teacher_conflict->execute();
+
+            if ($query_teacher_conflict->rowCount() > 0) {
+                echo json_encode(['status' => 'error', 'message' => 'El profesor ya tiene una asignación en el horario seleccionado.']);
+                $pdo->rollBack();
+                exit;
+            }
+        }
+
+        // Verificación de horas semanales
         $query_weekly_hours = $pdo->prepare("SELECT weekly_hours FROM subjects WHERE subject_id = :subject_id");
         $query_weekly_hours->bindParam(':subject_id', $subject_id, PDO::PARAM_INT);
         $query_weekly_hours->execute();
@@ -166,6 +194,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $pdo->rollBack();
             exit;
         }
+
+        // Actualizar o insertar la asignación
         if ($assignment_id) { 
             if ($tipo_espacio === 'Laboratorio') {
                 $sentencia_actualizar = $pdo->prepare("
