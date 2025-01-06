@@ -2,6 +2,11 @@
 include('../../app/config.php');
 include('../../app/helpers/verificar_admin.php');
 include('../../admin/layout/parte1.php');
+
+$sql_buildings = "SELECT DISTINCT building_name FROM building_programs ORDER BY building_name ASC";
+$stmt_buildings = $pdo->prepare($sql_buildings);
+$stmt_buildings->execute();
+$buildings = $stmt_buildings->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -36,7 +41,14 @@ include('../../admin/layout/parte1.php');
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="">Edificio</label>
-                                            <input type="text" name="edificio" class="form-control" required>
+                                            <select name="edificio" class="form-control" required>
+                                                <option value="">Selecciona un edificio</option>
+                                                <?php foreach ($buildings as $bld): ?>
+                                                    <option value="<?= htmlspecialchars($bld['building_name']); ?>">
+                                                        <?= htmlspecialchars($bld['building_name']); ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -45,8 +57,8 @@ include('../../admin/layout/parte1.php');
                                         <div class="form-group">
                                             <label for="">Planta</label>
                                             <select name="planta" class="form-control" required>
-                                                <option value="Planta Baja">Planta Baja</option>
-                                                <option value="Planta Alta">Planta Alta</option>
+                                                <option value="BAJA">Planta Baja</option>
+                                                <option value="ALTA">Planta Alta</option>
                                             </select>
                                         </div>
                                     </div>

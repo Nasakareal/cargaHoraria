@@ -3,7 +3,7 @@
 /* Definir los horarios disponibles por turno y día */
 $horarios_disponibles = [
     'MATUTINO' => [
-        'Lunes' => ['start' => '07:00:00', 'end' => '15:00:00'],
+        'Lunes' => ['start' => '07:00:00', 'end' => '14:00:00'],
         'Martes' => ['start' => '07:00:00', 'end' => '14:00:00'],
         'Miércoles' => ['start' => '07:00:00', 'end' => '15:00:00'],
         'Jueves' => ['start' => '07:00:00', 'end' => '14:00:00'],
@@ -46,7 +46,7 @@ $horarios_disponibles = [
         'Martes' => ['start' => '07:00:00', 'end' => '12:00:00'],
         'Miércoles' => ['start' => '07:00:00', 'end' => '12:00:00'],
         'Jueves' => ['start' => '07:00:00', 'end' => '12:00:00'],
-        'Viernes' => ['start' => '07:00:00', 'end' => '12:00:00'],
+        'Viernes' => ['start' => '07:00:00', 'end' => '13:00:00'],
     ],
     'VESPERTINO AVANZADO' => [
         'Lunes' => ['start' => '12:00:00', 'end' => '17:00:00'],

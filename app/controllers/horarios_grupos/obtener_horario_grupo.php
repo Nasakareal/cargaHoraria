@@ -9,6 +9,7 @@ function obtenerHorarioGrupo($group_id, $pdo)
                         s.subject_name, 
                         sh.shift_name,
                         r.classroom_name AS room_name,
+                        l.lab_name AS lab_name,
                         RIGHT(r.building, 1) AS building_last_char,
                         t.teacher_name,
                         g.group_name
@@ -22,6 +23,8 @@ function obtenerHorarioGrupo($group_id, $pdo)
                         shifts sh ON g.turn_id = sh.shift_id
                      LEFT JOIN 
                         classrooms r ON sa.classroom_id = r.classroom_id
+                     LEFT JOIN 
+                        labs l ON sa.lab_id = l.lab_id
                      LEFT JOIN 
                         teachers t ON sa.teacher_id = t.teacher_id
                      WHERE 

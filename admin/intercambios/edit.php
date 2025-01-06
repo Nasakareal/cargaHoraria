@@ -1,163 +1,176 @@
 <?php
+date_default_timezone_set('America/Mexico_City');
+
 include('../../app/config.php');
+include('../../app/helpers/verificar_admin.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/horarios_grupos/grupos_disponibles.php');
-include('../../app/controllers/horarios_grupos/obtener_horario_grupo.php');
-include('../../app/controllers/horarios_grupos/procesar_horario_grupo.php');
-include('../../app/controllers/horarios_grupos/listado_asignaciones.php');
 
-
-$group_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-
-
-$asignaciones = listarAsignaciones($pdo);
-
-
-if ($group_id) {
-    $resultado = procesarHorarioGrupo($group_id, $pdo);
-
-    if (isset($resultado['error'])) {
-        echo $resultado['error'];
-        include('../../layout/parte2.php');
-        exit;
-    }
-
-    $tabla_horarios = $resultado['tabla_horarios'];
-    $turno = $resultado['turno'];
-    $nombre_grupo = $resultado['nombre_grupo'];
-    $horas = $resultado['horas'];
-    $dias = $resultado['dias'];
-} else {
-    $tabla_horarios = [];
-    $turno = null;
-    $nombre_grupo = null;
-    $horas = [];
-    $dias = [];
+if (!isset($grupos) || !is_array($grupos)) {
+    die('Error: No se pudieron obtener los grupos disponibles.');
 }
 
+$materias = [];
+$group_id = isset($_GET['id']) ? intval($_GET['id']) : null;
 
-$grupos = obtenerGrupos($pdo);
+if ($group_id) {
+    $queryMaterias = $pdo->prepare("
+        SELECT m.subject_id, m.subject_name 
+        FROM subjects m 
+        INNER JOIN group_subjects gs ON m.subject_id = gs.subject_id
+        WHERE gs.group_id = :group_id
+    ");
+    $queryMaterias->bindParam(':group_id', $group_id, PDO::PARAM_INT);
+    $queryMaterias->execute();
+    $materias = $queryMaterias->fetchAll(PDO::FETCH_ASSOC);
+}
+
+$sql = "
+    SELECT 
+        a.assignment_id,
+        a.subject_id,
+        m.subject_name,
+        a.start_time,
+        a.end_time,
+        a.schedule_day,
+        a.group_id,
+        g.group_name,
+        a.classroom_id,
+        a.lab_id,
+        a.tipo_espacio,
+        a.teacher_id
+    FROM schedule_assignments a
+    INNER JOIN subjects m ON a.subject_id = m.subject_id
+    INNER JOIN `groups` g ON a.group_id = g.group_id
+    WHERE a.schedule_day IS NOT NULL
+      AND a.estado = 'activo'
+      AND a.group_id = :group_id
+";
+
+$queryAsignaciones = $pdo->prepare($sql);
+
+if ($group_id) {
+    $queryAsignaciones->bindValue(':group_id', $group_id, PDO::PARAM_INT);
+}
+
+$queryAsignaciones->execute();
+$asignaciones = $queryAsignaciones->fetchAll(PDO::FETCH_ASSOC);
+
+$colorPalette = [
+    '#1f77b4', // azul
+    '#2ca02c', // verde
+    '#ff7f0e', // naranja
+    '#ffc107', // amarillo
+    '#9467bd', // morado
+    '#8c564b', // café
+    '#e377c2', // rosa
+    '#7f7f7f', // gris
+    '#bcbd22', // verde claro
+    '#17becf'  // turquesa
+];
+
+$subjectColors = [];
+foreach ($materias as $index => $materia) {
+    $colorIndex = $index % count($colorPalette);
+    $subjectColors[$materia['subject_id']] = $colorPalette[$colorIndex];
+}
+
+$events = [];
+$daysOfWeek = [
+    'lunes' => 1, 'martes' => 2, 'miércoles' => 3,
+    'jueves' => 4, 'viernes' => 5,
+    'sábado' => 6, 'sabado' => 6,
+    'sábados' => 6, 'sabado' => 6
+];
+
+foreach ($asignaciones as $asignacion) {
+    $dayLower = strtolower($asignacion['schedule_day']);
+    if (!isset($daysOfWeek[$dayLower])) {
+        continue;
+    }
+
+    $start_date = new DateTime();
+    $start_date->setISODate((int)$start_date->format('o'), (int)$start_date->format('W'), $daysOfWeek[$dayLower]);
+    $start_date->setTime(
+        (int)substr($asignacion['start_time'], 0, 2),
+        (int)substr($asignacion['start_time'], 3, 2)
+    );
+
+    $end_date = clone $start_date;
+    $end_date->setTime(
+        (int)substr($asignacion['end_time'], 0, 2),
+        (int)substr($asignacion['end_time'], 3, 2)
+    );
+
+    $color = isset($subjectColors[$asignacion['subject_id']]) ? $subjectColors[$asignacion['subject_id']] : '#000000';
+
+    $events[] = [
+        'id' => $asignacion['assignment_id'],
+        'title' => htmlspecialchars($asignacion['subject_name'] . ' - Grupo ' . $asignacion['group_name']),
+        'start' => $start_date->format('Y-m-d\TH:i:s'),
+        'end'   => $end_date->format('Y-m-d\TH:i:s'),
+        'color' => $color,
+        'textColor' => '#fff',
+        'editable' => true,
+        'extendedProps' => [
+            'assignment_id' => $asignacion['assignment_id'],
+            'group_id'      => $asignacion['group_id'],
+            'subject_id'    => $asignacion['subject_id'],
+            'tipo_espacio'  => $asignacion['tipo_espacio']
+        ]
+    ];
+}
+
+$events_json = json_encode($events);
 ?>
-
-<!-- Content Wrapper -->
+<!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
+
+    <!-- Selector de Grupos -->
+    <div class="container">
+        <form method="GET" action="">
+            <div class="form-group">
+                <label for="groupSelector">Seleccione un grupo:</label>
+                <select id="groupSelector" name="id" class="form-control" onchange="this.form.submit()">
+                    <option value="">-- Seleccionar grupo --</option>
+                    <?php foreach ($grupos as $grupo): ?>
+                        <option value="<?= htmlspecialchars($grupo['group_id']); ?>"
+                            <?= ($group_id && $group_id == $grupo['group_id']) ? 'selected' : ''; ?>>
+                            <?= htmlspecialchars($grupo['group_name']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </form>
+    </div>
+
     <div class="content-header">
         <div class="container">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Horarios por Grupo</h1>
+                    <h1 class="m-0">Calendario de Horarios</h1>
                 </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="../../admin/horarios_grupos">Horarios</a></li>
-                        <li class="breadcrumb-item active">Detalles</li>
-                    </ol>
-                </div>
+                <div class="col-sm-6"></div>
             </div>
         </div>
     </div>
 
+    <!-- Main content -->
     <div class="content">
         <div class="container">
-            <!-- Filtro por Grupo -->
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <form method="GET" action="">
-                        <div class="form-group">
-                            <label for="groupSelector">Seleccione un grupo:</label>
-                            <select id="groupSelector" name="id" class="form-control" onchange="this.form.submit()">
-                                <option value="">-- Seleccionar grupo --</option>
-                                <?php foreach ($grupos as $grupo): ?>
-                                    <option value="<?= $grupo['group_id']; ?>" <?= $group_id == $grupo['group_id'] ? 'selected' : ''; ?>>
-                                        <?= htmlspecialchars($grupo['group_name']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Tabla de Horarios -->
-            <?php if ($group_id): ?>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card card-outline card-primary">
-                            <div class="card-header">
-                                <h3 class="card-title">Horario del Grupo: <?= htmlspecialchars($nombre_grupo); ?> (Turno: <?= htmlspecialchars($turno); ?>)</h3>
-                                <div class="card-tools">
-                                    <a href="../../admin/intercambios" class="btn btn-secondary btn-sm"><i class="bi bi-arrow-left-circle"></i> Volver</a>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <table id="horarioTabla" class="table table-bordered table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Hora/Día</th>
-                                            <?php foreach ($dias as $dia): ?>
-                                                <th><?= htmlspecialchars($dia); ?></th>
-                                            <?php endforeach; ?>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($horas as $hora): ?>
-                                            <tr>
-                                                <td><?= htmlspecialchars($hora); ?></td>
-                                                <?php foreach ($dias as $dia): ?>
-                                                    <td ondblclick="abrirModalIntercambio('<?= htmlspecialchars($hora); ?>', '<?= htmlspecialchars($dia); ?>', '<?= $tabla_horarios[$hora][$dia] ?? ''; ?>')">
-                                                        <?= $tabla_horarios[$hora][$dia] ?? ''; ?>
-                                                    </td>
-                                                <?php endforeach; ?>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
+            <div class="row">
+                <!-- Calendario -->
+                <div class="col-md-12">
+                    <div class="card card-primary">
+                        <div class="card-body p-0">
+                            <div id="calendar"></div>
                         </div>
                     </div>
                 </div>
-            <?php endif; ?>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Modal para Intercambio de Asignaciones -->
-<div id="intercambioModal" class="modal">
-    <form id="intercambioForm">
-        <h4 id="modalTitle">Intercambiar Asignación</h4>
-        <div class="form-group">
-            <label for="horaSeleccionada">Hora:</label>
-            <input type="text" id="horaSeleccionada" name="horaSeleccionada" class="form-control" readonly>
-        </div>
-        <div class="form-group">
-            <label for="diaSeleccionado">Día:</label>
-            <input type="text" id="diaSeleccionado" name="diaSeleccionado" class="form-control" readonly>
-        </div>
-        <div class="form-group">
-            <label for="asignacionActual">Asignación Actual:</label>
-            <input type="text" id="asignacionActual" name="asignacionActual" class="form-control" readonly>
-        </div>
-        <div class="form-group">
-            <label for="grupoSeleccionado">Grupo:</label>
-            <select id="grupoSeleccionado" name="grupoSeleccionado" class="form-control" onchange="cargarAsignacionesPorGrupo()">
-                <option value="">Seleccionar grupo</option>
-                <?php foreach ($grupos as $grupo): ?>
-                    <option value="<?= $grupo['group_id']; ?>">
-                        <?= htmlspecialchars($grupo['group_name']); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="nuevaAsignacion">Nueva Asignación:</label>
-            <select id="nuevaAsignacion" name="nuevaAsignacion" class="form-control">
-                <option value="">Seleccionar nueva asignación</option>
-                <!-- Opciones dinámicas cargadas por JavaScript -->
-            </select>
-        </div>
-        <button type="button" class="btn btn-primary" onclick="guardarIntercambio()">Guardar Intercambio</button>
-        <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
-    </form>
 </div>
 
 <?php
@@ -165,109 +178,145 @@ include('../../admin/layout/parte2.php');
 include('../../layout/mensajes.php');
 ?>
 
-
-<!-- Estilos -->
-<style>
-    .modal {
-        display: none;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #fff;
-        border-radius: 8px;
-        padding: 20px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        z-index: 1050;
-        width: 400px;
-        max-width: 90%;
-        overflow-y: auto;
-    }
-</style>
+<!-- FullCalendar Styles and Scripts -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/es.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-ui-dist/jquery-ui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    function abrirModalIntercambio(hora, dia, asignacion) {
-        document.getElementById('horaSeleccionada').value = hora;
-        document.getElementById('diaSeleccionado').value = dia;
-        document.getElementById('asignacionActual').value = asignacion;
-        document.getElementById('grupoSeleccionado').value = "";
-        document.getElementById('nuevaAsignacion').innerHTML = "<option value=''>Seleccionar nueva asignación</option>";
-        document.getElementById('intercambioModal').style.display = 'block';
-    }
+    const events = <?php echo $events_json; ?>;
+    const materias = <?php echo json_encode($materias); ?>;
+    const groupId = <?= json_encode($group_id); ?>;
 
-    function cerrarModal() {
-        document.getElementById('intercambioModal').style.display = 'none';
-    }
+    console.log("Eventos desde PHP:", events);
+    console.log("Materias desde PHP:", materias);
+    console.log("Grupo seleccionado:", groupId);
 
-    function cargarAsignacionesPorGrupo() {
-    const grupoId = document.getElementById('grupoSeleccionado').value;
-    const selectAsignaciones = document.getElementById('nuevaAsignacion');
+    const colorPalette = [
+        '#1f77b4', '#2ca02c', '#ff7f0e', '#ffc107',
+        '#9467bd', '#8c564b', '#e377c2', '#7f7f7f',
+        '#bcbd22', '#17becf'
+    ];
 
-    if (!grupoId) {
-        console.log('No se seleccionó ningún grupo.');
-        selectAsignaciones.innerHTML = "<option value=''>Seleccionar nueva asignación</option>";
-        return;
-    }
-
-    console.log(`Cargando asignaciones para el grupo ID: ${grupoId}`);
-
-    fetch('../../app/controllers/horarios_grupos/obtener_horarios_por_grupo.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `group_id=${grupoId}`
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            console.error('Error del servidor:', data.error);
-            alert(data.error);
-            return;
-        }
-
-        console.log('Asignaciones obtenidas:', data);
-
-        
-        selectAsignaciones.innerHTML = "<option value=''>Seleccionar nueva asignación</option>";
-        data.forEach(asignacion => {
-            const option = document.createElement('option');
-            option.value = asignacion.assignment_id;
-            option.textContent = `${asignacion.schedule_day} ${asignacion.start_time} - ${asignacion.end_time} | ${asignacion.subject_name} | ${asignacion.teacher_name} | ${asignacion.classroom_name}`;
-            selectAsignaciones.appendChild(option);
-        });
-    })
-    .catch(error => {
-        console.error('Error en la solicitud Fetch:', error);
-        alert('Error al cargar asignaciones.');
+    const subjectColorMap = {};
+    materias.forEach((materia, index) => {
+        subjectColorMap[materia.subject_id] = colorPalette[index % colorPalette.length];
     });
-}
 
+    const eventsWithColors = events.map(ev => {
+        const subjId = ev.extendedProps.subject_id;
+        return {
+            ...ev,
+            color: subjectColorMap[subjId] || '#4F4F4F',
+            textColor: '#fff'
+        };
+    });
 
+    $(function () {
+        var calendarEl = document.getElementById('calendar');
 
-    function guardarIntercambio() {
-        const hora = document.getElementById('horaSeleccionada').value;
-        const dia = document.getElementById('diaSeleccionado').value;
-        const nuevaAsignacion = document.getElementById('nuevaAsignacion').value;
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'timeGridWeek',
+            locale: 'es',
+            timeZone: 'America/Mexico_City',
+            editable: true,
+            droppable: true,
+            headerToolbar: {
+                left: '',
+                center: '',
+                right: ''
+            },
+            allDaySlot: false,
+            slotMinTime: '07:00:00',
+            slotMaxTime: '20:00:00',
+            slotDuration: '00:30',
+            hiddenDays: [0],
 
-        if (!nuevaAsignacion) {
-            alert('Por favor, selecciona una nueva asignación.');
-            return;
-        }
+            events: eventsWithColors,
 
-        fetch('../../app/controllers/intercambios/intercambio_asignacion.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ hora, dia, nuevaAsignacion })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Intercambio realizado correctamente.');
-                location.reload();
-            } else {
-                alert('Error al realizar el intercambio.');
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
+            eventClick: function(info) {
+                Swal.fire({
+                    title: info.event.title,
+                    html: `
+                        <strong>Inicio:</strong> ${info.event.start.toISOString().slice(11, 19)}<br>
+                        <strong>Fin:</strong> ${info.event.end.toISOString().slice(11, 19)}<br>
+                        <strong>Tipo de Espacio:</strong> ${info.event.extendedProps.tipo_espacio}
+                    `,
+                    icon: 'info',
+                    confirmButtonText: 'Cerrar'
+                });
+            },
+
+            eventDrop: function(info) {
+                const newStart = info.event.start;
+                const newEnd = info.event.end;
+                const daysSpanish = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+                const schedule_day = daysSpanish[newStart.getDay()];
+                const start_time = newStart.toISOString().slice(11, 19);
+                const end_time = newEnd.toISOString().slice(11, 19);
+
+                Swal.fire({
+                    title: '¿Estás seguro de mover esta materia?',
+                    html: `Nueva Fecha: <strong>${schedule_day.charAt(0).toUpperCase() + schedule_day.slice(1)}</strong><br>
+                           Nueva Hora: <strong>${start_time} - ${end_time}</strong>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, mover',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '../../app/controllers/intercambios/update_assignment.php',
+                            method: 'POST',
+                            data: {
+                                assignment_id: info.event.extendedProps.assignment_id,
+                                schedule_day: schedule_day,
+                                start_time: start_time,
+                                end_time: end_time
+                            },
+                            success: function(response) {
+                                try {
+                                    var data = JSON.parse(response);
+                                    if (data.status === 'success') {
+                                        Swal.fire('Actualizado!', 'La materia ha sido movida correctamente.', 'success');
+                                        calendar.refetchEvents();
+                                    } else {
+                                        Swal.fire('Error!', data.message || 'No se pudo actualizar la materia.', 'error');
+                                        info.revert();
+                                    }
+                                } catch (e) {
+                                    Swal.fire('success!', 'Por favor actualiza.', 'success');
+                                    info.revert();
+                                }
+                            },
+                            error: function() {
+                                Swal.fire('Error!', 'Ocurrió un error al actualizar.', 'error');
+                                info.revert();
+                            }
+                        });
+                    } else {
+                        info.revert();
+                    }
+                });
+            },
+        });
+
+        calendar.render();
+    });
 </script>
 
+
+<style>
+    .fc-event {
+        cursor: pointer;
+        opacity: 1;
+    }
+
+    .fc-timegrid-event {
+        font-size: 10px;
+        color: white !important;
+    }
+</style>

@@ -10,8 +10,8 @@ ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 
-set_time_limit(200); // Aumentado para manejar más asignaciones
-ini_set('memory_limit', '512M'); // Aumentado para manejar más datos
+set_time_limit(200);
+ini_set('memory_limit', '512M');
 error_log("Límite de memoria inicial: " . ini_get('memory_limit'));
 
 // 2. Restaurar asignaciones desde manual_schedule_assignments
@@ -22,7 +22,7 @@ function restaurarAsignaciones($pdo)
 
         $sql_restore = "
             INSERT INTO schedule_assignments 
-                (subject_id, group_id, teacher_id, classroom_id, schedule_day, start_time, end_time, estado, fyh_creacion, tipo_espacio)
+                (subject_id, group_id, teacher_id, classroom_id, schedule_day, start_time, end_time, estado, fyh_creacion, tipo_espacio, lab_id)
             SELECT 
                 m.subject_id, 
                 m.group_id, 
@@ -33,10 +33,12 @@ function restaurarAsignaciones($pdo)
                 m.end_time, 
                 'activo', 
                 NOW(), 
-                m.tipo_espacio
+                m.tipo_espacio,
+                l.lab_id  -- Usar el lab_id válido de labs
             FROM manual_schedule_assignments m
             LEFT JOIN teachers t ON m.teacher_id = t.teacher_id
             LEFT JOIN classrooms c ON m.classroom_id = c.classroom_id
+            LEFT JOIN labs l ON m.lab1_assigned = l.lab_id  -- Asegura que lab_id existe
             WHERE NOT EXISTS (
                 SELECT 1 FROM schedule_assignments sa
                 WHERE sa.group_id = m.group_id

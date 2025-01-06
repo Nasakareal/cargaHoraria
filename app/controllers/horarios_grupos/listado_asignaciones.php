@@ -10,7 +10,8 @@ function listarAsignaciones($pdo)
                     s.subject_name, 
                     t.teacher_name, 
                     g.group_name, 
-                    r.classroom_name
+                    r.classroom_name,
+                    l.lab_name
                 FROM 
                     schedule_assignments sa
                 LEFT JOIN 
@@ -21,6 +22,8 @@ function listarAsignaciones($pdo)
                     `groups` g ON sa.group_id = g.group_id
                 LEFT JOIN 
                     classrooms r ON sa.classroom_id = r.classroom_id
+                LEFT JOIN 
+                    labs l ON sa.lab_id = l.lab_id
                 ORDER BY 
                     sa.schedule_day, sa.start_time";
 

@@ -18,11 +18,11 @@ function procesarHorarioGrupo($group_id, $pdo)
 
     switch ($turno) {
         case 'MATUTINO':
-            $horas = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
+            $horas = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'];
             $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
             break;
         case 'VESPERTINO':
-            $horas = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
+            $horas = ['11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
             $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
             break;
         case 'MIXTO':
@@ -34,12 +34,12 @@ function procesarHorarioGrupo($group_id, $pdo)
             $horas = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
             $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
             break;
-            case 'MATUTINO AVANZADO':
-            $horas = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
+        case 'MATUTINO AVANZADO':
+            $horas = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00'];
             $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
             break;
-            case 'VESPERTINO AVANZADO':
-            $horas = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
+        case 'VESPERTINO AVANZADO':
+            $horas = ['11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
             $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
             break;
 
@@ -62,20 +62,29 @@ function procesarHorarioGrupo($group_id, $pdo)
         $end_time = strtotime($horario['end']);
         $dia = $horario['day'];
         $materia = $horario['subject_name'];
-        $salon = $horario['room_name'] ?? 'Sin salón';
         $profesor = $horario['teacher_name'] ?? 'Sin profesor';
+        $lab_name = $horario['lab_name'] ?? null;
+        $room_name = $horario['room_name'] ?? null;
 
-        $building_last_char = $horario['building_last_char'] ?? '';
-        if ($building_last_char !== '') {
-            $salon = htmlspecialchars($building_last_char) . "-" . htmlspecialchars($salon);
+        if (!empty($lab_name)) {
+            $espacio = htmlspecialchars($lab_name);
+        } elseif (!empty($room_name)) {
+            $building_last_char = $horario['building_last_char'] ?? '';
+            if ($building_last_char !== '') {
+                $espacio = htmlspecialchars($building_last_char) . "-" . htmlspecialchars($room_name);
+            } else {
+                $espacio = htmlspecialchars($room_name);
+            }
+        } else {
+            $espacio = 'Sin salón ni laboratorio';
         }
+
+        $contenido = "{$materia} - {$espacio} - {$profesor}";
 
         for ($current_time = $start_time; $current_time < $end_time; $current_time = strtotime("+1 hour", $current_time)) {
             $hora = date("H:i", $current_time);
 
             if (in_array($hora, $horas) && in_array($dia, $dias)) {
-                $contenido = "{$materia} - {$salon} - {$profesor}";
-
                 if (empty($tabla_horarios[$hora][$dia])) {
                     $tabla_horarios[$hora][$dia] = $contenido;
                 } else {

@@ -38,7 +38,7 @@ $nivel_id = isset($nivel_id) ? $nivel_id : null;
                         <input type="hidden" name="group_id" value="<?= htmlspecialchars($group_id); ?>">
 
                         <div class="row">
-                            <!-- Primera columna -->
+                            <!-- Nombre del grupo -->
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="">Nombre del grupo</label>
@@ -75,7 +75,7 @@ $nivel_id = isset($nivel_id) ? $nivel_id : null;
                                 </div>
                             </div>
 
-                            <!-- Segunda columna -->
+                            <!-- Turno del grupo -->
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="">Turno</label>
@@ -101,6 +101,7 @@ $nivel_id = isset($nivel_id) ? $nivel_id : null;
                                     </select>
                                 </div>
 
+                                <!-- Edificio del salón del grupo -->
                                 <div class="form-group">
                                     <label for="building_id">Edificio</label>
                                     <select id="building_id" name="building_id" class="form-control">

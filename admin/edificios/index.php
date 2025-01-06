@@ -1,4 +1,6 @@
 <?php
+header('Content-Type: text/html; charset=utf-8');
+
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/edificios/listado_de_edificios.php'); 
