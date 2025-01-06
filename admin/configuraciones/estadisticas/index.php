@@ -25,6 +25,17 @@ include('../../../admin/layout/parte1.php');
               </div>
           </div>
 
+          <!-- Estadística: Descargar todos los horarios -->
+          <div class="col-md-4 col-sm-6 col-12">
+              <div class="info-box">
+                  <span class="info-box-icon bg-purple"><i class="bi bi-calendar4-week"></i></span>
+                  <div class="info-box-content">
+                      <span class="info-box-text"><b>Descargar Horarios</b></span>
+                      <a href="horarios_grupos.php" class="btn btn-primary btn-sm">Ver Estadística</a>
+                  </div>
+              </div>
+          </div>
+
           <!-- Estadística: Ejemplo de Otras Estadísticas Futuras -->
           <div class="col-md-4 col-sm-6 col-12">
               <div class="info-box">

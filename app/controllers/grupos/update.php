@@ -1,4 +1,5 @@
 <?php
+
 include('../../../app/config.php');
 
 $group_id = $_POST['group_id'];
@@ -86,14 +87,24 @@ try {
 
     foreach ($subjects as $subject) {
         $stmt_group_subject = $pdo->prepare("INSERT INTO group_subjects (group_id, subject_id, fyh_creacion, estado) 
-                                             VALUES (:group_id, :subject_id, NOW(), '1')");
+                                             VALUES (:group_id, :subject_id, NOW(), 'ACTIVO')");
         $stmt_group_subject->execute([':group_id' => $group_id, ':subject_id' => $subject['subject_id']]);
+    }
+
+    $stmt_update_all_classrooms = $pdo->prepare("UPDATE schedule_assignments 
+                                                 SET classroom_id = :classroom_id, fyh_actualizacion = NOW() 
+                                                 WHERE group_id = :group_id");
+    $stmt_update_all_classrooms->bindParam(':classroom_id', $classroom_assigned);
+    $stmt_update_all_classrooms->bindParam(':group_id', $group_id);
+
+    if (!$stmt_update_all_classrooms->execute()) {
+        throw new Exception("No se pudo actualizar el salón en los registros de la tabla `schedule_assignments`.");
     }
 
     $pdo->commit();
 
     session_start();
-    $_SESSION['mensaje'] = "El grupo ha sido actualizado correctamente y las materias se han actualizado.";
+    $_SESSION['mensaje'] = "El grupo ha sido actualizado correctamente, las materias se han actualizado y el salón ha sido asignado a todos los horarios.";
     $_SESSION['icono'] = "success";
     header('Location:' . APP_URL . "/admin/grupos");
     exit();

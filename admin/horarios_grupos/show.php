@@ -4,13 +4,11 @@ include('../../admin/layout/parte1.php');
 include('../../app/controllers/horarios_grupos/grupos_disponibles.php');
 include('../../app/controllers/horarios_grupos/obtener_horario_grupo.php');
 include('../../app/controllers/horarios_grupos/procesar_horario_grupo.php');
-include('../../app/controllers/horarios_grupos/listado_asignaciones.php');
 
 
 $group_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
 
-$asignaciones = listarAsignaciones($pdo);
 
 
 if ($group_id) {
@@ -95,7 +93,11 @@ $grupos = obtenerGrupos($pdo);
                                                 <tr>
                                                     <td><?= htmlspecialchars($hora); ?></td>
                                                     <?php foreach ($dias as $dia): ?>
-                                                        <td><?= $tabla_horarios[$hora][$dia] ?? ''; ?></td>
+                                                        <?php
+                                                        $contenido = $tabla_horarios[$hora][$dia] ?? '';
+                                                        $sin_profesor = strpos($contenido, 'Sin profesor') !== false ? 'table-warning' : '';
+                                                        ?>
+                                                        <td class="<?= $sin_profesor; ?>"><?= $contenido; ?></td>
                                                     <?php endforeach; ?>
                                                 </tr>
                                             <?php endforeach; ?>
