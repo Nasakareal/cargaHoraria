@@ -1,6 +1,6 @@
 <?php
 include('../../../app/config.php');
-require_once('../../../app/registro_eventos.php'); // Incluir la función de registro de eventos
+require_once('../../../app/registro_eventos.php');
 
 $group_id = $_POST['group_id'];
 $group_name = $_POST['group_name'];
@@ -92,10 +92,11 @@ try {
     }
 
     $stmt_update_all_classrooms = $pdo->prepare("UPDATE schedule_assignments 
-                                                 SET classroom_id = :classroom_id, fyh_actualizacion = NOW() 
-                                                 WHERE group_id = :group_id");
-    $stmt_update_all_classrooms->bindParam(':classroom_id', $classroom_assigned);
-    $stmt_update_all_classrooms->bindParam(':group_id', $group_id);
+                                             SET classroom_id = :classroom_id, fyh_actualizacion = NOW() 
+                                             WHERE group_id = :group_id AND tipo_espacio = 'Aula'");
+$stmt_update_all_classrooms->bindParam(':classroom_id', $classroom_assigned);
+$stmt_update_all_classrooms->bindParam(':group_id', $group_id);
+
 
     if (!$stmt_update_all_classrooms->execute()) {
         throw new Exception("No se pudo actualizar el salón en los registros de la tabla `schedule_assignments`.");

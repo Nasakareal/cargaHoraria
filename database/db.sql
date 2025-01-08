@@ -743,16 +743,6 @@ ALTER TABLE manual_schedule_assignments
 ADD CONSTRAINT unique_manual_group_schedule UNIQUE (group_id, schedule_day, start_time);
 
 
-
-
-
-
-
-
-
-
-
-
 CREATE TABLE registro_eventos (
     id_evento INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, /* ID único del evento */
     usuario_email VARCHAR(255) NOT NULL, /* Correo del usuario que realiza la acción */
@@ -762,6 +752,21 @@ CREATE TABLE registro_eventos (
     ip_usuario VARCHAR(45) NOT NULL, /* Dirección IP del usuario */
     estado VARCHAR(11) DEFAULT 'ACTIVO' /* Estado del registro para controlar si es visible o no */
 ) ENGINE=InnoDB;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

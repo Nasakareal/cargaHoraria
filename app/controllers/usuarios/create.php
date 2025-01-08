@@ -1,7 +1,7 @@
 <?php
 
 include('../../../app/config.php');
-require_once '../../../app/registro_eventos.php'; // Incluir el archivo con la función de registro de eventos
+require_once '../../../app/registro_eventos.php';
 
 /* Datos del formulario */
 $nombres = $_POST['nombres'];
@@ -16,7 +16,7 @@ if ($password == $password_repet) {
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     $fechaHora = date('Y-m-d H:i:s');  // Fecha de creación
-    $estado_de_registro = 'ACTIVO';  // Estado por defecto
+    $estado_de_registro = '1';  // Estado por defecto
 
     /* Prepara la sentencia para insertar el usuario en la base de datos */
     $sentencia = $pdo->prepare('INSERT INTO usuarios

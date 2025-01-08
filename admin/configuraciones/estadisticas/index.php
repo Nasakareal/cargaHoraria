@@ -42,7 +42,7 @@ include('../../../admin/layout/parte1.php');
                   <span class="info-box-icon bg-purple"><i class="bi bi-person-video3"></i></span>
                   <div class="info-box-content">
                       <span class="info-box-text"><b>Descargar Horarios de Profesores</b></span>
-                      <a href="horarios_grupos.php" class="btn btn-primary btn-sm">Descargar Archivos</a>
+                      <a href="horarios_profesores.php" class="btn btn-primary btn-sm">Descargar Archivos</a>
                   </div>
               </div>
           </div>

@@ -1,7 +1,7 @@
 <?php
 
 include('../../../app/config.php');
-require_once('../../../app/registro_eventos.php'); // Incluir la función de registro de eventos
+require_once('../../../app/registro_eventos.php');
 
 $classroom_id = $_POST['classroom_id'];
 $classroom_name = $_POST['classroom_name'];
