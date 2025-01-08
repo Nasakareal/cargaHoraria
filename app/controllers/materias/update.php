@@ -1,5 +1,6 @@
 <?php
 include('../../../app/config.php');
+require_once('../../../app/registro_eventos.php');
 
 // Iniciar sesión si no está iniciada
 if (session_status() == PHP_SESSION_NONE) {
@@ -10,12 +11,7 @@ if (session_status() == PHP_SESSION_NONE) {
 $subject_id = filter_input(INPUT_POST, 'subject_id', FILTER_VALIDATE_INT);
 $subject_name = filter_input(INPUT_POST, 'subject_name', FILTER_SANITIZE_STRING);
 $weekly_hours = filter_input(INPUT_POST, 'weekly_hours', FILTER_VALIDATE_INT);
-$class_hours = filter_input(INPUT_POST, 'class_hours', FILTER_VALIDATE_INT);
-$lab_hours = filter_input(INPUT_POST, 'lab_hours', FILTER_VALIDATE_INT);
-$lab1_hours = filter_input(INPUT_POST, 'lab1_hours', FILTER_VALIDATE_INT);
-$lab2_hours = filter_input(INPUT_POST, 'lab2_hours', FILTER_VALIDATE_INT);
-$hours_consecutive = filter_input(INPUT_POST, 'hours_consecutive', FILTER_VALIDATE_INT);
-$max_consecutive_lab_hours = filter_input(INPUT_POST, 'max_consecutive_lab_hours', FILTER_VALIDATE_INT);
+$max_consecutive_class_hours = filter_input(INPUT_POST, 'max_consecutive_class_hours', FILTER_VALIDATE_INT);
 $program_id = filter_input(INPUT_POST, 'program_id', FILTER_VALIDATE_INT);
 $term_id = filter_input(INPUT_POST, 'term_id', FILTER_VALIDATE_INT);
 
@@ -24,12 +20,7 @@ if (
     !$subject_id || 
     !$subject_name || 
     $weekly_hours === false || 
-    $class_hours === false || 
-    $lab_hours === false || 
-    $lab1_hours === false || 
-    $lab2_hours === false || 
-    $hours_consecutive === false || 
-    $max_consecutive_lab_hours === false || 
+    $max_consecutive_class_hours === false || 
     !$program_id || 
     !$term_id
 ) {
@@ -42,11 +33,10 @@ if (
 $fechaHora = date('Y-m-d H:i:s');
 
 try {
-    // Iniciar transacción
     $pdo->beginTransaction();
 
     // 1. Obtener el valor actual de weekly_hours antes de actualizar
-    $query_old_hours = $pdo->prepare("SELECT weekly_hours FROM subjects WHERE subject_id = :subject_id");
+    $query_old_hours = $pdo->prepare("SELECT subject_name, weekly_hours FROM subjects WHERE subject_id = :subject_id");
     $query_old_hours->execute([':subject_id' => $subject_id]);
     $old_subject = $query_old_hours->fetch(PDO::FETCH_ASSOC);
 
@@ -54,6 +44,7 @@ try {
         throw new Exception("Materia no encontrada.");
     }
 
+    $old_subject_name = $old_subject['subject_name'];
     $old_weekly_hours = $old_subject['weekly_hours'];
     $difference = $weekly_hours - $old_weekly_hours;
 
@@ -61,12 +52,7 @@ try {
     $sentencia_actualizar = $pdo->prepare("UPDATE subjects
         SET subject_name = :subject_name,
             weekly_hours = :weekly_hours,
-            class_hours = :class_hours,
-            lab_hours = :lab_hours,
-            lab1_hours = :lab1_hours,
-            lab2_hours = :lab2_hours,
             max_consecutive_class_hours = :max_consecutive_class_hours,
-            max_consecutive_lab_hours = :max_consecutive_lab_hours,
             fyh_actualizacion = :fyh_actualizacion,
             program_id = :program_id,
             term_id = :term_id
@@ -74,12 +60,7 @@ try {
 
     $sentencia_actualizar->bindParam(':subject_name', $subject_name);
     $sentencia_actualizar->bindParam(':weekly_hours', $weekly_hours, PDO::PARAM_INT);
-    $sentencia_actualizar->bindParam(':class_hours', $class_hours, PDO::PARAM_INT);
-    $sentencia_actualizar->bindParam(':lab_hours', $lab_hours, PDO::PARAM_INT);
-    $sentencia_actualizar->bindParam(':lab1_hours', $lab1_hours, PDO::PARAM_INT);
-    $sentencia_actualizar->bindParam(':lab2_hours', $lab2_hours, PDO::PARAM_INT);
-    $sentencia_actualizar->bindParam(':max_consecutive_class_hours', $hours_consecutive, PDO::PARAM_INT);
-    $sentencia_actualizar->bindParam(':max_consecutive_lab_hours', $max_consecutive_lab_hours, PDO::PARAM_INT);
+    $sentencia_actualizar->bindParam(':max_consecutive_class_hours', $max_consecutive_class_hours, PDO::PARAM_INT);
     $sentencia_actualizar->bindParam(':fyh_actualizacion', $fechaHora);
     $sentencia_actualizar->bindParam(':program_id', $program_id, PDO::PARAM_INT);
     $sentencia_actualizar->bindParam(':term_id', $term_id, PDO::PARAM_INT);
@@ -119,6 +100,12 @@ try {
         }
     }
 
+    $usuario_email = $_SESSION['sesion_email'] ?? 'desconocido@dominio.com';
+    $accion = 'Actualización de materia';
+    $descripcion = "Se actualizó la materia con ID $subject_id. Nombre anterior: '$old_subject_name', Nuevo nombre: '$subject_name', Horas semanales anteriores: $old_weekly_hours, Nuevas horas semanales: $weekly_hours.";
+
+    registrarEvento($pdo, $usuario_email, $accion, $descripcion);
+
     // Confirmar transacción
     $pdo->commit();
 
@@ -134,4 +121,3 @@ try {
     header('Location: ' . APP_URL . "/admin/materias");
     exit;
 }
-?>

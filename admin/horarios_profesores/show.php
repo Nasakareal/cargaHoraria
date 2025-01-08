@@ -16,7 +16,8 @@ $sql_horarios = "SELECT
                     sa.end_time, 
                     s.subject_name, 
                     g.group_name, 
-                    COALESCE(r.classroom_name, 'Sin aula') AS classroom_name
+                    COALESCE(r.classroom_name, 'Sin aula') AS classroom_name, 
+                    t.teacher_name
                  FROM 
                     schedule_assignments sa
                  JOIN 
@@ -25,6 +26,8 @@ $sql_horarios = "SELECT
                     `groups` g ON sa.group_id = g.group_id
                  LEFT JOIN 
                     classrooms r ON sa.classroom_id = r.classroom_id
+                 JOIN 
+                    teachers t ON sa.teacher_id = t.teacher_id
                  WHERE 
                     sa.teacher_id = :teacher_id
                  ORDER BY sa.schedule_day, sa.start_time";
@@ -37,6 +40,9 @@ if (!$horarios) {
     echo "No se encontraron horarios asignados para este profesor.";
     exit;
 }
+
+$teacher_name = $horarios[0]['teacher_name'];
+
 
 /* Definir los horarios y días */
 $horas = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
@@ -84,7 +90,7 @@ foreach ($horarios as $horario) {
     <div class="content">
         <div class="container">
             <div class="row">
-                <h1>Horarios Asignados al Profesor</h1> 
+                <h1>Horarios Asignados al Profesor <?= $teacher_name ?></h1> 
             </div>
             <div class="row">
                 <div class="col-md-12">

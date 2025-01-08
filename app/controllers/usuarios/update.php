@@ -1,5 +1,5 @@
 <?php
-
+require_once '../../../app/registro_eventos.php';
 include('../../../app/config.php');
 
 session_start();
@@ -58,6 +58,12 @@ try {
             exit();
         }
     }
+
+    $usuario_email = $_SESSION['sesion_email'];
+    $accion = 'Actualización de Usuario';
+    $descripcion = "Se actualizó un usuario con ID $id_usuario.";
+
+    registrarEvento($pdo, $usuario_email, $accion, $descripcion);
 
     if ($sentencia->execute()) {
         $_SESSION['mensaje'] = "Se ha actualizado con éxito";

@@ -1,5 +1,6 @@
 <?php
 include('../../../app/config.php');
+require_once('../../../app/registro_eventos.php');
 
 $nombres = $_POST['teacher_name'];
 $fecha_creacion = date('Y-m-d H:i:s');
@@ -12,7 +13,6 @@ if (strcasecmp($nombres, 'Elsa Pato') === 0) {
 }
 
 if (strcasecmp($nombres, 'Vania') === 0) {
-
     session_start();
     $_SESSION['mostrar_flores'] = true;
     header('Location:' . APP_URL . "/admin/autoSalones/ainav.php");
@@ -28,6 +28,13 @@ $sentencia->bindParam(':estado', $estado);
 try {
     if ($sentencia->execute()) {
         session_start();
+
+        $usuario_email = $_SESSION['sesion_email'] ?? 'desconocido@dominio.com';
+        $accion = 'Registro de profesor';
+        $descripcion = "Se registró al profesor '$nombres' con estado '$estado'.";
+
+        registrarEvento($pdo, $usuario_email, $accion, $descripcion);
+
         $_SESSION['mensaje'] = "Se ha registrado con éxito el profesor";
         $_SESSION['icono'] = "success";
         header('Location:' . APP_URL . "/admin/profesores");

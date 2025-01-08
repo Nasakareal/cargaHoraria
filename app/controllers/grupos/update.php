@@ -1,6 +1,6 @@
 <?php
-
 include('../../../app/config.php');
+require_once('../../../app/registro_eventos.php'); // Incluir la función de registro de eventos
 
 $group_id = $_POST['group_id'];
 $group_name = $_POST['group_name'];
@@ -101,9 +101,14 @@ try {
         throw new Exception("No se pudo actualizar el salón en los registros de la tabla `schedule_assignments`.");
     }
 
+    $usuario_email = $_SESSION['sesion_email'] ?? 'desconocido@dominio.com';
+    $accion = 'Actualización de grupo';
+    $descripcion = "Se actualizó el grupo '$group_name' con ID $group_id. Programa ID $program_id, Periodo ID $term_id, Turno ID $turn_id, Salón asignado: $classroom_assigned.";
+
+    registrarEvento($pdo, $usuario_email, $accion, $descripcion);
+
     $pdo->commit();
 
-    session_start();
     $_SESSION['mensaje'] = "El grupo ha sido actualizado correctamente, las materias se han actualizado y el salón ha sido asignado a todos los horarios.";
     $_SESSION['icono'] = "success";
     header('Location:' . APP_URL . "/admin/grupos");

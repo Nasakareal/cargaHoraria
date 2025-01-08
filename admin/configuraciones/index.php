@@ -57,6 +57,17 @@ include('../../admin/layout/parte1.php');
               </div>
           </div>
 
+          <!-- Interfaz para Eliminar Materias -->
+            <div class="col-md-4 col-sm-6 col-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-danger"><i class="bi bi-trash-fill"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text"><b>Eliminar Materias</b></span>
+                        <a href="<?= APP_URL; ?>/admin/configuraciones/eliminar_materias_profesor" class="btn btn-primary btn-sm">Acceder</a>
+                    </div>
+                </div>
+            </div>
+
             <!-- Configuración para Activar/Desactivar Usuarios -->
             <div class="col-md-4 col-sm-6 col-12">
                 <div class="info-box">
@@ -71,17 +82,6 @@ include('../../admin/layout/parte1.php');
                             <input type="checkbox" id="toggle-switch">
                             <span class="slider"></span>
                         </label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Interfaz para Eliminar Materias -->
-            <div class="col-md-4 col-sm-6 col-12">
-                <div class="info-box">
-                    <span class="info-box-icon bg-danger"><i class="bi bi-trash-fill"></i></span>
-                    <div class="info-box-content">
-                        <span class="info-box-text"><b>Eliminar Materias</b></span>
-                        <a href="<?= APP_URL; ?>/admin/configuraciones/eliminar_materias_profesor" class="btn btn-primary btn-sm">Acceder</a>
                     </div>
                 </div>
             </div>
@@ -108,13 +108,24 @@ include('../../admin/layout/parte1.php');
                 </div>
             </div
 
-            <!-- Interfaz para Calendario Escolar -->
+            <!-- Interfaz para el Mapa Escolar -->
             <div class="col-md-4 col-sm-6 col-12">
                 <div class="info-box">
                     <span class="info-box-icon bg-olive"><i class="bi bi-map"></i></span>
                     <div class="info-box-content">
                         <span class="info-box-text"><b>Mapa Escolar</b></span>
                         <a href="<?= APP_URL; ?>/admin/configuraciones/mapa" class="btn btn-primary btn-sm">Acceder</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interfaz para Registro de actividades -->
+            <div class="col-md-4 col-sm-6 col-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-gray"><i class="bi bi-clock-history"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text"><b>Registro de actividades</b></span>
+                        <a href="<?= APP_URL; ?>/admin/configuraciones/registro_de_actividades" class="btn btn-primary btn-sm">Acceder</a>
                     </div>
                 </div>
             </div>

@@ -1,4 +1,5 @@
 <?php
+require_once '../../app/registro_eventos.php';
 include('../../app/config.php');
 include('../../app/middleware.php');
 

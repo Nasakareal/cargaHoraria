@@ -1,26 +1,39 @@
 <?php
+// Incluir la configuración y conexión a la base de datos
 include_once($_SERVER['DOCUMENT_ROOT'] . '/cargaHoraria/app/config.php');
 
+// Incluir la función de registro de eventos
+require_once($_SERVER['DOCUMENT_ROOT'] . '/cargaHoraria/app/registro_eventos.php');
+
+// Iniciar la sesión si no está iniciada
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Configuración de errores
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 ini_set('error_log', '/app/controllers/asignacion_manual/debug.log');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $subject_id = isset($_POST['subject_id']) ? $_POST['subject_id'] : '';
+    // Obtener y sanitizar los datos del formulario
+    $subject_id = isset($_POST['subject_id']) ? intval($_POST['subject_id']) : 0;
     $start_time = isset($_POST['start_time']) ? $_POST['start_time'] : '';
     $end_time = isset($_POST['end_time']) ? $_POST['end_time'] : '';
     $schedule_day = isset($_POST['schedule_day']) ? $_POST['schedule_day'] : '';
-    $group_id = isset($_POST['group_id']) ? $_POST['group_id'] : '';
-    $assignment_id = isset($_POST['assignment_id']) ? $_POST['assignment_id'] : '';
-    $lab_id = isset($_POST['lab_id']) ? $_POST['lab_id'] : 0;
-    $aula_id = isset($_POST['aula_id']) ? $_POST['aula_id'] : 0;
+    $group_id = isset($_POST['group_id']) ? intval($_POST['group_id']) : 0;
+    $assignment_id = isset($_POST['assignment_id']) ? intval($_POST['assignment_id']) : 0;
+    $lab_id = isset($_POST['lab_id']) ? intval($_POST['lab_id']) : 0;
+    $aula_id = isset($_POST['aula_id']) ? intval($_POST['aula_id']) : 0;
     $tipo_espacio = isset($_POST['tipo_espacio']) ? $_POST['tipo_espacio'] : null;
 
+    // Validaciones de los datos requeridos
     if (empty($subject_id) || empty($start_time) || empty($schedule_day) || empty($group_id)) {
         echo json_encode(['status' => 'error', 'message' => 'Faltan datos requeridos.']);
         exit;
     }
 
+    // Validaciones según el tipo de espacio
     if ($tipo_espacio === 'Laboratorio') {
         if (empty($lab_id) || $lab_id == 0) {
             echo json_encode(['status' => 'error', 'message' => 'Debe seleccionar un laboratorio para asignar.']);
@@ -36,16 +49,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
     }
 
+    // Si no se proporciona end_time, se agrega 1 hora al start_time
     if (empty($end_time)) {
         $start_time_obj = new DateTime($start_time);
         $start_time_obj->modify('+1 hour');
         $end_time = $start_time_obj->format('H:i:s');
     }
 
+    // Formatear las horas
     $start_time = date("H:i:s", strtotime($start_time));
     $end_time = date("H:i:s", strtotime($end_time));
 
     try {
+        // Iniciar la transacción
         $pdo->beginTransaction();
 
         // Obtener el ID del profesor asignado a la materia y grupo
@@ -62,11 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $teacher = $query_teacher->fetch(PDO::FETCH_ASSOC);
 
-        if (!$teacher) {
-            $teacher_id = null;
-        } else {
-            $teacher_id = $teacher['teacher_id'];
-        }
+        $teacher_id = $teacher ? intval($teacher['teacher_id']) : null;
 
         // Verificación de disponibilidad de espacio (Laboratorio o Aula)
         if ($tipo_espacio === 'Laboratorio') {
@@ -89,10 +101,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                   AND assignment_id != :assignment_id
             ");
             $query_verificar->bindParam(':aula_id', $aula_id, PDO::PARAM_INT);
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Tipo de espacio inválido.']);
-            $pdo->rollBack();
-            exit;
         }
 
         $query_verificar->bindParam(':schedule_day', $schedule_day, PDO::PARAM_STR);
@@ -151,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $interval = $start->diff($end);
         $duration_hours = (int)$interval->h + ($interval->i / 60) + ($interval->s / 3600);
 
-        if ($assignment_id) {
+        if ($assignment_id) { 
             $query_current_hours = $pdo->prepare("
                 SELECT start_time, end_time 
                 FROM manual_schedule_assignments 
@@ -266,12 +274,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $sentencia_insertar->execute();
         }
 
+        // Confirmar la transacción
         $pdo->commit();
+
+        // Registrar el evento de asignación
+        if (isset($_SESSION['sesion_email'])) {
+            $usuario_email = $_SESSION['sesion_email'];
+        } else {
+            $usuario_email = 'desconocido@dominio.com';
+        }
+
+        $accion = 'Asignación manual de horario';
+        $descripcion = "Se asignó la materia ID $subject_id al grupo ID $group_id en el día $schedule_day de $start_time a $end_time.";
+
+        registrarEvento($pdo, $usuario_email, $accion, $descripcion);
+
+        // Respuesta exitosa
         echo json_encode(['status' => 'success', 'message' => 'La asignación se ha guardado correctamente.']);
         exit;
     } catch (Exception $exception) {
+        // Revertir la transacción en caso de error
         $pdo->rollBack();
-        error_log("Error en update.php: " . $exception->getMessage());
+        error_log("Error en asignacion_manual.php: " . $exception->getMessage());
         echo json_encode(['status' => 'error', 'message' => 'Error al guardar la asignación.']);
         exit;
     }

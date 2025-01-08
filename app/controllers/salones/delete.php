@@ -1,11 +1,12 @@
 <?php
 
 include('../../../app/config.php');
+require_once('../../../app/registro_eventos.php'); // Incluir el archivo con la función de registro de eventos
 
 $classroom_id = $_POST['classroom_id'];
 
 /* Verificar si el salón está asociado a algún grupo */
-$sql_asociaciones = "SELECT * FROM `groups` WHERE estado = '1' AND classroom_id = :classroom_id";
+$sql_asociaciones = "SELECT * FROM `groups` WHERE estado = '1' AND classroom_assigned = :classroom_id";
 $query_asociaciones = $pdo->prepare($sql_asociaciones);
 $query_asociaciones->bindParam(':classroom_id', $classroom_id);
 $query_asociaciones->execute();
@@ -25,6 +26,13 @@ if ($contador > 0) {
     try {
         if ($sentencia->execute()) {
             session_start();
+
+            $usuario_email = $_SESSION['sesion_email'] ?? 'desconocido@dominio.com';
+            $accion = 'Eliminación de salón';
+            $descripcion = "Se eliminó el salón con ID $classroom_id.";
+
+            registrarEvento($pdo, $usuario_email, $accion, $descripcion);
+
             $_SESSION['mensaje'] = "Se ha eliminado el salón correctamente.";
             $_SESSION['icono'] = "success";
             header('Location:' . APP_URL . "/admin/salones");

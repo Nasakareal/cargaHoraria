@@ -1,6 +1,7 @@
 <?php
 
 include('../../../app/config.php');
+require_once('../../../app/registro_eventos.php');
 
 /* Validar que se reciba el ID del profesor */
 $teacher_id = filter_input(INPUT_POST, 'teacher_id', FILTER_VALIDATE_INT);
@@ -34,11 +35,24 @@ try {
     $deleteRelated->bindParam(':teacher_id', $teacher_id);
     $deleteRelated->execute();
 
+    /* Obtener el nombre del profesor antes de eliminar */
+    $queryTeacherName = $pdo->prepare("SELECT teacher_name FROM teachers WHERE teacher_id = :teacher_id");
+    $queryTeacherName->bindParam(':teacher_id', $teacher_id);
+    $queryTeacherName->execute();
+    $teacher_name = $queryTeacherName->fetchColumn();
+
     /* Ahora eliminar el profesor */
     $deleteTeacher = $pdo->prepare("DELETE FROM teachers WHERE teacher_id = :teacher_id");
     $deleteTeacher->bindParam(':teacher_id', $teacher_id);
 
     if ($deleteTeacher->execute()) {
+        
+        $usuario_email = $_SESSION['sesion_email'] ?? 'desconocido@dominio.com';
+        $accion = 'Eliminación de profesor';
+        $descripcion = "Se eliminó al profesor '$teacher_name' con ID $teacher_id y sus registros relacionados.";
+
+        registrarEvento($pdo, $usuario_email, $accion, $descripcion);
+
         $_SESSION['mensaje'] = "El profesor y sus registros relacionados han sido eliminados correctamente.";
         $_SESSION['icono'] = "success";
     } else {

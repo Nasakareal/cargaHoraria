@@ -1,5 +1,5 @@
 <?php
-
+require_once '../../../app/registro_eventos.php';
 include('../../../app/config.php');
 
 if (session_status() == PHP_SESSION_NONE) {
@@ -207,6 +207,12 @@ try {
     $sentencia_actualizar_horas->execute([$total_hours, $fechaHora, $teacher_id]);
 
     $pdo->commit();
+
+    $usuario_email = $_SESSION['sesion_email'];
+    $accion = 'Asignación de materias';
+    $descripcion = "Se asignaron materias al profesor con ID $teacher_id. Materias asignadas: " . implode(', ', $materia_ids);
+
+    registrarEvento($pdo, $usuario_email, $accion, $descripcion);
 
     $_SESSION['mensaje'] = "Se han añadido las materias con éxito.";
     $_SESSION['icono'] = "success";

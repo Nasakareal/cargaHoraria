@@ -1,12 +1,14 @@
 <?php
-// Incluir la configuración de la base de datos
-require_once('../../../app/config.php'); // Ajusta la ruta según sea necesario
-require '../../../vendor/autoload.php'; // PhpSpreadsheet
+require_once('../../../app/config.php');
+require '../../../vendor/autoload.php';
 
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
+ini_set('memory_limit', '2G');
+set_time_limit(0);
+
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
-// Función para obtener los horarios de todos los grupos
 function obtenerHorariosPorGrupo($pdo)
 {
     $sql = "SELECT 
@@ -42,7 +44,6 @@ function obtenerHorariosPorGrupo($pdo)
     $query->execute();
     $horarios = $query->fetchAll(PDO::FETCH_ASSOC);
 
-    // Agrupar los horarios por grupo
     $horarios_por_grupo = [];
     foreach ($horarios as $horario) {
         $group_name = $horario['group_name'];
@@ -55,64 +56,151 @@ function obtenerHorariosPorGrupo($pdo)
     return $horarios_por_grupo;
 }
 
-// Obtener los horarios por grupo
+function logError($message) {
+    file_put_contents(__DIR__ . '/error_log.txt', $message . "\n", FILE_APPEND);
+}
+
+$temp_dir = sys_get_temp_dir() . '/horarios_temp_' . uniqid();
+if (!mkdir($temp_dir, 0777, true)) {
+    exit("No se pudo crear el directorio temporal para almacenar los archivos Excel.");
+}
+
 $horarios_por_grupo = obtenerHorariosPorGrupo($pdo);
 
-// Crear un archivo ZIP
+if (empty($horarios_por_grupo)) {
+    exit("No se encontraron horarios.");
+}
+
+$template_path = __DIR__ . '/plantilla.xlsx';
+if (!file_exists($template_path)) {
+    exit("La plantilla 'plantilla.xlsx' no existe en el directorio " . __DIR__);
+}
+
 $zip = new ZipArchive();
 $zip_file = 'Horarios_Por_Grupo.zip';
+
+if (file_exists($zip_file)) {
+    unlink($zip_file);
+}
 
 if ($zip->open($zip_file, ZipArchive::CREATE) !== TRUE) {
     exit("No se pudo crear el archivo ZIP.");
 }
 
 foreach ($horarios_por_grupo as $group_name => $horarios) {
-    $spreadsheet = new Spreadsheet();
-    $sheet = $spreadsheet->getActiveSheet();
-    
-    // Encabezados del Excel
-    $sheet->setCellValue('A1', 'Grupo');
-    $sheet->setCellValue('B1', 'Materia');
-    $sheet->setCellValue('C1', 'Profesor');
-    $sheet->setCellValue('D1', 'Día');
-    $sheet->setCellValue('E1', 'Hora Inicio');
-    $sheet->setCellValue('F1', 'Hora Fin');
-    $sheet->setCellValue('G1', 'Salón');
-    $sheet->setCellValue('H1', 'Edificio');
-
-    // Agregar los datos al Excel
-    $fila = 2;
-    foreach ($horarios as $horario) {
-        $sheet->setCellValue("A$fila", $horario['group_name']);
-        $sheet->setCellValue("B$fila", $horario['subject_name']);
-        $sheet->setCellValue("C$fila", $horario['teacher_name']);
-        $sheet->setCellValue("D$fila", $horario['day']);
-        $sheet->setCellValue("E$fila", $horario['start_time']);
-        $sheet->setCellValue("F$fila", $horario['end_time']);
-        $sheet->setCellValue("G$fila", $horario['room_name']);
-        $sheet->setCellValue("H$fila", $horario['building_last_char']);
-        $fila++;
+    if (empty($horarios)) {
+        logError("El grupo '$group_name' no tiene horarios.");
+        continue;
     }
 
-    // Guardar el archivo Excel temporalmente
-    $filename = "Horario_" . str_replace(' ', '_', $group_name) . ".xlsx";
-    $temp_file = tempnam(sys_get_temp_dir(), $filename);
-    $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-    $writer->save($temp_file);
+    try {
+        $spreadsheet = IOFactory::load($template_path);
+    } catch (Exception $e) {
+        logError("Error al cargar la plantilla para el grupo '$group_name': " . $e->getMessage());
+        continue;
+    }
 
-    // Agregar el archivo Excel al ZIP
-    $zip->addFile($temp_file, $filename);
+    $sheet = $spreadsheet->getActiveSheet();
+
+    $diaColumna = [
+        'Lunes' => 'B',
+        'Martes' => 'C',
+        'Miércoles' => 'D',
+        'Jueves' => 'E',
+        'Viernes' => 'F',
+        'Sábado' => 'G'
+    ];
+
+    $filaInicial = [
+        '07:00' => 7,
+        '08:00' => 10,
+        '09:00' => 13,
+        '10:00' => 16,
+        '11:00' => 19,
+        '12:00' => 22,
+        '13:00' => 25,
+        '14:00' => 28,
+        '15:00' => 31,
+        '16:00' => 34,
+        '17:00' => 37,
+        '18:00' => 40,
+        '19:00' => 43
+    ];
+
+    foreach ($horarios as $horario) {
+        $dia = ucfirst(strtolower($horario['day']));
+        $hora_raw = $horario['start_time'];
+        $hora = date('H:i', strtotime($hora_raw));
+
+        if (!isset($diaColumna[$dia])) {
+            logError("Día no mapeado: '$dia' para grupo: '$group_name'");
+            continue;
+        }
+
+        if (!isset($filaInicial[$hora])) {
+            logError("Hora no mapeada: '$hora' para grupo: '$group_name'");
+            continue;
+        }
+
+        $columna = $diaColumna[$dia];
+        $fila = $filaInicial[$hora];
+
+        $contenido = $horario['subject_name'] . "\n" . $horario['teacher_name'] . "\n";
+        if (!empty($horario['room_name'])) {
+            $contenido .= 'Aula: ' . $horario['room_name'] . ' (' . $horario['building_last_char'] . ')';
+        } elseif (!empty($horario['lab_name'])) {
+            $contenido .= 'Lab: ' . $horario['lab_name'];
+        }
+
+        $sheet->setCellValue($columna . $fila, $contenido);
+        $sheet->getStyle($columna . $fila)->getAlignment()->setWrapText(true);
+        $sheet->getStyle($columna . $fila)->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
+    }
+
+    $safe_group_name = preg_replace('/[^A-Za-z0-9_\-]/', '_', $group_name);
+
+    $excel_filename = "Horario_" . $safe_group_name . ".xlsx";
+    $excel_path = $temp_dir . '/' . $excel_filename;
+
+    try {
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save($excel_path);
+    } catch (Exception $e) {
+        logError("Error al guardar el archivo Excel para el grupo '$group_name': " . $e->getMessage());
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
+        continue;
+    }
+
+    if (!$zip->addFile($excel_path, $excel_filename)) {
+        logError("Error al agregar el archivo Excel al ZIP para el grupo '$group_name'.");
+    }
+
+    $spreadsheet->disconnectWorksheets();
+    unset($spreadsheet);
+    unset($sheet);
+    unset($writer);
 }
 
-// Cerrar el ZIP
 $zip->close();
 
-// Enviar el archivo ZIP al navegador para descargar
+if (!file_exists($zip_file)) {
+    logError("El archivo ZIP '$zip_file' no se pudo crear.");
+    exit("Error al crear el archivo ZIP.");
+}
+
 header('Content-Type: application/zip');
 header('Content-Disposition: attachment; filename="' . $zip_file . '"');
 header('Content-Length: ' . filesize($zip_file));
 readfile($zip_file);
 
-// Eliminar el archivo ZIP después de enviarlo
 unlink($zip_file);
+
+$files = glob($temp_dir . '/*.xlsx');
+foreach ($files as $file) {
+    unlink($file);
+}
+rmdir($temp_dir);
+
 exit;
+?>

@@ -48,64 +48,12 @@ include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
                                         </div>
                                     </div>
 
-                                    <!-- Horas clase -->
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="class_hours">Horas Clase</label>
-                                            <input type="number" name="class_hours" value="<?= htmlspecialchars($class_hours); ?>" class="form-control" required>
-                                        </div>
-                                    </div>
-
-                                    <!-- Horas de laboratorio -->
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="lab_hours">Horas de Laboratorio</label>
-                                            <input type="number" name="lab_hours" value="<?= htmlspecialchars($lab_hours); ?>" class="form-control" required>
-                                        </div>
-                                    </div>
-
                                     
-                                    <!-- Horas (Laboratorio 1) -->
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="lab1_hours">Horas en Laboratorio 1</label>
-                                            <select name="lab1_hours" class="form-control" required>
-                                                <?php for ($i = 0; $i <= 10; $i++):?>
-                                                    <option value="<?= $i; ?>" <?= $i == $materia['lab1_hours'] ? 'selected' : ''; ?>>
-                                                        <?= $i; ?>
-                                                    </option>
-                                                <?php endfor; ?>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <!-- Horas (Laboratorio 2) -->
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="lab2_hours">Horas en Laboratorio 2</label>
-                                            <select name="lab2_hours" class="form-control" required>
-                                                <?php for ($i = 0; $i <= 10; $i++):?>
-                                                    <option value="<?= $i; ?>" <?= $i == $materia['lab2_hours'] ? 'selected' : ''; ?>>
-                                                        <?= $i; ?>
-                                                    </option>
-                                                <?php endfor; ?>
-                                            </select>
-                                        </div>
-                                    </div>
-
                                     <!-- Máximo de Horas consecutivas -->
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label for="hours_consecutive">Máximo de Horas Consecutivas (Clase)</label>
-                                            <input type="number" name="hours_consecutive" value="<?= htmlspecialchars($hours_consecutive); ?>" class="form-control" required>
-                                        </div>
-                                    </div>
-
-                                    <!-- Máximo de Horas consecutivas (Laboratorio) -->
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="max_consecutive_lab_hours">Máximo de Horas Consecutivas (Lab)</label>
-                                            <input type="number" name="max_consecutive_lab_hours" value="<?= htmlspecialchars($materia['max_consecutive_lab_hours']); ?>" class="form-control" required>
+                                            <label for="hours_consecutive">Máximo de Horas Consecutivas</label>
+                                            <input type="number" name="max_consecutive_class_hours" value="<?= htmlspecialchars($max_consecutive_class_hours); ?>" class="form-control" required>
                                         </div>
                                     </div>
 

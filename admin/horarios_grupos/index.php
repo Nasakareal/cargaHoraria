@@ -1,17 +1,25 @@
 <?php
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
-include('../../app/controllers/grupos/listado_de_grupos.php');
 
+/* Obtener todos los grupos activos con el nombre del turno (shift_name) */
+$sql_groups = "SELECT 
+                    g.group_id, 
+                    g.group_name, 
+                    s.shift_name 
+               FROM 
+                    `groups` g
+               JOIN 
+                    shifts s ON g.turn_id = s.shift_id
+               WHERE 
+                    g.estado = '1' 
+               ORDER BY 
+                    g.group_name ASC";
 
-
-
-
-/* Obtener todos los grupos activos para mostrarlos en la tabla*/
-$sql_groups = "SELECT group_id, group_name, turn_id FROM `groups` WHERE estado = '1' ORDER BY group_name ASC";
 $stmt_groups = $pdo->prepare($sql_groups);
 $stmt_groups->execute();
 $groups = $stmt_groups->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <div class="content-wrapper">
@@ -59,7 +67,7 @@ $groups = $stmt_groups->fetchAll(PDO::FETCH_ASSOC);
                                     <tr>
                                         <td style="text-align: center"><?= $contador_grupos; ?></td>
                                         <td class="text-center"><?= htmlspecialchars($group['group_name']); ?></td>
-                                        <td class="text-center"><?= $group['turn_id']; ?></td>
+                                        <td class="text-center"><?= $group['shift_name']; ?></td>
                                         <td class="text-center">
                                             <!-- Botón Ver que redirige a show.php con el ID del grupo -->
                                             <a href="show.php?id=<?= $group['group_id']; ?>" class="btn btn-info btn-sm">

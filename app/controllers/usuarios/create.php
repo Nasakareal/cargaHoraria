@@ -1,6 +1,7 @@
 <?php
 
 include('../../../app/config.php');
+require_once '../../../app/registro_eventos.php'; // Incluir el archivo con la función de registro de eventos
 
 /* Datos del formulario */
 $nombres = $_POST['nombres'];
@@ -13,6 +14,9 @@ $password_repet = $_POST['password_repet'];
 if ($password == $password_repet) {
     /* Hashea la contraseña antes de guardarla en la base de datos */
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+    $fechaHora = date('Y-m-d H:i:s');  // Fecha de creación
+    $estado_de_registro = 'ACTIVO';  // Estado por defecto
 
     /* Prepara la sentencia para insertar el usuario en la base de datos */
     $sentencia = $pdo->prepare('INSERT INTO usuarios
@@ -31,6 +35,13 @@ if ($password == $password_repet) {
         /* Ejecuta la consulta */
         if ($sentencia->execute()) {
             session_start();
+
+            $usuario_email = $_SESSION['sesion_email'];
+            $accion = 'Registro de nuevo usuario';
+            $descripcion = "Se registró al usuario con email $email, nombre $nombres y rol ID $rol_id";
+
+            registrarEvento($pdo, $usuario_email, $accion, $descripcion);
+
             $_SESSION['mensaje'] = "Se ha registrado con éxito";
             $_SESSION['icono'] = "success";
             header('Location:' . APP_URL . "/admin/usuarios");

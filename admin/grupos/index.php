@@ -99,6 +99,9 @@ if (!verificarPermiso($_SESSION['sesion_id_usuario'], 'group_view', $pdo)) {
                                                         <input type="text" name="group_id" value="<?= $group_id; ?>" hidden>
                                                         <button type="submit" class="btn btn-danger btn-sm" style="border-radius: 0px 5px 5px 0px"><i class="bi bi-trash"></i></button>
                                                     </form>
+                                                    <a href="<?= APP_URL; ?>/admin/horarios_grupos/show.php?id=<?= $group['group_id']; ?>" class="btn btn-secondary btn-sm" style="background-color: #6f42c1;">
+                                                    <i class="bi bi-clock"></i>
+                                                    </a>
 
                                                     <script>
                                                         function preguntar<?= $group_id; ?>(event){

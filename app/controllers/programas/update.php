@@ -1,5 +1,6 @@
 <?php
 include('../../../app/config.php');
+require_once('../../../app/registro_eventos.php'); // Incluir la función de registro de eventos
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -66,6 +67,15 @@ try {
             throw new Exception("No se pudo actualizar la tabla teachers.");
         }
     }
+
+    $usuario_email = $_SESSION['sesion_email'] ?? 'desconocido@dominio.com';
+    $accion = 'Actualización de programa educativo';
+    $descripcion = "Se actualizó el programa con ID $program_id. Nombre: '$program_name', Área: '$new_area'.";
+    if ($current_area !== $new_area) {
+        $descripcion .= " También se actualizó el área en las tablas relacionadas.";
+    }
+
+    registrarEvento($pdo, $usuario_email, $accion, $descripcion);
 
     $_SESSION['mensaje'] = "El programa y sus referencias se actualizaron correctamente.";
     $_SESSION['icono'] = "success";

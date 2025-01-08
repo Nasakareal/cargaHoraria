@@ -1,5 +1,6 @@
 <?php
 include('../../../app/config.php');
+require_once('../../../app/registro_eventos.php');
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -29,9 +30,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             if ($sentencia->execute()) {
                 session_start();
+
+                $usuario_email = $_SESSION['sesion_email'] ?? 'desconocido@dominio.com';
+                $accion = 'Registro de materia';
+                $descripcion = "Se registró la materia '$subject_name' con $hours_consecutive horas consecutivas y $weekly_hours horas semanales. Especialización: " . ($is_specialization ? 'Sí' : 'No') . ".";
+
+                registrarEvento($pdo, $usuario_email, $accion, $descripcion);
+
                 $_SESSION['mensaje'] = "Se ha registrado la materia";
                 $_SESSION['icono'] = "success";
-                header('Location:' .APP_URL."/admin/materias");
+                header('Location:' . APP_URL . "/admin/materias");
                 exit;
             } else {
                 session_start();

@@ -1,15 +1,20 @@
 <?php
 include_once($_SERVER['DOCUMENT_ROOT'] . '/cargaHoraria/app/config.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/cargaHoraria/app/registro_eventos.php'); // Incluir la función de registro de eventos
+
+// Iniciar sesión para acceder al email del usuario
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 ini_set('error_log', '/app/controllers/asignacion_manual/debug.log');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $assignment_id = isset($_POST['assignment_id']) ? $_POST['assignment_id'] : '';
-    $group_id = isset($_POST['group_id']) ? $_POST['group_id'] : '';
-    $lab_id = isset($_POST['lab_id']) ? $_POST['lab_id'] : null;
-
+    $assignment_id = isset($_POST['assignment_id']) ? intval($_POST['assignment_id']) : 0;
+    $group_id = isset($_POST['group_id']) ? intval($_POST['group_id']) : 0;
+    $lab_id = isset($_POST['lab_id']) ? intval($_POST['lab_id']) : null;
 
     if (empty($assignment_id) || empty($group_id)) {
         echo json_encode(['status' => 'error', 'message' => 'Faltan datos requeridos.']);
@@ -19,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     try {
         $pdo->beginTransaction();
 
+        // Verificar si la asignación existe
         if ($lab_id) {
             $check_exists = $pdo->prepare("
                 SELECT * FROM manual_schedule_assignments 
@@ -45,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit;
         }
 
+        // Eliminar la asignación
         $consulta_delete = $pdo->prepare("
             DELETE FROM manual_schedule_assignments 
             WHERE assignment_id = :assignment_id 
@@ -56,6 +63,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if ($consulta_delete->rowCount() > 0) {
             $pdo->commit();
+
+            // Registrar el evento de eliminación
+            $usuario_email = $_SESSION['sesion_email'] ?? 'desconocido@dominio.com'; // Email del usuario autenticado
+            $accion = 'Eliminación de asignación manual';
+            $descripcion = "Se eliminó la asignación con ID $assignment_id del grupo ID $group_id.";
+
+            registrarEvento($pdo, $usuario_email, $accion, $descripcion); // Registro del evento
+
             echo json_encode(['status' => 'success', 'message' => 'La asignación ha sido eliminada correctamente.']);
             exit;
         } else {
@@ -70,4 +85,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
     }
 }
-

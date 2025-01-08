@@ -1,6 +1,7 @@
 <?php
 
 include('../../../app/config.php');
+require_once('../../../app/registro_eventos.php'); // Incluir la función de registro de eventos
 
 $classroom_id = $_POST['classroom_id'];
 $classroom_name = $_POST['classroom_name'];
@@ -33,9 +34,15 @@ $sentencia->bindParam(':floor', $floor);
 $sentencia->bindParam(':classroom_id', $classroom_id);
 
 try {
-    
     if ($sentencia->execute()) {
         session_start();
+
+        $usuario_email = $_SESSION['sesion_email'] ?? 'desconocido@dominio.com';
+        $accion = 'Actualización de salón';
+        $descripcion = "Se actualizó el salón con ID $classroom_id. Nombre: '$classroom_name', Capacidad: $capacity, Edificio: '$building', Planta: '$floor'.";
+
+        registrarEvento($pdo, $usuario_email, $accion, $descripcion);
+
         $_SESSION['mensaje'] = "Se ha actualizado el salón correctamente";
         $_SESSION['icono'] = "success";
         header('Location:' . APP_URL . "/admin/salones");

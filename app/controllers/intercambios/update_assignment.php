@@ -1,5 +1,6 @@
 <?php
 include_once($_SERVER['DOCUMENT_ROOT'] . '/cargaHoraria/app/config.php');
+require_once('../../../app/registro_eventos.php');
 
 ini_set('log_errors', 1);
 ini_set('error_log', 'C:/wamp/logs/php_error.log');
@@ -165,6 +166,13 @@ try {
     $query_update->bindParam(':assignment_id', $assignment_id, PDO::PARAM_INT);
 
     $query_update->execute();
+
+    
+    $usuario_email = $_SESSION['sesion_email'] ?? 'desconocido@dominio.com';
+    $accion = 'Actualización de asignación';
+    $descripcion = "Se actualizó la asignación ID $assignment_id. Nuevo día: $schedule_day, Hora de inicio: $start_time, Hora de fin: $end_time.";
+
+    registrarEvento($pdo, $usuario_email, $accion, $descripcion);
 
     $pdo->commit();
     error_log("Asignación actualizada correctamente en update_assignment.php: ID " . $assignment_id . " con start_time " . $start_time . " y end_time " . $end_time);

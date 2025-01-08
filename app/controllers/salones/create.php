@@ -1,5 +1,6 @@
 <?php
 include('../../../app/config.php');
+require_once('../../../app/registro_eventos.php'); // Incluir la función de registro de eventos
 
 session_start();
 
@@ -32,6 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sentencia->bindParam(':estado', $estado_de_registro, PDO::PARAM_STR);
 
         if ($sentencia->execute()) {
+            $usuario_email = $_SESSION['sesion_email'] ?? 'desconocido@dominio.com';
+            $accion = 'Registro de salón';
+            $descripcion = "Se registró el salón '$nombre_salon' con capacidad de $capacidad en el edificio '$edificio', planta '$planta'.";
+
+            registrarEvento($pdo, $usuario_email, $accion, $descripcion);
+
             $_SESSION['mensaje'] = "El salón se ha registrado con éxito.";
             $_SESSION['icono'] = "success";
             header('Location: ' . APP_URL . "/admin/salones");

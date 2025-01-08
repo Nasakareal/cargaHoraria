@@ -4,7 +4,7 @@ $sql_materias = "SELECT
                     s.subject_id,
                     s.subject_name, 
                     s.weekly_hours,
-                    s.max_consecutive_class_hours AS hours_consecutive,
+                    s.max_consecutive_class_hours,
                     s.fyh_creacion,
                     s.fyh_actualizacion,
                     s.estado,
@@ -31,7 +31,7 @@ if (!$materia) {
 }
 
 $subject_name = $materia['subject_name'];
-$hours_consecutive = $materia['hours_consecutive'];
+$max_consecutive_class_hours = $materia['max_consecutive_class_hours'];
 $weekly_hours = $materia['weekly_hours'];
 $program_id = $materia['program_id'];
 $program_name = $materia['program_name'] ?? 'No asignado';

@@ -100,7 +100,8 @@ try {
     exit();
 }
 
-$excluded_turnos = ['MIXTO', 'ZINAPÉCUARO'];
+// Si algunos turnos no quieres que se asignen, los pones aquí
+$excluded_turnos = ['ZINAPÉCUARO'];
 
 // 5. Filtrar grupos excluyendo ciertos turnos
 $groups = array_filter($groups, function ($group) use ($turn_id_to_turno, $excluded_turnos) {
@@ -120,9 +121,10 @@ $groups = array_values($groups);
 error_log("Grupos después del filtrado: " . count($groups));
 
 // 6. Incluir materias por grupo y calcular horas restantes
+//    Esto llena $subjects_by_group según tu lógica interna.
 include('../../../app/controllers/grupos/materias_grupos.php');
 
-// 7. Función para asignar bloques de horario (Solo Aula)
+// 7. Función para asignar bloques de horario (Sólo Aula)
 function asignarBloqueHorario($pdo, $subject, $group, $dia, $start_time, $end_time, &$mensajes_error)
 {
     $tipo_espacio = 'Aula';
@@ -162,7 +164,7 @@ function asignarBloqueHorario($pdo, $subject, $group, $dia, $start_time, $end_ti
         return false;
     }
 
-    // Verificar disponibilidad del profesor
+    // Verificar disponibilidad del profesor (si hay profesor asignado)
     if ($teacher_id) {
         $check_teacher_sql = "SELECT COUNT(*) FROM schedule_assignments 
             WHERE teacher_id = :teacher_id
@@ -207,7 +209,7 @@ function asignarBloqueHorario($pdo, $subject, $group, $dia, $start_time, $end_ti
                   . "en $dia de $formatted_start_time a $formatted_end_time en $tipo_espacio.");
         return true;
     } catch (PDOException $e) {
-        if ($e->getCode() == '23000') { // Código de error para violación de integridad (duplicados)
+        if ($e->getCode() == '23000') { // Violación de integridad (ej. duplicado)
             if (strpos($e->getMessage(), 'unique_schedule') !== false) {
                 error_log("Duplicado detectado: Grupo ID: {$group['group_id']}, Día: $dia, Hora: $formatted_start_time.");
                 return false;
@@ -220,11 +222,11 @@ function asignarBloqueHorario($pdo, $subject, $group, $dia, $start_time, $end_ti
     }
 }
 
-// 8. Función para distribuir materias en la semana (sin cambio de profesor)
+// 8. Función para distribuir materias en la semana
 function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $dias_turno, &$mensajes_error, $horarios_disponibles)
 {
     $grupo_turno          = $horario_turno;
-    $dias_sin_restriccion = ['jueves', 'viernes'];
+    $dias_sin_restriccion = ['viernes'];
 
     if (!isset($horarios_disponibles[$grupo_turno])) {
         error_log("Error: Horario de turno '$grupo_turno' no encontrado para el grupo ID: {$group['group_id']}.");
@@ -233,18 +235,32 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
     }
 
     // 1) ORDENAR MATERIAS POR PRIORIDAD:
-    //    a) Primero las que SÍ tienen profesor (teacher_id != null).
-    //    b) Dentro de ellas, mayor 'remaining_hours' primero.
-    //    c) Luego las que NO tienen profesor, también mayor 'remaining_hours' primero.
+    //    a) Primero las que tengan 'clasificacion = PA'
+    //    b) Luego las que SÍ tienen profesor (pero no son PA)
+    //    c) Luego las que NO tienen profesor
+    //    d) Dentro de cada bloque anterior, mayor 'remaining_hours' primero.
+
     usort($subjects, function ($a, $b) {
+        // 1) Revisamos si alguno es PA
+        $aIsPA = ($a['clasificacion'] === 'PA') ? 1 : 0;
+        $bIsPA = ($b['clasificacion'] === 'PA') ? 1 : 0;
+        if ($aIsPA !== $bIsPA) {
+            // Quiero que PA vaya primero, es decir, si aIsPA=1 y bIsPA=0, a va primero => devolvemos -1
+            return $bIsPA - $aIsPA; 
+        }
+
+        // 2) Ambos son PA o ninguno => pasamos a la lógica de "tiene profesor vs no tiene"
         $aHasTeacher = !empty($a['teacher_id']);
         $bHasTeacher = !empty($b['teacher_id']);
 
-        // 1) Prioridad: con teacher vs sin teacher
-        if ($aHasTeacher && !$bHasTeacher) return -1; 
-        if (!$aHasTeacher && $bHasTeacher) return 1;  
+        if ($aHasTeacher && !$bHasTeacher) {
+            return -1; 
+        }
+        if (!$aHasTeacher && $bHasTeacher) {
+            return 1;  
+        }
 
-        // 2) Ambos tienen o ambos no => más horas primero
+        // 3) Si ambos tienen profesor o ambos no => mayor remaining_hours primero
         return $b['remaining_hours'] - $a['remaining_hours'];
     });
 
@@ -269,28 +285,30 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
             $hora = $inicio_turno;
             $consecutivasActuales = 0;
 
-            while ($subject['remaining_hours'] > 0 && $hora + 3600 <= $fin_turno) {
+            while ($subject['remaining_hours'] > 0 && ($hora + 3600) <= $fin_turno) {
                 $diaLower         = mb_strtolower($dia, 'UTF-8');
                 $esSinRestriccion = in_array($diaLower, $dias_sin_restriccion);
 
+                // Control de horas consecutivas (solo restringe si no es día sin restricción)
                 if (!$esSinRestriccion) {
                     $max_consecutive_hours = $subject['max_consecutive_hours'] ?? 2;
                     if ($consecutivasActuales >= $max_consecutive_hours) {
-                        // Tope en días normales
                         break; 
                     }
                 }
-                $formatted_start_time = date('H:i:s', $hora);
-                $formatted_end_time   = date('H:i:s', $hora + 3600);
 
                 // Intentar asignar
                 if (asignarBloqueHorario($pdo, $subject, $group, $dia, $hora, $hora + 3600, $mensajes_error)) {
+                    // Decrementa 1 hora
                     $subject['remaining_hours']--;
+                    // Si no es viernes (o día sin restricción), incrementa contador de horas consecutivas
                     if (!$esSinRestriccion) {
                         $consecutivasActuales++;
                     }
+                    // Avanza una hora
                     $hora += 3600;
                 } else {
+                    // Si no pudo asignar, simplemente avanzamos la hora e intentamos en la siguiente
                     $hora += 3600;
                 }
             }
@@ -298,7 +316,7 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
     }
 
     // ------------------------------------------------
-    // SEGUNDA PASADA: Asignar horas restantes en una hora extra
+    // SEGUNDA PASADA: Asignar horas restantes en una hora extra (fuera del horario normal)
     // ------------------------------------------------
     foreach ($subjects as &$subject) {
         while ($subject['remaining_hours'] > 0) {
@@ -312,48 +330,46 @@ function distribuirMateriasEnSemana($pdo, $group, &$subjects, $horario_turno, $d
                 $inicio_turno   = strtotime($start_time_str);
                 $fin_turno      = strtotime($end_time_str);
 
-                // Intentar asignar dentro del horario
+                // Intentar asignar dentro del horario normal primero
                 $hora = $inicio_turno;
-                while ($hora + 3600 <= $fin_turno) {
+                while (($hora + 3600) <= $fin_turno) {
                     if (asignarBloqueHorario($pdo, $subject, $group, $dia, $hora, $hora + 3600, $mensajes_error)) {
                         $subject['remaining_hours']--;
                         $asignado = true;
-                        break 2; // Salir de ambos bucles
+                        break 2; // Salimos de ambos bucles
                     }
                     $hora += 3600;
                 }
 
-                // Si no se pudo asignar dentro del horario, intentar asignar una hora adicional después del horario
+                // Si no se pudo asignar dentro del horario, intentamos una hora adicional DESPUÉS
                 if (!$asignado) {
-                    $hora_extra = $fin_turno;
+                    $hora_extra     = $fin_turno;
                     $hora_extra_end = $hora_extra + 3600;
 
-                    // Verificar si la hora extra no excede el límite (solo una hora adicional)
+                    // Verificar que esta hora extra no sobrepase algún límite (solo 1 hora)
                     if (asignarBloqueHorario($pdo, $subject, $group, $dia, $hora_extra, $hora_extra_end, $mensajes_error)) {
                         $subject['remaining_hours']--;
                         $asignado = true;
-                        break; // Salir del bucle de días
+                        break; 
                     }
                 }
             }
 
             if (!$asignado) {
                 // No se pudo asignar la hora restante
-                error_log("No se pudo asignar la hora restante para la materia "
-                  . "'{$subject['subject_name']}' (ID: {$subject['subject_id']}) "
-                  . "del grupo ID: {$group['group_id']}.");
-                $mensajes_error[] = "No se pudo asignar una hora restante para la materia "
-                                  . "'{$subject['subject_name']}' (ID: {$subject['subject_id']}) "
-                                  . "del grupo ID: {$group['group_id']}.";
+                error_log(
+                    "No se pudo asignar la hora restante para la materia '{$subject['subject_name']}' ".
+                    "(ID: {$subject['subject_id']}) del grupo ID: {$group['group_id']}."
+                );
+                $mensajes_error[] = 
+                    "No se pudo asignar una hora restante para la materia ".
+                    "'{$subject['subject_name']}' (ID: {$subject['subject_id']}) ".
+                    "del grupo ID: {$group['group_id']}.";
                 break;
             }
         }
     }
 
-    // ------------------------------------------------
-    // TERCERA PASADA: Asignar horas restantes en una segunda hora extra (ELIMINADA)
-    // ------------------------------------------------
-    // Esta sección ha sido eliminada para evitar la asignación de una segunda hora extra.
 }
 
 // 9. Verificar si todas las materias han sido asignadas
@@ -378,8 +394,8 @@ foreach ($groups as $group) {
         continue;
     }
 
-    $horario_turno = $turno;
     // Aquí asumo que $dias_semana está definido en horarios_disponibles.php o en tu entorno
+    $horario_turno = $turno;
     $dias_turno    = $dias_semana[$turno] ?? [];
 
     if (empty($dias_turno)) {
@@ -388,6 +404,7 @@ foreach ($groups as $group) {
         continue;
     }
 
+    // Verificamos si hay materias para el grupo
     if (!isset($subjects_by_group[$group['group_id']])) {
         error_log("No se encontraron materias para el grupo ID: {$group['group_id']}");
         $mensajes_error[] = "No se encontraron materias para el grupo ID: {$group['group_id']}.";
@@ -395,12 +412,22 @@ foreach ($groups as $group) {
     }
 
     try {
-        // Preparar las materias del grupo
-        $subjects = array_map(function ($subject) {
+        // 1) Crear un arreglo con la información de cada materia
+        //    y, ADEMÁS, le asignamos la clasificación del profesor.
+        $subjects = array_map(function ($subject) use ($pdo) {
+            // Obtener la clasificación del profesor (si existe)
+            $clasificacion = null;
+            if (!empty($subject['teacher_id'])) {
+                $stmt = $pdo->prepare("SELECT clasificacion FROM teachers WHERE teacher_id = :tid");
+                $stmt->execute([':tid' => $subject['teacher_id']]);
+                $clasificacion = $stmt->fetchColumn();
+            }
+
             return [
                 'subject_id'            => $subject['subject_id'],
                 'subject_name'          => $subject['subject_name'],
                 'teacher_id'            => $subject['teacher_id'],
+                'clasificacion'         => $clasificacion,
                 'remaining_hours'       => $subject['remaining_hours'],
                 'type'                  => $subject['type'],
                 'max_consecutive_hours' => $subject['max_consecutive_hours'],
@@ -408,34 +435,25 @@ foreach ($groups as $group) {
             ];
         }, $subjects_by_group[$group['group_id']]);
 
-        // Ordenar primero las materias CON profesor, luego SIN profesor,
-        // y dentro de cada grupo, por la que tenga más 'remaining_hours'.
-        usort($subjects, function ($a, $b) {
-            $aHasTeacher = !empty($a['teacher_id']);
-            $bHasTeacher = !empty($b['teacher_id']);
-
-            // 1) Prioridad a las que sí tienen teacher
-            if ($aHasTeacher && !$bHasTeacher) return -1; 
-            if (!$aHasTeacher && $bHasTeacher) return 1;  
-
-            // 2) Si ambos tienen teacher (o ambos no), orden por mayor remaining_hours
-            return $b['remaining_hours'] - $a['remaining_hours'];
-        });
-
-        // Asignar materias
+        // 2) Asignar materias
         distribuirMateriasEnSemana($pdo, $group, $subjects, $horario_turno, $dias_turno, $mensajes_error, $horarios_disponibles);
 
-        // Verificar
+        // 3) Verificar si todas las materias quedaron asignadas
         if (todasMateriasAsignadas($subjects)) {
             error_log("Todas las materias asignadas para el grupo ID: {$group['group_id']}.");
         } else {
             foreach ($subjects as $subject) {
                 if ($subject['remaining_hours'] > 0) {
-                    $mensajes_error[] = "No se pudieron asignar todas las horas para la materia "
-                                      . "'{$subject['subject_name']}' (ID: {$subject['subject_id']}) "
-                                      . "del grupo ID: {$group['group_id']}. Horas restantes: {$subject['remaining_hours']}.";
-                    error_log("Materia '{$subject['subject_name']}' (ID: {$subject['subject_id']}) "
-                              . "del grupo ID: {$group['group_id']} tiene {$subject['remaining_hours']} horas restantes.");
+                    $mensajes_error[] = 
+                        "No se pudieron asignar todas las horas para la materia ".
+                        "'{$subject['subject_name']}' (ID: {$subject['subject_id']}) ".
+                        "del grupo ID: {$group['group_id']}. ".
+                        "Horas restantes: {$subject['remaining_hours']}.";
+                    error_log(
+                        "Materia '{$subject['subject_name']}' (ID: {$subject['subject_id']}) ".
+                        "del grupo ID: {$group['group_id']} ".
+                        "tiene {$subject['remaining_hours']} horas restantes."
+                    );
                 }
             }
         }
