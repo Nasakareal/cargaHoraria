@@ -257,17 +257,65 @@ include('../../layout/mensajes.php');
 
             events: eventsWithColors,
 
-            // Al hacer clic sobre un evento, mostramos alerta
+            // **Manejador de clic en evento para eliminar**
             eventClick: function(info) {
                 Swal.fire({
-                    title: info.event.title,
+                    title: '¿Estás seguro de que deseas borrar este evento?',
                     html: `
+                        <strong>${info.event.title}</strong><br>
                         <strong>Inicio:</strong> ${info.event.start.toISOString().slice(11, 19)}<br>
-                        <strong>Fin:</strong> ${info.event.end.toISOString().slice(11, 19)}<br>
-                        <strong>Tipo de Espacio:</strong> ${info.event.extendedProps.tipo_espacio}
+                        <strong>Fin:</strong> ${info.event.end ? info.event.end.toISOString().slice(11, 19) : 'No especificado'}<br>
+                        <strong>Tipo de Espacio:</strong> ${info.event.extendedProps.tipo_espacio || 'No especificado'}
                     `,
-                    icon: 'info',
-                    confirmButtonText: 'Cerrar'
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, borrar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Llamamos al servidor para eliminar el evento
+                        $.ajax({
+                            url: '../../app/controllers/eliminar_evento.php', // Cambia esto al archivo PHP correspondiente
+                            method: 'POST',
+                            data: {
+                                event_id: info.event.id // Asegúrate de que el ID del evento esté disponible
+                            },
+                            success: function(response) {
+                                try {
+                                    const data = (typeof response === 'object') ? response : JSON.parse(response);
+                                    if (data.status === 'success') {
+                                        Swal.fire(
+                                            'Borrado',
+                                            data.message || 'El evento se ha eliminado correctamente.',
+                                            'success'
+                                        );
+                                        // Eliminamos el evento del calendario visualmente
+                                        info.event.remove();
+                                    } else {
+                                        Swal.fire(
+                                            'Error',
+                                            data.message || 'No se pudo borrar el evento.',
+                                            'error'
+                                        );
+                                    }
+                                } catch (e) {
+                                    console.error("Error al parsear respuesta:", e);
+                                    Swal.fire(
+                                        'Error',
+                                        'No se pudo leer la respuesta del servidor.',
+                                        'error'
+                                    );
+                                }
+                            },
+                            error: function() {
+                                Swal.fire(
+                                    'Error',
+                                    'Ocurrió un error al comunicarse con el servidor.',
+                                    'error'
+                                );
+                            }
+                        });
+                    }
                 });
             },
 
@@ -310,15 +358,12 @@ include('../../layout/mensajes.php');
                                             data.message || 'La materia ha sido movida correctamente.',
                                             'success'
                                         );
-                                        // Refrescamos o actualizamos si deseas
-                                        //calendar.refetchEvents(); // si deseas recargar del servidor
                                     } else {
                                         Swal.fire(
                                             'Error!',
                                             data.message || 'No se pudo actualizar la materia.',
                                             'error'
                                         );
-                                        // Revertimos el movimiento en el calendario
                                         info.revert();
                                     }
                                 } catch (e) {
@@ -328,7 +373,6 @@ include('../../layout/mensajes.php');
                                         'No se pudo leer la respuesta del servidor.',
                                         'error'
                                     );
-                                    // Revertir el arrastre
                                     info.revert();
                                 }
                             },
@@ -342,7 +386,6 @@ include('../../layout/mensajes.php');
                             }
                         });
                     } else {
-                        // Si cancela, revertimos
                         info.revert();
                     }
                 });
