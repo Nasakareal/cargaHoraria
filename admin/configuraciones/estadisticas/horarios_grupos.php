@@ -77,7 +77,7 @@ if (!file_exists($template_path)) {
 }
 
 $zip = new ZipArchive();
-$zip_file = 'Horarios_Por_Grupo.zip';
+$zip_file = __DIR__ . '/Horarios_Por_Grupo.zip';
 
 if (file_exists($zip_file)) {
     unlink($zip_file);

@@ -101,7 +101,7 @@ if (!file_exists($template_path)) {
 
 // Crear un archivo ZIP
 $zip = new ZipArchive();
-$zip_file = 'Horarios_Por_Profesor.zip';
+$zip_file = __DIR__ . '/Horarios_Por_Profesor.zip';
 
 // Eliminar el ZIP existente si existe para evitar conflictos
 if (file_exists($zip_file)) {
