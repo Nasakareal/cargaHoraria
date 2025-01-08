@@ -1,29 +1,23 @@
 <?php
-// Ajusta la ruta si fuera necesario
 include_once($_SERVER['DOCUMENT_ROOT'] . '/cargaHoraria/app/config.php');
 require_once('../../../app/registro_eventos.php');
 
-// Configuración de errores (logs) - ajústalo si en tu hosting/entorno difiere
 ini_set('log_errors', 1);
 ini_set('error_log', 'C:/wamp/logs/php_error.log');
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 
-// Importante para que el navegador sepa que retornamos JSON y evitar
-// salidas de texto que dificulten la decodificación
 header('Content-Type: application/json');
 
 date_default_timezone_set('America/Mexico_City');
 
-// Verificamos que sea POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     error_log("Método de solicitud no permitido: " . $_SERVER['REQUEST_METHOD']);
     echo json_encode(['status' => 'error', 'message' => 'Método de solicitud no permitido.']);
     exit;
 }
 
-// Validamos campos requeridos
 $required_fields = ['assignment_id', 'schedule_day', 'start_time', 'end_time'];
 $missing_fields = [];
 
@@ -42,13 +36,11 @@ if (!empty($missing_fields)) {
     exit;
 }
 
-// Asignamos variables
 $assignment_id = intval($_POST['assignment_id']);
 $schedule_day  = trim($_POST['schedule_day']);
 $start_time    = trim($_POST['start_time']);
 $end_time      = trim($_POST['end_time']);
 
-// Validamos formato de horas HH:MM:SS
 if (!preg_match('/^(2[0-3]|[01]?[0-9]):([0-5][0-9]):([0-5][0-9])$/', $start_time)) {
     error_log("Formato de start_time inválido en update_assignment.php: " . $start_time);
     echo json_encode(['status' => 'error', 'message' => 'Formato de hora de inicio inválido.']);
@@ -61,7 +53,6 @@ if (!preg_match('/^(2[0-3]|[01]?[0-9]):([0-5][0-9]):([0-5][0-9])$/', $end_time))
     exit;
 }
 
-// Validamos día (en minúsculas)
 $valid_days = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
 if (!in_array(strtolower($schedule_day), $valid_days)) {
     error_log("Día inválido en update_assignment.php: " . $schedule_day);
@@ -70,10 +61,8 @@ if (!in_array(strtolower($schedule_day), $valid_days)) {
 }
 
 try {
-    // Iniciamos transacción
     $pdo->beginTransaction();
 
-    // Obtenemos la asignación actual
     $query_get_assignment = $pdo->prepare("
         SELECT * 
         FROM schedule_assignments 
@@ -84,7 +73,6 @@ try {
     $query_get_assignment->execute();
     $current_assignment = $query_get_assignment->fetch(PDO::FETCH_ASSOC);
 
-    // Si no existe, error
     if (!$current_assignment) {
         error_log("Asignación no encontrada en update_assignment.php: ID " . $assignment_id);
         echo json_encode(['status' => 'error', 'message' => 'La asignación actual no existe.']);
@@ -92,7 +80,6 @@ try {
         exit;
     }
 
-    // Variables que pudiéramos usar
     $subject_id   = intval($current_assignment['subject_id']);
     $group_id     = intval($current_assignment['group_id']);
     $tipo_espacio = strtolower($current_assignment['tipo_espacio']);
@@ -100,7 +87,6 @@ try {
     $aula_id      = intval($current_assignment['classroom_id']);
     $teacher_id   = intval($current_assignment['teacher_id']);
 
-    // Verificación de conflictos de espacio
     if ($tipo_espacio === 'laboratorio') {
         $query_verificar = $pdo->prepare("
             SELECT assignment_id 
@@ -132,7 +118,6 @@ try {
         exit;
     }
 
-    // Ejecutamos verificación de conflicto
     $query_verificar->bindParam(':schedule_day', $schedule_day, PDO::PARAM_STR);
     $query_verificar->bindParam(':start_time', $start_time, PDO::PARAM_STR);
     $query_verificar->bindParam(':end_time', $end_time, PDO::PARAM_STR);
@@ -149,7 +134,6 @@ try {
         exit;
     }
 
-    // Verificación de conflicto con profesor (si aplica)
     if ($teacher_id > 0) {
         $query_teacher_conflict = $pdo->prepare("
             SELECT assignment_id 
@@ -178,7 +162,6 @@ try {
         }
     }
 
-    // Actualizamos
     $query_update = $pdo->prepare("
         UPDATE schedule_assignments 
         SET schedule_day = :schedule_day,
@@ -197,18 +180,15 @@ try {
 
     $query_update->execute();
 
-    // Registramos el evento (auditoría)
     $usuario_email = $_SESSION['sesion_email'] ?? 'desconocido@dominio.com';
     $accion        = 'Actualización de asignación';
     $descripcion   = "Se actualizó la asignación ID $assignment_id. Nuevo día: $schedule_day, Hora de inicio: $start_time, Hora de fin: $end_time.";
 
     registrarEvento($pdo, $usuario_email, $accion, $descripcion);
 
-    // Hacemos commit
     $pdo->commit();
     error_log("Asignación actualizada correctamente en update_assignment.php: ID " . $assignment_id . " con start_time " . $start_time . " y end_time " . $end_time);
 
-    // Enviamos la respuesta exitosa en formato JSON
     echo json_encode([
         'status'  => 'success',
         'message' => 'La asignación se ha movido correctamente.'
@@ -216,7 +196,6 @@ try {
     exit;
 
 } catch (Exception $exception) {
-    // Manejo de errores en transacción
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
