@@ -1,4 +1,5 @@
 <?php
+// Ajusta la ruta y la lógica según tu estructura real
 date_default_timezone_set('America/Mexico_City');
 
 include('../../app/config.php');
@@ -13,6 +14,7 @@ if (!isset($grupos) || !is_array($grupos)) {
 $materias = [];
 $group_id = isset($_GET['id']) ? intval($_GET['id']) : null;
 
+// Si se especifica un grupo, obtenemos las materias
 if ($group_id) {
     $queryMaterias = $pdo->prepare("
         SELECT m.subject_id, m.subject_name 
@@ -25,6 +27,7 @@ if ($group_id) {
     $materias = $queryMaterias->fetchAll(PDO::FETCH_ASSOC);
 }
 
+// Obtenemos asignaciones activas
 $sql = "
     SELECT 
         a.assignment_id,
@@ -56,6 +59,7 @@ if ($group_id) {
 $queryAsignaciones->execute();
 $asignaciones = $queryAsignaciones->fetchAll(PDO::FETCH_ASSOC);
 
+// Paleta de colores para asignar a cada materia
 $colorPalette = [
     '#1f77b4', // azul
     '#2ca02c', // verde
@@ -69,18 +73,24 @@ $colorPalette = [
     '#17becf'  // turquesa
 ];
 
+// Asignamos un color a cada materia según índice
 $subjectColors = [];
 foreach ($materias as $index => $materia) {
     $colorIndex = $index % count($colorPalette);
     $subjectColors[$materia['subject_id']] = $colorPalette[$colorIndex];
 }
 
+// Creamos eventos para FullCalendar
 $events = [];
 $daysOfWeek = [
-    'lunes' => 1, 'martes' => 2, 'miércoles' => 3,
-    'jueves' => 4, 'viernes' => 5,
-    'sábado' => 6, 'sabado' => 6,
-    'sábados' => 6, 'sabado' => 6
+    'lunes'     => 1, 
+    'martes'    => 2, 
+    'miércoles' => 3,
+    'jueves'    => 4, 
+    'viernes'   => 5,
+    'sábado'    => 6,
+    // A veces escrito "sabado" sin tilde
+    'sabado'    => 6
 ];
 
 foreach ($asignaciones as $asignacion) {
@@ -89,6 +99,7 @@ foreach ($asignaciones as $asignacion) {
         continue;
     }
 
+    // Creamos fechas ficticias basadas en la semana actual
     $start_date = new DateTime();
     $start_date->setISODate((int)$start_date->format('o'), (int)$start_date->format('W'), $daysOfWeek[$dayLower]);
     $start_date->setTime(
@@ -102,10 +113,13 @@ foreach ($asignaciones as $asignacion) {
         (int)substr($asignacion['end_time'], 3, 2)
     );
 
-    $color = isset($subjectColors[$asignacion['subject_id']]) ? $subjectColors[$asignacion['subject_id']] : '#000000';
+    // Determinamos color según la materia
+    $color = isset($subjectColors[$asignacion['subject_id']])
+             ? $subjectColors[$asignacion['subject_id']]
+             : '#000000';
 
     $events[] = [
-        'id' => $asignacion['assignment_id'],
+        'id'    => $asignacion['assignment_id'],
         'title' => htmlspecialchars($asignacion['subject_name'] . ' - Grupo ' . $asignacion['group_name']),
         'start' => $start_date->format('Y-m-d\TH:i:s'),
         'end'   => $end_date->format('Y-m-d\TH:i:s'),
@@ -123,6 +137,7 @@ foreach ($asignaciones as $asignacion) {
 
 $events_json = json_encode($events);
 ?>
+
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
 
@@ -134,7 +149,8 @@ $events_json = json_encode($events);
                 <select id="groupSelector" name="id" class="form-control" onchange="this.form.submit()">
                     <option value="">-- Seleccionar grupo --</option>
                     <?php foreach ($grupos as $grupo): ?>
-                        <option value="<?= htmlspecialchars($grupo['group_id']); ?>"
+                        <option 
+                            value="<?= htmlspecialchars($grupo['group_id']); ?>"
                             <?= ($group_id && $group_id == $grupo['group_id']) ? 'selected' : ''; ?>>
                             <?= htmlspecialchars($grupo['group_name']); ?>
                         </option>
@@ -187,6 +203,7 @@ include('../../layout/mensajes.php');
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    // Pasamos los eventos y materias desde PHP a JavaScript
     const events = <?php echo $events_json; ?>;
     const materias = <?php echo json_encode($materias); ?>;
     const groupId = <?= json_encode($group_id); ?>;
@@ -195,17 +212,20 @@ include('../../layout/mensajes.php');
     console.log("Materias desde PHP:", materias);
     console.log("Grupo seleccionado:", groupId);
 
+    // Paleta de colores para reasignar si fuera necesario
     const colorPalette = [
         '#1f77b4', '#2ca02c', '#ff7f0e', '#ffc107',
         '#9467bd', '#8c564b', '#e377c2', '#7f7f7f',
         '#bcbd22', '#17becf'
     ];
 
+    // Mapeo de ID de materia a color
     const subjectColorMap = {};
     materias.forEach((materia, index) => {
         subjectColorMap[materia.subject_id] = colorPalette[index % colorPalette.length];
     });
 
+    // Aplicamos el color correspondiente a cada evento
     const eventsWithColors = events.map(ev => {
         const subjId = ev.extendedProps.subject_id;
         return {
@@ -225,18 +245,19 @@ include('../../layout/mensajes.php');
             editable: true,
             droppable: true,
             headerToolbar: {
-                left: '',
-                center: '',
-                right: ''
+                left: '',    // Puedes agregar: 'prev,next today'
+                center: '',  // 'title'
+                right: ''    // 'dayGridMonth,timeGridWeek,timeGridDay'
             },
             allDaySlot: false,
             slotMinTime: '07:00:00',
             slotMaxTime: '20:00:00',
             slotDuration: '00:30',
-            hiddenDays: [0],
+            hiddenDays: [0], // Oculta los domingos
 
             events: eventsWithColors,
 
+            // Al hacer clic sobre un evento, mostramos alerta
             eventClick: function(info) {
                 Swal.fire({
                     title: info.event.title,
@@ -250,13 +271,14 @@ include('../../layout/mensajes.php');
                 });
             },
 
+            // Al arrastrar y soltar un evento
             eventDrop: function(info) {
-                const newStart = info.event.start;
-                const newEnd = info.event.end;
-                const daysSpanish = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+                const newStart     = info.event.start;
+                const newEnd       = info.event.end;
+                const daysSpanish  = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
                 const schedule_day = daysSpanish[newStart.getDay()];
-                const start_time = newStart.toISOString().slice(11, 19);
-                const end_time = newEnd.toISOString().slice(11, 19);
+                const start_time   = newStart.toISOString().slice(11, 19);
+                const end_time     = newEnd.toISOString().slice(11, 19);
 
                 Swal.fire({
                     title: '¿Estás seguro de mover esta materia?',
@@ -268,6 +290,7 @@ include('../../layout/mensajes.php');
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        // Llamamos a nuestro PHP
                         $.ajax({
                             url: '../../app/controllers/intercambios/update_assignment.php',
                             method: 'POST',
@@ -278,26 +301,48 @@ include('../../layout/mensajes.php');
                                 end_time: end_time
                             },
                             success: function(response) {
+                                // Intentamos parsear la respuesta
                                 try {
-                                    var data = JSON.parse(response);
+                                    var data = (typeof response === 'object') ? response : JSON.parse(response);
                                     if (data.status === 'success') {
-                                        Swal.fire('Actualizado!', 'La materia ha sido movida correctamente.', 'success');
-                                        calendar.refetchEvents();
+                                        Swal.fire(
+                                            'Actualizado!',
+                                            data.message || 'La materia ha sido movida correctamente.',
+                                            'success'
+                                        );
+                                        // Refrescamos o actualizamos si deseas
+                                        //calendar.refetchEvents(); // si deseas recargar del servidor
                                     } else {
-                                        Swal.fire('Error!', data.message || 'No se pudo actualizar la materia.', 'error');
+                                        Swal.fire(
+                                            'Error!',
+                                            data.message || 'No se pudo actualizar la materia.',
+                                            'error'
+                                        );
+                                        // Revertimos el movimiento en el calendario
                                         info.revert();
                                     }
                                 } catch (e) {
-                                    Swal.fire('success!', 'Por favor actualiza.', 'success');
+                                    console.error("Error al parsear respuesta:", e);
+                                    Swal.fire(
+                                        'Error!',
+                                        'No se pudo leer la respuesta del servidor.',
+                                        'error'
+                                    );
+                                    // Revertir el arrastre
                                     info.revert();
                                 }
                             },
                             error: function() {
-                                Swal.fire('Error!', 'Ocurrió un error al actualizar.', 'error');
+                                Swal.fire(
+                                    'Error!',
+                                    'Ocurrió un error al comunicarse con el servidor.',
+                                    'error'
+                                );
                                 info.revert();
                             }
                         });
                     } else {
+                        // Si cancela, revertimos
                         info.revert();
                     }
                 });
@@ -308,13 +353,11 @@ include('../../layout/mensajes.php');
     });
 </script>
 
-
 <style>
     .fc-event {
         cursor: pointer;
         opacity: 1;
     }
-
     .fc-timegrid-event {
         font-size: 10px;
         color: white !important;
