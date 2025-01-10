@@ -15,8 +15,6 @@ try {
             subjects s ON gs.subject_id = s.subject_id
         LEFT JOIN 
             teacher_subjects ts ON ts.subject_id = s.subject_id AND ts.group_id = g.group_id
-        WHERE 
-            gs.estado = '1'
         GROUP BY 
             g.group_name";
 
