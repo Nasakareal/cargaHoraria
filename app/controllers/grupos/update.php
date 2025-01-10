@@ -87,7 +87,7 @@ try {
 
     foreach ($subjects as $subject) {
         $stmt_group_subject = $pdo->prepare("INSERT INTO group_subjects (group_id, subject_id, fyh_creacion, estado) 
-                                             VALUES (:group_id, :subject_id, NOW(), 'ACTIVO')");
+                                             VALUES (:group_id, :subject_id, NOW(), '1')");
         $stmt_group_subject->execute([':group_id' => $group_id, ':subject_id' => $subject['subject_id']]);
     }
 

@@ -30,8 +30,19 @@ include('../../../admin/layout/parte1.php');
               <div class="info-box">
                   <span class="info-box-icon bg-purple"><i class="bi bi-calendar4-week"></i></span>
                   <div class="info-box-content">
-                      <span class="info-box-text"><b>Descargar Horarios de Grupos</b></span>
+                      <span class="info-box-text"><b>Horarios de Grupos</b></span>
                       <a href="horarios_grupos.php" class="btn btn-primary btn-sm">Descargar Archivos</a>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Estadística: Descargar todos los horarios de los grupos sin profesor-->
+          <div class="col-md-4 col-sm-6 col-12">
+              <div class="info-box">
+                  <span class="info-box-icon bg-purple"><i class="bi bi-calendar4-week"></i></span>
+                  <div class="info-box-content">
+                      <span class="info-box-text"><b>Horarios de Grupos sin Profesor</b></span>
+                      <a href="horarios_grupos_sin_profesor.php" class="btn btn-primary btn-sm">Descargar Archivos</a>
                   </div>
               </div>
           </div>
@@ -39,9 +50,9 @@ include('../../../admin/layout/parte1.php');
           <!-- Estadística: Descargar todos los horarios de los profesores -->
           <div class="col-md-4 col-sm-6 col-12">
               <div class="info-box">
-                  <span class="info-box-icon bg-purple"><i class="bi bi-person-video3"></i></span>
+                  <span class="info-box-icon bg-lightblue"><i class="bi bi-person-video3"></i></span>
                   <div class="info-box-content">
-                      <span class="info-box-text"><b>Descargar Horarios de Profesores</b></span>
+                      <span class="info-box-text"><b>Horarios de Profesores</b></span>
                       <a href="horarios_profesores.php" class="btn btn-primary btn-sm">Descargar Archivos</a>
                   </div>
               </div>
