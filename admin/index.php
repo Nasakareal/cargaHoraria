@@ -103,6 +103,9 @@ include('../layout/mensajes.php');
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
 
+<!-- Reproductor de audio para la celebración -->
+<audio id="audioCelebracion" src="../public/trompetas.m4a"></audio>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var ctx = document.getElementById('materiasChart').getContext('2d');
@@ -147,34 +150,39 @@ include('../layout/mensajes.php');
         });
     });
 
-   function lanzarConfeti() {
-    const duracion = 15000;
-    const animacionBase = {
-        startVelocity: 30,
-        spread: 360,
-        ticks: 60,
-        zIndex: 1000
-    };
+    function lanzarConfeti() {
+        const duracion = 15000;
+        const animacionBase = {
+            startVelocity: 30,
+            spread: 360,
+            ticks: 60,
+            zIndex: 1000
+        };
 
-    const intervalo = setInterval(() => {
-        const randomX = Math.random();
-        const randomY = Math.random();
-        const randomAngle = Math.random() * 360;
+        const audio = document.getElementById('audioCelebracion');
+        audio.play();
 
-        confetti({
-            ...animacionBase,
-            origin: { x: randomX, y: randomY },
-            angle: randomAngle
-        });
-    }, 250);
+        const intervalo = setInterval(() => {
+            const randomX = Math.random();
+            const randomY = Math.random();
+            const randomAngle = Math.random() * 360;
 
-    setTimeout(() => {
-        clearInterval(intervalo);
-        confetti.reset();
-    }, duracion);
-}
+            confetti({
+                ...animacionBase,
+                origin: { x: randomX, y: randomY },
+                angle: randomAngle
+            });
+        }, 250);
 
+        setTimeout(() => {
+            clearInterval(intervalo);
+            confetti.reset();
+            audio.pause();
+            audio.currentTime = 0;
+        }, duracion);
+    }
 </script>
+
 
 <script>
     $(document).ready(function () {
