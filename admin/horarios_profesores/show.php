@@ -17,7 +17,8 @@ $sql_horarios = "SELECT
                     s.subject_name, 
                     g.group_name, 
                     COALESCE(r.classroom_name, 'Sin aula') AS classroom_name, 
-                    t.teacher_name
+                    t.teacher_name, 
+                    t.hours /* Se incluye la columna 'hours' de la tabla 'teachers' */
                  FROM 
                     schedule_assignments sa
                  JOIN 
@@ -41,8 +42,9 @@ if (!$horarios) {
     exit;
 }
 
+/* Captura del nombre del profesor y horas */
 $teacher_name = $horarios[0]['teacher_name'];
-
+$teacher_hours = $horarios[0]['hours']; // Se asigna la cantidad de horas del profesor
 
 /* Definir los horarios y días */
 $horas = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
@@ -67,12 +69,9 @@ foreach ($horarios as $horario) {
 
     $detalle_clase = htmlspecialchars("$materia (Grupo: $grupo, Salón: $salon)");
 
-    
     foreach ($horas as $hora) {
         if ($hora >= $start_time && $hora < $end_time) {
-            
             if (in_array($dia, $dias)) {
-                
                 if (!empty($tabla_horarios[$hora][$dia])) {
                     $tabla_horarios[$hora][$dia] .= "<br>" . $detalle_clase;
                 } else {
@@ -227,26 +226,30 @@ include('../../layout/mensajes.php');
                         {
                             text: 'Excel',
                             action: function () {
-                                
                                 let horarios = [];
                                 $("#example1 tbody tr").each(function () {
                                     let fila = [];
-                                    $(this).find('td').each(function () {
+                                    $(this).find('td').each(function (index) {
                                         fila.push($(this).html().trim());
                                     });
                                     horarios.push(fila);
                                 });
 
-                                
+                                let teacher_name = "<?= addslashes($teacher_name) ?>";}
+                                let teacher_hours = "<?= addslashes($teacher_hours) ?>";}
+
                                 $.ajax({
                                     url: '../../app/controllers/horarios_grupos/generar_horario.php',
                                     method: 'POST',
-                                    data: { horarios: horarios },
+                                    data: { 
+                                        horarios: horarios, 
+                                        teacher_name: teacher_name, 
+                                        hours: teacher_hours 
+                                    },
                                     xhrFields: {
                                         responseType: 'blob'
                                     },
                                     success: function (response) {
-                                        
                                         let blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                                         let link = document.createElement('a');
                                         link.href = window.URL.createObjectURL(blob);
@@ -259,6 +262,7 @@ include('../../layout/mensajes.php');
                                 });
                             }
                         }
+
                     ]
                 },
                 {
