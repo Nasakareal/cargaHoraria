@@ -146,6 +146,24 @@ foreach ($profesores as $profesor) {
 
     $sheet = $spreadsheet->getActiveSheet();
 
+    $totalHoras = 0;
+    foreach ($horarios as $horario) {
+        $start_time = new DateTime($horario['start_time']);
+        $end_time = new DateTime($horario['end_time']);
+        $interval = $start_time->diff($end_time);
+        $horas = $interval->h + ($interval->i / 60);
+        $totalHoras += $horas;
+    }
+
+    $sheet->setCellValue('C3', $teacher_name);
+    $sheet->getStyle('C3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+    $sheet->getStyle('C3')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+
+    $sheet->setCellValue('G4', $totalHoras);
+    $sheet->getStyle('G4')->getNumberFormat()->setFormatCode('0.00');
+    $sheet->getStyle('G4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+    $sheet->getStyle('G4')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+
     foreach ($horarios as $horario) {
         $dia = ucfirst(strtolower($horario['day']));
         $hora_raw = $horario['start_time'];
@@ -209,7 +227,7 @@ if (!file_exists($zip_file)) {
 }
 
 header('Content-Type: application/zip');
-header('Content-Disposition: attachment; filename="' . $zip_file . '"');
+header('Content-Disposition: attachment; filename="' . basename($zip_file) . '"');
 header('Content-Length: ' . filesize($zip_file));
 readfile($zip_file);
 
