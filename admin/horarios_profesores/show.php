@@ -9,7 +9,6 @@ if (!$teacher_id) {
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 
-/* Actualizar la consulta SQL para manejar registros */
 $sql_horarios = "SELECT 
                     sa.schedule_day, 
                     sa.start_time, 
@@ -18,7 +17,7 @@ $sql_horarios = "SELECT
                     g.group_name, 
                     COALESCE(r.classroom_name, 'Sin aula') AS classroom_name, 
                     t.teacher_name, 
-                    t.hours /* Se incluye la columna 'hours' de la tabla 'teachers' */
+                    t.hours
                  FROM 
                     schedule_assignments sa
                  JOIN 
@@ -44,7 +43,7 @@ if (!$horarios) {
 
 /* Captura del nombre del profesor y horas */
 $teacher_name = $horarios[0]['teacher_name'];
-$teacher_hours = $horarios[0]['hours']; // Se asigna la cantidad de horas del profesor
+$teacher_hours = $horarios[0]['hours'];
 
 /* Definir los horarios y días */
 $horas = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
@@ -89,7 +88,7 @@ foreach ($horarios as $horario) {
     <div class="content">
         <div class="container">
             <div class="row">
-                <h1>Horarios Asignados al Profesor <?= $teacher_name ?></h1> 
+                <h1>Horarios Asignados al Profesor <?= htmlspecialchars($teacher_name, ENT_QUOTES, 'UTF-8') ?></h1> 
             </div>
             <div class="row">
                 <div class="col-md-12">
@@ -97,8 +96,6 @@ foreach ($horarios as $horario) {
                         <div class="card-header">
                             <h3 class="card-title">Detalles del Horario</h3>
                             <a href="javascript:history.back();" class="btn btn-secondary" style="float: right;">Volver</a>
-
-
                         </div>
 
                         <div class="card-body">
@@ -109,14 +106,14 @@ foreach ($horarios as $horario) {
                                             <tr>
                                                 <th>Hora/Día</th>
                                                 <?php foreach ($dias as $dia): ?>
-                                                    <th><?= $dia; ?></th>
+                                                    <th><?= htmlspecialchars($dia, ENT_QUOTES, 'UTF-8'); ?></th>
                                                 <?php endforeach; ?>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php foreach ($horas as $hora): ?>
                                                 <tr>
-                                                    <td><?= $hora; ?></td>
+                                                    <td><?= htmlspecialchars($hora, ENT_QUOTES, 'UTF-8'); ?></td>
                                                     <?php foreach ($dias as $dia): ?>
                                                         <td><?= $tabla_horarios[$hora][$dia] ?? ''; ?></td>
                                                     <?php endforeach; ?>
@@ -149,8 +146,6 @@ foreach ($horarios as $horario) {
 include('../../admin/layout/parte2.php');
 include('../../layout/mensajes.php');
 ?>
-
-
 
 <script>
     $(function () {
@@ -226,18 +221,20 @@ include('../../layout/mensajes.php');
                         {
                             text: 'Excel',
                             action: function () {
+                                
                                 let horarios = [];
                                 $("#example1 tbody tr").each(function () {
                                     let fila = [];
-                                    $(this).find('td').each(function (index) {
+                                    $(this).find('td').each(function () {
                                         fila.push($(this).html().trim());
                                     });
                                     horarios.push(fila);
                                 });
 
-                                let teacher_name = "<?= addslashes($teacher_name) ?>";}
-                                let teacher_hours = "<?= addslashes($teacher_hours) ?>";}
+                                let teacher_name = "<?= addslashes($teacher_name) ?>";
+                                let teacher_hours = "<?= addslashes($teacher_hours) ?>";
 
+                                
                                 $.ajax({
                                     url: '../../app/controllers/horarios_grupos/generar_horario.php',
                                     method: 'POST',
@@ -250,10 +247,11 @@ include('../../layout/mensajes.php');
                                         responseType: 'blob'
                                     },
                                     success: function (response) {
+                                        
                                         let blob = new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                                         let link = document.createElement('a');
                                         link.href = window.URL.createObjectURL(blob);
-                                        link.download = "Horario_Personalizado.xlsx";
+                                        link.download = "Horario_" + teacher_name + ".xlsx";
                                         link.click();
                                     },
                                     error: function () {
@@ -262,7 +260,6 @@ include('../../layout/mensajes.php');
                                 });
                             }
                         }
-
                     ]
                 },
                 {

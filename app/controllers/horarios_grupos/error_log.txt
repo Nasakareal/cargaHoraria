@@ -17,3 +17,47 @@
 [14-Jan-2025 23:33:38 UTC] Horas del profesor establecidas en F4: 20
 [14-Jan-2025 23:33:38 UTC] Hora no reconocida: 20:00
 [14-Jan-2025 23:33:40 UTC] Archivo Excel generado y enviado correctamente.
+[15-Jan-2025 19:27:32 UTC] Plantilla cargada correctamente.
+[15-Jan-2025 19:27:32 UTC] Nombre del profesor establecido en C3: JESUS EDUARDO RODRÍGUEZ GUTIÉRREZ
+[15-Jan-2025 19:27:32 UTC] Horas del profesor establecidas en F4: 20
+[15-Jan-2025 19:27:33 UTC] Hora no reconocida: 20:00
+[15-Jan-2025 19:27:34 UTC] Archivo Excel generado y enviado correctamente.
+[15-Jan-2025 19:29:57 UTC] Plantilla cargada correctamente.
+[15-Jan-2025 19:29:57 UTC] Nombre del profesor establecido en C3: JESUS EDUARDO RODRÍGUEZ GUTIÉRREZ
+[15-Jan-2025 19:29:57 UTC] Horas del profesor establecidas en G4: 20
+[15-Jan-2025 19:29:57 UTC] Hora no reconocida: 20:00
+[15-Jan-2025 19:29:58 UTC] Archivo Excel generado y enviado correctamente: Horario_JESUS_EDUARDO_RODR__GUEZ_GUTI__RREZ.xlsx
+[15-Jan-2025 19:30:58 UTC] Plantilla cargada correctamente.
+[15-Jan-2025 19:30:58 UTC] Nombre del profesor establecido en C3: JESUS EDUARDO RODRÍGUEZ GUTIÉRREZ
+[15-Jan-2025 19:30:58 UTC] Horas del profesor establecidas en G4: 20
+[15-Jan-2025 19:30:58 UTC] Hora no reconocida: 20:00
+[15-Jan-2025 19:31:00 UTC] Archivo Excel generado y enviado correctamente: Horario_JESUS_EDUARDO_RODR__GUEZ_GUTI__RREZ.xlsx
+[15-Jan-2025 19:31:54 UTC] Plantilla cargada correctamente.
+[15-Jan-2025 19:31:54 UTC] Nombre del profesor establecido en C3: JESUS EDUARDO RODRÍGUEZ GUTIÉRREZ
+[15-Jan-2025 19:31:54 UTC] Horas del profesor establecidas en G4: 20
+[15-Jan-2025 19:31:55 UTC] Hora no reconocida: 20:00
+[15-Jan-2025 19:31:56 UTC] Archivo Excel generado y enviado correctamente: Horario_JESUS_EDUARDO_RODR__GUEZ_GUTI__RREZ.xlsx
+[15-Jan-2025 19:33:14 UTC] Plantilla cargada correctamente.
+[15-Jan-2025 19:33:14 UTC] Nombre del profesor establecido en C3: JESUS EDUARDO RODRÍGUEZ GUTIÉRREZ
+[15-Jan-2025 19:33:14 UTC] Horas del profesor establecidas en G4: 20
+[15-Jan-2025 19:33:14 UTC] Hora no reconocida: 20:00
+[15-Jan-2025 19:33:15 UTC] Archivo Excel generado y enviado correctamente: Horario_JESUS_EDUARDO_RODR__GUEZ_GUTI__RREZ.xlsx
+[15-Jan-2025 19:33:39 UTC] Plantilla cargada correctamente.
+[15-Jan-2025 19:33:39 UTC] Nombre del profesor establecido en C3: JESUS EDUARDO RODRÍGUEZ GUTIÉRREZ
+[15-Jan-2025 19:33:39 UTC] Horas del profesor establecidas en G4: 20
+[15-Jan-2025 19:33:39 UTC] Hora no reconocida: 20:00
+[15-Jan-2025 19:33:40 UTC] Archivo Excel generado y enviado correctamente: Horario_JESUS_EDUARDO_RODR__GUEZ_GUTI__RREZ.xlsx
+[15-Jan-2025 19:35:07 UTC] Plantilla cargada correctamente.
+[15-Jan-2025 19:35:07 UTC] Nombre del profesor establecido en C3: JESUS EDUARDO RODRÍGUEZ GUTIÉRREZ
+[15-Jan-2025 19:35:07 UTC] Horas del profesor establecidas en G4: 20
+[15-Jan-2025 19:35:07 UTC] Hora no reconocida: 20:00
+[15-Jan-2025 19:35:11 UTC] Plantilla cargada correctamente.
+[15-Jan-2025 19:35:11 UTC] Nombre del profesor establecido en C3: JESUS EDUARDO RODRÍGUEZ GUTIÉRREZ
+[15-Jan-2025 19:35:11 UTC] Horas del profesor establecidas en G4: 20
+[15-Jan-2025 19:35:11 UTC] Hora no reconocida: 20:00
+[15-Jan-2025 19:35:12 UTC] Archivo Excel generado y enviado correctamente: Horario_JESUS_EDUARDO_RODR__GUEZ_GUTI__RREZ.xlsx
+[15-Jan-2025 19:39:02 UTC] Plantilla cargada correctamente.
+[15-Jan-2025 19:39:02 UTC] Nombre del profesor establecido en C3: MARINA JOSEFINA TAPIA MERLO
+[15-Jan-2025 19:39:02 UTC] Horas del profesor establecidas en G4: 32
+[15-Jan-2025 19:39:02 UTC] Hora no reconocida: 20:00
+[15-Jan-2025 19:39:03 UTC] Archivo Excel generado y enviado correctamente: Horario_MARINA_JOSEFINA_TAPIA_MERLO.xlsx

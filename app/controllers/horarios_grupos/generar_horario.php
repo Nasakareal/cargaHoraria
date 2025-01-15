@@ -1,14 +1,28 @@
 <?php
+// Iniciar el almacenamiento en búfer para prevenir salidas tempranas
 ob_start();
 
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
-ini_set('error_log', __DIR__ . '/error_log.txt');
+// Configurar el registro de errores
+ini_set('display_errors', 0); // Deshabilitar la visualización de errores
+ini_set('log_errors', 1);     // Habilitar el registro de errores
+ini_set('error_log', __DIR__ . '/error_log.txt'); // Ruta al archivo de log
 
 error_reporting(E_ALL);
 
 require '../../../vendor/autoload.php';
 use PhpOffice\PhpSpreadsheet\IOFactory;
+
+/* Función para sanitizar el nombre del archivo */
+function sanitizeFileName($filename) {
+    // Reemplazar caracteres no permitidos por guiones bajos
+    // Permitidos: letras, números, guiones y espacios
+    $sanitized = preg_replace('/[^A-Za-z0-9\- ]/', '_', $filename);
+    // Reemplazar espacios por guiones bajos
+    $sanitized = str_replace(' ', '_', $sanitized);
+    // Opcional: Limitar la longitud del nombre del archivo
+    $sanitized = substr($sanitized, 0, 50);
+    return $sanitized;
+}
 
 $templatePath = __DIR__ . '/../../../templates/plantilla_horario.xlsx';
 
@@ -24,6 +38,7 @@ try {
     error_log('Error al cargar la plantilla: ' . $e->getMessage());
     die('Error: No se pudo cargar la plantilla.');
 }
+
 $sheet = $spreadsheet->getActiveSheet();
 
 if (!isset($_POST['horarios']) || empty($_POST['horarios'])) {
@@ -45,7 +60,7 @@ $sheet->setCellValue('C3', strtoupper($teacher_name));
 error_log('Nombre del profesor establecido en C3: ' . strtoupper($teacher_name));
 
 $sheet->setCellValue('G4', $teacher_hours);
-error_log('Horas del profesor establecidas en F4: ' . $teacher_hours);
+error_log('Horas del profesor establecidas en G4: ' . $teacher_hours);
 
 $horaFila = [
     '07:00' => 7,
@@ -93,10 +108,15 @@ foreach ($horarios as $fila) {
     }
 }
 
+/* Sanitizar el nombre del archivo usando el nombre del profesor */
+$sanitized_teacher_name = sanitizeFileName($teacher_name);
+$filename = "Horario_{$sanitized_teacher_name}.xlsx";
+
 ob_end_clean();
 
+/* Configurar encabezados para descargar el archivo como Excel con nombre personalizado */
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-header('Content-Disposition: attachment; filename="Horario_Personalizado.xlsx"');
+header("Content-Disposition: attachment; filename=\"{$filename}\"");
 header('Cache-Control: max-age=0');
 header('Expires: Fri, 11 Nov 2011 11:11:11 GMT');
 header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
@@ -106,7 +126,7 @@ header('Pragma: public');
 try {
     $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
     $writer->save('php://output');
-    error_log('Archivo Excel generado y enviado correctamente.');
+    error_log('Archivo Excel generado y enviado correctamente: ' . $filename);
 } catch (\PhpOffice\PhpSpreadsheet\Writer\Exception $e) {
     error_log('Error al generar el archivo Excel: ' . $e->getMessage());
     die('Error: No se pudo generar el archivo Excel.');

@@ -131,38 +131,51 @@ include('../../layout/mensajes.php');
         $("#example1").DataTable({
             "pageLength": 5,
             "language": {
-                "emptyTable": "No hay información",
-                "info": "Mostrando _START_ a _END_ de _TOTAL_ Profesores",
-                "infoEmpty": "Mostrando 0 a 0 de 0 Profesores",
-                "infoFiltered": "(Filtrado de _MAX_ total Profesores)",
-                "lengthMenu": "Mostrar _MENU_ Profesores",
-                "loadingRecords": "Cargando...",
-                "processing": "Procesando...",
-                "search": "Buscador:",
-                "zeroRecords": "Sin resultados encontrados",
-                "paginate": {
-                    "first": "Primero",
-                    "last": "Ultimo",
-                    "next": "Siguiente",
-                    "previous": "Anterior"
-                }
+              "emptyTable": "No hay información",
+              "info": "Mostrando _START_ a _END_ de _TOTAL_ Usuarios",
+              "infoEmpty": "Mostrando 0 a 0 de 0 Usuarios",
+              "infoFiltered": "(Filtrado de _MAX_ total Usuarios)",
+              "infoPostFix": "",
+              "thousands": ",",
+              "lengthMenu": "Mostrar _MENU_ Usuarios",
+              "loadingRecord": "Cargando...",
+              "processing": "Procesando...",
+              "search": "Buscador:",
+              "zeroRecords": "Sin resultados encontrados",
+              "paginate": {
+                "first": "Primero",
+                "last": "Ultimo",
+                "next": "Siguiente",
+                "previous": "Anterior"
+              }
             },
-            "responsive": true,
-            "lengthChange": true,
-            "autoWidth": false,
+            "responsive": true, "lengthChange": true, "autoWidth": false,
             buttons: [{
-                extend: 'collection',
-                text: 'Opciones',
-                orientation: 'landscape',
-                buttons: [{
-                }]
+              extend: 'collection',
+              text: 'Opciones',
+              orientation: 'landscape',
+              buttons: [{
+                text: 'Copiar',
+                extend: 'copy',
+              }, {
+                extend: 'pdf'
+              }, {
+                extend: 'csv'
+              }, {
+                extend: 'excel'
+              }, {
+                text: 'Imprimir',
+                extend: 'print'
+              }
+              ]
             },
-            {
+              {
                 extend: 'colvis',
                 text: 'Visor de columnas',
                 collectionLayout: 'fixed three-column'
-            }],
-        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+              }
+            ],
+        }) .buttons() .container() .appendTo('#example1_wrapper .col-md-6:eq(0)');
     });
 </script>
 
