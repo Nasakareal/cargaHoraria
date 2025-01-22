@@ -61,3 +61,111 @@
 [15-Jan-2025 19:39:02 UTC] Horas del profesor establecidas en G4: 32
 [15-Jan-2025 19:39:02 UTC] Hora no reconocida: 20:00
 [15-Jan-2025 19:39:03 UTC] Archivo Excel generado y enviado correctamente: Horario_MARINA_JOSEFINA_TAPIA_MERLO.xlsx
+[22-Jan-2025 18:01:51 UTC] Plantilla cargada correctamente.
+[22-Jan-2025 18:01:51 UTC] Error: Faltan datos del profesor.
+[22-Jan-2025 18:10:03 UTC] Plantilla cargada correctamente.
+[22-Jan-2025 18:10:03 UTC] Error: Faltan datos del grupo o turno.
+[22-Jan-2025 18:10:50 UTC] Plantilla cargada correctamente.
+[22-Jan-2025 18:10:50 UTC] Error: Faltan datos del grupo o turno.
+[22-Jan-2025 19:14:08 UTC] Plantilla cargada correctamente.
+[22-Jan-2025 19:14:08 UTC] Formato de fila incorrecto: Array
+(
+    [0] => 07:00
+    [1] => INGLÉS II - Sin salón ni laboratorio - MARIA VERONICA ALVAREZ RIOS
+    [2] => INGLÉS II - Sin salón ni laboratorio - MARIA VERONICA ALVAREZ RIOS
+    [3] => INGLÉS II - Sin salón ni laboratorio - MARIA VERONICA ALVAREZ RIOS
+    [4] => MARCO JURÍDICO Y LEGAL - Sin salón ni laboratorio - Sin profesor
+    [5] => CALIDAD - Sin salón ni laboratorio - LETICIA RUBICELA RODRIGUEZ RUIZ
+)
+
+[22-Jan-2025 19:14:08 UTC] Formato de fila incorrecto: Array
+(
+    [0] => 08:00
+    [1] => INGLÉS II - Sin salón ni laboratorio - MARIA VERONICA ALVAREZ RIOS
+    [2] => INGLÉS II - Sin salón ni laboratorio - MARIA VERONICA ALVAREZ RIOS
+    [3] => MARCO JURÍDICO Y LEGAL - Sin salón ni laboratorio - Sin profesor
+    [4] => CALIDAD - Sin salón ni laboratorio - LETICIA RUBICELA RODRIGUEZ RUIZ
+    [5] => INTRODUCCIÓN AL SISTEMA FINANCIERO - Sin salón ni laboratorio - BERENICE CEJA GUZMAN
+)
+
+[22-Jan-2025 19:14:08 UTC] Formato de fila incorrecto: Array
+(
+    [0] => 09:00
+    [1] => HABILIDADES SOCIOEMOCIONALES Y MANEJO DE CONFLICTOS - Sin salón ni laboratorio - EDITH SARAI RODRIGUEZ CALDERON
+    [2] => HABILIDADES SOCIOEMOCIONALES Y MANEJO DE CONFLICTOS - Sin salón ni laboratorio - EDITH SARAI RODRIGUEZ CALDERON
+    [3] => MARCO JURÍDICO Y LEGAL - Sin salón ni laboratorio - Sin profesor
+    [4] => CALIDAD - Sin salón ni laboratorio - LETICIA RUBICELA RODRIGUEZ RUIZ
+    [5] => INTRODUCCIÓN AL SISTEMA FINANCIERO - Sin salón ni laboratorio - BERENICE CEJA GUZMAN
+)
+
+[22-Jan-2025 19:14:08 UTC] Formato de fila incorrecto: Array
+(
+    [0] => 10:00
+    [1] => HABILIDADES SOCIOEMOCIONALES Y MANEJO DE CONFLICTOS - Sin salón ni laboratorio - EDITH SARAI RODRIGUEZ CALDERON
+    [2] => HABILIDADES SOCIOEMOCIONALES Y MANEJO DE CONFLICTOS - Sin salón ni laboratorio - EDITH SARAI RODRIGUEZ CALDERON
+    [3] => ESTADISTICA ADMINISTRATIVA - Sin salón ni laboratorio - ZACARIAS ESAU TORRES OLGUIN
+    [4] => INTRODUCCIÓN AL SISTEMA FINANCIERO - Sin salón ni laboratorio - BERENICE CEJA GUZMAN
+    [5] => MARCO JURÍDICO Y LEGAL - Sin salón ni laboratorio - Sin profesor
+)
+
+[22-Jan-2025 19:14:08 UTC] Formato de fila incorrecto: Array
+(
+    [0] => 11:00
+    [1] => MARCO JURÍDICO Y LEGAL - Sin salón ni laboratorio - Sin profesor
+    [2] => MACROECONOMÍA - Sin salón ni laboratorio - Sin profesor
+    [3] => ESTADISTICA ADMINISTRATIVA - Sin salón ni laboratorio - ZACARIAS ESAU TORRES OLGUIN
+    [4] => INTRODUCCIÓN AL SISTEMA FINANCIERO - Sin salón ni laboratorio - BERENICE CEJA GUZMAN
+    [5] => MARCO JURÍDICO Y LEGAL - Sin salón ni laboratorio - Sin profesor
+)
+
+[22-Jan-2025 19:14:08 UTC] Formato de fila incorrecto: Array
+(
+    [0] => 12:00
+    [1] => MARCO JURÍDICO Y LEGAL - Sin salón ni laboratorio - Sin profesor
+    [2] => MACROECONOMÍA - Sin salón ni laboratorio - Sin profesor
+    [3] => CALIDAD - Sin salón ni laboratorio - LETICIA RUBICELA RODRIGUEZ RUIZ
+    [4] => MACROECONOMÍA - Sin salón ni laboratorio - Sin profesor
+    [5] => 
+)
+
+[22-Jan-2025 19:14:08 UTC] Formato de fila incorrecto: Array
+(
+    [0] => 13:00
+    [1] => ESTADISTICA ADMINISTRATIVA - Sin salón ni laboratorio - ZACARIAS ESAU TORRES OLGUIN
+    [2] => ESTADISTICA ADMINISTRATIVA - Sin salón ni laboratorio - ZACARIAS ESAU TORRES OLGUIN
+    [3] => CALIDAD - Sin salón ni laboratorio - LETICIA RUBICELA RODRIGUEZ RUIZ
+    [4] => MACROECONOMÍA - Sin salón ni laboratorio - Sin profesor
+    [5] => 
+)
+
+[22-Jan-2025 19:14:08 UTC] Formato de fila incorrecto: Array
+(
+    [0] => 14:00
+    [1] => ESTADISTICA ADMINISTRATIVA - Sin salón ni laboratorio - ZACARIAS ESAU TORRES OLGUIN
+    [2] => ESTADISTICA ADMINISTRATIVA - Sin salón ni laboratorio - ZACARIAS ESAU TORRES OLGUIN
+    [3] => 
+    [4] => 
+    [5] => 
+)
+
+[22-Jan-2025 19:14:08 UTC] Formato de fila incorrecto: Array
+(
+    [0] => 15:00
+    [1] => 
+    [2] => 
+    [3] => 
+    [4] => 
+    [5] => 
+)
+
+[22-Jan-2025 19:14:08 UTC] Formato de fila incorrecto: Array
+(
+    [0] => 16:00
+    [1] => 
+    [2] => 
+    [3] => 
+    [4] => 
+    [5] => 
+)
+
+[22-Jan-2025 19:14:09 UTC] Archivo Excel generado y enviado correctamente: Horario_AFC-2A.xlsx

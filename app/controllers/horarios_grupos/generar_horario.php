@@ -1,11 +1,10 @@
 <?php
-// Iniciar el almacenamiento en búfer para prevenir salidas tempranas
+
 ob_start();
 
-// Configurar el registro de errores
-ini_set('display_errors', 0); // Deshabilitar la visualización de errores
-ini_set('log_errors', 1);     // Habilitar el registro de errores
-ini_set('error_log', __DIR__ . '/error_log.txt'); // Ruta al archivo de log
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/error_log.txt');
 
 error_reporting(E_ALL);
 
@@ -14,12 +13,9 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 /* Función para sanitizar el nombre del archivo */
 function sanitizeFileName($filename) {
-    // Reemplazar caracteres no permitidos por guiones bajos
-    // Permitidos: letras, números, guiones y espacios
+
     $sanitized = preg_replace('/[^A-Za-z0-9\- ]/', '_', $filename);
-    // Reemplazar espacios por guiones bajos
     $sanitized = str_replace(' ', '_', $sanitized);
-    // Opcional: Limitar la longitud del nombre del archivo
     $sanitized = substr($sanitized, 0, 50);
     return $sanitized;
 }
