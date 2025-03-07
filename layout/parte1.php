@@ -160,10 +160,14 @@ document.addEventListener('DOMContentLoaded', function () {
   <aside class="main-sidebar sidebar-dark-primary elevation-4" style="background-color: #008080">
     
     <!-- Brand Logo --> 
-    <a href="<?=APP_URL;?>/portal" class="brand-link" style="background-color: #008080">
-      <img src="https://ut-morelia.edu.mx/wp-content/uploads/2022/05/Logo-UTM-Claro.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8; width: 50px; height: 50px; object-fit: contain;">
-      <span class="brand-text font-weight-light">Carga Horaria</span>
-    </a>
+        <a href="<?=APP_URL;?>/admin" class="brand-link" style="background-color: #008080; padding: 10px; border-radius: 8px;">
+          <img src="<?= APP_URL; ?>/public/dist/img/UTM.png" 
+               alt="AdminLTE Logo" 
+               class="brand-image img-circle elevation-3" 
+               style="opacity: .8; width: 50px; height: 50px; object-fit: contain; background-color: white; padding: 5px; border-radius: 50%;">
+          <span class="brand-text font-weight-light">Carga Horaria</span>
+        </a>
+
 
     <!-- Sidebar -->
     <div class="sidebar" style="background-color: #008080">

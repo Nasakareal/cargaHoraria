@@ -19,7 +19,7 @@ session_start();
 <body class="hold-transition login-page">
 <div class="login-box">
     <center>
-    <img src="https://ut-morelia.edu.mx/ingenieria/wordpress/wp-content/uploads/2022/09/UTM.png" width="350px" alt=""><br><br>
+    <img src="/cargaHoraria/public/img/utm2025.png" width="400px" alt="UTM Logo"><br><br>
     </center>
   <div class="login-logo">
     <h3><b><?=APP_NAME;?></b></h3>

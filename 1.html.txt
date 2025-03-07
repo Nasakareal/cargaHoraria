@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Prueba ZXing</title>
+  <!-- Carga la librería ZXing UMD desde unpkg -->
+  <script src="https://unpkg.com/@zxing/browser@latest/dist/index.umd.min.js"></script>
+</head>
+<body>
+  <h1>Prueba de ZXing</h1>
+  
+  <video id="preview" autoplay muted style="width: 400px; background: #000;"></video>
+  
+  <button id="stopScan">Detener Escaneo</button>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Verifica que window.ZXing exista
+      console.log('window.ZXing:', window.ZXing);
+
+      if (!window.ZXing) {
+        alert("No se pudo cargar ZXing. Revisa la consola Network si fue bloqueado.");
+        return;
+      }
+
+      const { BrowserMultiFormatReader, NotFoundException } = window.ZXing;
+      // Creamos el lector
+      const codeReader = new BrowserMultiFormatReader();
+      const previewElem = document.getElementById('preview');
+      const stopBtn = document.getElementById('stopScan');
+
+      try {
+        // Obtenemos lista de cámaras
+        const videoInputDevices = await codeReader.listVideoInputDevices();
+        console.log("Cámaras detectadas:", videoInputDevices);
+
+        if (videoInputDevices.length === 0) {
+          alert("No se encontraron cámaras disponibles.");
+          return;
+        }
+
+        // Empezamos con la primera (o la trasera, si la encuentras)
+        await codeReader.decodeFromVideoDevice(
+          videoInputDevices[0].deviceId, 
+          'preview',
+          (result, err) => {
+            if (result) {
+              const content = result.getText();
+              console.log("Contenido escaneado:", content);
+              alert("QR detectado: " + content);
+            } else if (err && !(err instanceof NotFoundException)) {
+              console.error(err);
+            }
+          }
+        );
+      } catch (e) {
+        console.error("Error al acceder a la cámara:", e);
+        alert("Hubo un problema al intentar acceder a la cámara: " + e);
+      }
+
+      // Botón para detener
+      stopBtn.addEventListener('click', () => {
+        codeReader.reset();
+        alert("Escaneo detenido.");
+      });
+    });
+  </script>
+</body>
+</html>
