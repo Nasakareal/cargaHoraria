@@ -755,6 +755,23 @@ CREATE TABLE registro_eventos (
 
 
 
+CREATE TABLE schedule_history (
+    assignment_id INT AUTO_INCREMENT PRIMARY KEY,
+    schedule_id INT,
+    subject_id INT,
+    teacher_id INT,
+    group_id INT,
+    classroom_id INT,
+    lab_id INT,
+    start_time TIME,
+    end_time TIME,
+    schedule_day ENUM('Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'),
+    estado VARCHAR(11),
+    fyh_creacion DATETIME,
+    fyh_actualizacion DATETIME,
+    tipo_espacio VARCHAR(50),
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
 
 
 

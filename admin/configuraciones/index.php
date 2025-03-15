@@ -119,6 +119,17 @@ include('../../admin/layout/parte1.php');
                 </div>
             </div>
 
+            <!-- Interfaz para Horarios Pasados -->
+            <div class="col-md-4 col-sm-6 col-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-info"><i class="bi bi-hourglass-split"></i></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text"><b>Horarios Pasados</b></span>
+                        <a href="<?= APP_URL; ?>/admin/configuraciones/horarios" class="btn btn-primary btn-sm">Acceder</a>
+                    </div>
+                </div>
+            </div>
+
             <!-- Interfaz para Registro de actividades -->
             <div class="col-md-4 col-sm-6 col-12">
                 <div class="info-box">
