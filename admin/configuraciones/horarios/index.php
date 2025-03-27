@@ -46,6 +46,7 @@ try {
                                 <thead>
                                     <tr>
                                         <th class="text-center">Número</th>
+                                        <th class="text-center">Cuatrimestre</th>
                                         <th class="text-center">Fecha de Registro</th>
                                         <th class="text-center">Total Registros</th>
                                         <th class="text-center">Acciones</th>
@@ -55,15 +56,34 @@ try {
                                     <?php
                                     $contador = 1;
                                     foreach ($fechas as $fila):
+
+                                        // Obtener el cuatrimestre y assignment_id representativo por fecha
+                                        $stmtDetalle = $pdo->prepare("SELECT assignment_id, quarter_name_en 
+                                                                      FROM schedule_history 
+                                                                      WHERE DATE(fecha_registro) = :fecha 
+                                                                      LIMIT 1");
+                                        $stmtDetalle->bindParam(':fecha', $fila['fecha_registro']);
+                                        $stmtDetalle->execute();
+                                        $detalle = $stmtDetalle->fetch(PDO::FETCH_ASSOC);
+
+                                        $quarter_name = $detalle['quarter_name_en'] ?? '';
+                                        $assignment_id = $detalle['assignment_id'] ?? null;
                                     ?>
                                     <tr>
                                         <td class="text-center"><?= $contador; ?></td>
+                                        <td class="text-center"><?= htmlspecialchars($quarter_name); ?></td>
                                         <td class="text-center"><?= $fila['fecha_registro']; ?></td>
                                         <td class="text-center"><?= $fila['total']; ?></td>
                                         <td class="text-center">
                                             <a href="show.php?fecha=<?= $fila['fecha_registro']; ?>" class="btn btn-info btn-sm">
-                                                <i class="bi bi-eye"></i> Ver Detalles
+                                                <i class="bi bi-eye"></i>
                                             </a>
+
+                                            <?php if ($assignment_id): ?>
+                                            <a href="edit.php?id=<?= $assignment_id; ?>" class="btn btn-success btn-sm">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                     <?php

@@ -775,6 +775,8 @@ CREATE TABLE schedule_history (
 
 
 
+ALTER TABLE schedule_history
+ADD COLUMN quarter_name_en VARCHAR(100) NULL AFTER tipo_espacio;
 
 
 

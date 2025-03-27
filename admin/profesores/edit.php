@@ -67,33 +67,33 @@ foreach ($programs as $program) {
                                 </div>
 
                                 <!-- Áreas -->
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label for="areas">Áreas</label>
-                                                <div class="table-responsive">
-                                                    <table class="table table-bordered">
-                                                        <tbody>
-                                                            <?php $counter = 0; ?>
-                                                            <tr>
-                                                                <?php foreach ($areas as $area): ?>
-                                                                    <td>
-                                                                        <input type="checkbox" name="areas[]" value="<?= $area['area_id']; ?>" id="area_<?= $area['area_id']; ?>" <?= in_array($area['area_id'], $areas_asignadas ?? []) ? 'checked' : ''; ?>>
-                                                                        <label for="area_<?= $area['area_id']; ?>"><?= htmlspecialchars($area['area_name']); ?></label>
-                                                                    </td>
-                                                                    <?php $counter++; ?>
-                                                                    <?php if ($counter % 3 == 0): ?>
-                                                                        </tr><tr>
-                                                                    <?php endif; ?>
-                                                                <?php endforeach; ?>
-                                                            </tr>
-                                                         </tbody>
-                                                    </table>
-                                                </div>
-                                                <small class="text-muted">Seleccione una o más áreas.</small>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="areas">Áreas</label>
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered">
+                                                    <tbody>
+                                                        <?php $counter = 0; ?>
+                                                        <tr>
+                                                            <?php foreach ($areas as $area): ?>
+                                                                <td>
+                                                                    <input type="checkbox" name="areas[]" value="<?= $area['area_id']; ?>" id="area_<?= $area['area_id']; ?>" <?= in_array($area['area_id'], $areas_asignadas ?? []) ? 'checked' : ''; ?>>
+                                                                    <label for="area_<?= $area['area_id']; ?>"><?= htmlspecialchars($area['area_name']); ?></label>
+                                                                </td>
+                                                                <?php $counter++; ?>
+                                                                <?php if ($counter % 3 == 0): ?>
+                                                                    </tr><tr>
+                                                                <?php endif; ?>
+                                                            <?php endforeach; ?>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
+                                            <small class="text-muted">Seleccione una o más áreas.</small>
                                         </div>
                                     </div>
+                                </div>
 
                                 <!-- Horarios Disponibles -->
                                 <div class="row">
@@ -124,8 +124,28 @@ foreach ($programs as $program) {
                                                                         <option value="Sunday" <?= ($horario['day_of_week'] == 'Sunday') ? 'selected' : ''; ?>>Domingo</option>
                                                                     </select>
                                                                 </td>
-                                                                <td><input type="time" name="start_time[]" class="form-control" value="<?= htmlspecialchars($horario['start_time']); ?>"></td>
-                                                                <td><input type="time" name="end_time[]" class="form-control" value="<?= htmlspecialchars($horario['end_time']); ?>"></td>
+                                                                <td>
+                                                                    <select name="start_time[]" class="form-control">
+                                                                        <?php for ($h = 7; $h <= 22; $h++):
+                                                                            $time = sprintf("%02d:00", $h);
+                                                                        ?>
+                                                                        <option value="<?= $time; ?>" <?= (isset($horario['start_time']) && substr($horario['start_time'], 0, 5) == $time) ? 'selected' : ''; ?>>
+                                                                            <?= $time; ?>
+                                                                        </option>
+                                                                        <?php endfor; ?>
+                                                                    </select>
+                                                                </td>
+                                                                <td>
+                                                                    <select name="end_time[]" class="form-control">
+                                                                        <?php for ($h = 7; $h <= 22; $h++):
+                                                                            $time = sprintf("%02d:00", $h);
+                                                                        ?>
+                                                                        <option value="<?= $time; ?>" <?= (isset($horario['end_time']) && substr($horario['end_time'], 0, 5) == $time) ? 'selected' : ''; ?>>
+                                                                            <?= $time; ?>
+                                                                        </option>
+                                                                        <?php endfor; ?>
+                                                                    </select>
+                                                                </td>
                                                                 <td>
                                                                     <button type="button" class="btn btn-danger btn-sm remove-row">Eliminar</button>
                                                                 </td>
@@ -160,55 +180,65 @@ foreach ($programs as $program) {
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const horariosTable = document.getElementById('horarios_table');
+document.addEventListener('DOMContentLoaded', function () {
+    const horariosTable = document.getElementById('horarios_table');
 
-        // Agregar horario
-        document.getElementById('addHorario').addEventListener('click', function () {
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
-                <td>
-                    <select name="day_of_week[]" class="form-control">
-                        <option value="Monday">Lunes</option>
-                        <option value="Tuesday">Martes</option>
-                        <option value="Wednesday">Miércoles</option>
-                        <option value="Thursday">Jueves</option>
-                        <option value="Friday">Viernes</option>
-                        <option value="Saturday">Sábado</option>
-                        <option value="Sunday">Domingo</option>
-                    </select>
-                </td>
-                <td><input type="time" name="start_time[]" class="form-control"></td>
-                <td><input type="time" name="end_time[]" class="form-control"></td>
-                <td><button type="button" class="btn btn-danger btn-sm remove-row">Eliminar</button></td>
-            `;
-            horariosTable.appendChild(newRow);
-        });
+    // Función que genera el select de hora para el nuevo horario
+    function generateTimeSelect(name) {
+        let selectHTML = `<select name="${name}" class="form-control">`;
+        for (let h = 7; h <= 22; h++) {
+            let hour = h < 10 ? '0' + h : h;
+            let time = hour + ":00";
+            selectHTML += `<option value="${time}">${time}</option>`;
+        }
+        selectHTML += `</select>`;
+        return selectHTML;
+    }
 
-        horariosTable.addEventListener('click', function (event) {
-            if (event.target.classList.contains('remove-row')) {
-                event.target.closest('tr').remove();
+    // Agregar una nueva fila de horario
+    document.getElementById('addHorario').addEventListener('click', function () {
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td>
+                <select name="day_of_week[]" class="form-control">
+                    <option value="Monday">Lunes</option>
+                    <option value="Tuesday">Martes</option>
+                    <option value="Wednesday">Miércoles</option>
+                    <option value="Thursday">Jueves</option>
+                    <option value="Friday">Viernes</option>
+                    <option value="Saturday">Sábado</option>
+                    <option value="Sunday">Domingo</option>
+                </select>
+            </td>
+            <td>${generateTimeSelect('start_time[]')}</td>
+            <td>${generateTimeSelect('end_time[]')}</td>
+            <td><button type="button" class="btn btn-danger btn-sm remove-row">Eliminar</button></td>
+        `;
+        horariosTable.appendChild(newRow);
+    });
+
+    horariosTable.addEventListener('click', function (event) {
+        if (event.target.classList.contains('remove-row')) {
+            event.target.closest('tr').remove();
+        }
+    });
+
+    document.getElementById('clasificacion').addEventListener('change', function () {
+        const formData = new FormData(document.getElementById('editForm'));
+        fetch('<?= APP_URL; ?>/app/controllers/profesores/update.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Clasificación actualizada correctamente');
+            } else {
+                alert('Error al actualizar la clasificación');
             }
         });
-
-        document.getElementById('clasificacion').addEventListener('change', function () {
-            const clasificacion = this.value;
-            const programaAdscripcion = document.getElementById('programa_adscripcion');
-            const checkboxes = document.querySelectorAll('input[name="programas[]"]');
-            const formData = new FormData(document.getElementById('editForm'));
-            fetch('<?= APP_URL; ?>/app/controllers/profesores/update.php', {
-                method: 'POST',
-                body: formData
-            }).then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Clasificación actualizada correctamente');
-                } else {
-                    alert('Error al actualizar la clasificación');
-                }
-            });
-        });
     });
+});
 </script>
 
 <?php
