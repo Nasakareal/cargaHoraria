@@ -1,6 +1,8 @@
 <?php
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
+
+include('../../app/controllers/programas/listado_de_programas.php');
 ?>
 
 <!-- Content Wrapper. Contains page content -->
@@ -31,23 +33,28 @@ include('../../admin/layout/parte1.php');
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="">Horas consecutivas</label>
-                                            <input type="number" name="hours_consecutive" class="form-control" required>
+                                            <input type="number" name="max_consecutive_class_hours" class="form-control" required>
                                         </div>
                                     </div>
                                 </div>
+                                <!-- Programa -->
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="program_id">Programa</label>
+                                            <select name="program_id" class="form-control" required>
+                                                <?php foreach ($programs as $program): ?>
+                                                    <option value="<?= htmlspecialchars($program['program_id']); ?>" >
+                                                        <?= htmlspecialchars($program['program_name']); ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="">Horas semanales</label>
                                             <input type="number" name="weekly_hours" class="form-control" required>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="">¿Es especialización?</label>
-                                            <input type="checkbox" name="is_specialization" value="1"> Sí
                                         </div>
                                     </div>
                                 </div>

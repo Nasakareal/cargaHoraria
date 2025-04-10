@@ -5,9 +5,8 @@ session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $subject_name = trim($_POST['subject_name']);
-    $hours_consecutive = (int) $_POST['hours_consecutive'];
+    $hours_consecutive = (int) $_POST['max_consecutive_class_hours'];
     $weekly_hours = (int) $_POST['weekly_hours'];
-    $is_specialization = isset($_POST['is_specialization']) ? 1 : 0;
 
     /* Verifica si la materia ya existe */
     $query = $pdo->prepare("SELECT COUNT(*) FROM subjects WHERE subject_name = :subject_name");
@@ -21,11 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     } else {
         /* Inserta la nueva materia */
-        $sentencia = $pdo->prepare('INSERT INTO subjects (subject_name, hours_consecutive, weekly_hours, is_specialization) VALUES (:subject_name, :hours_consecutive, :weekly_hours, :is_specialization)');
+        $sentencia = $pdo->prepare('INSERT INTO subjects (subject_name, max_consecutive_class_hours, weekly_hours) VALUES (:subject_name, :max_consecutive_class_hours, :weekly_hours)');
         $sentencia->bindParam(':subject_name', $subject_name);
-        $sentencia->bindParam(':hours_consecutive', $hours_consecutive);
+        $sentencia->bindParam(':max_consecutive_class_hours', $hours_consecutive);
         $sentencia->bindParam(':weekly_hours', $weekly_hours);
-        $sentencia->bindParam(':is_specialization', $is_specialization);
 
         try {
             if ($sentencia->execute()) {
