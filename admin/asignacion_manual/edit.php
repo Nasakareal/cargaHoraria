@@ -542,66 +542,6 @@ include('../../layout/mensajes.php');
                     }
                 });
             },
-
-            eventClick: function(info) {
-                Swal.fire({
-                    title: '¿Deseas eliminar esta asignación?',
-                    text : `El evento "${info.event.title}" será eliminado.`,
-                    icon : 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Eliminar',
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const assignment_id = info.event.extendedProps.assignment_id;
-
-                        $.ajax({
-                            url: '../../app/controllers/asignacion_manual/delete.php',
-                            type: 'POST',
-                            data: {
-                                assignment_id: assignment_id,
-                                group_id     : groupId
-                            },
-                            success: function(response) {
-                                try {
-                                    var data = JSON.parse(response);
-                                    if (data.status === 'success') {
-                                        info.event.remove();
-                                        Swal.fire({
-                                            title: 'Asignación eliminada',
-                                            text : `La asignación "${info.event.title}" ha sido eliminada correctamente.`,
-                                            icon : 'success',
-                                            confirmButtonText: 'Aceptar'
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            title: 'Error',
-                                            text: data.message || 'Hubo un problema al eliminar la asignación.',
-                                            icon: 'error',
-                                            confirmButtonText: 'Aceptar'
-                                        });
-                                    }
-                                } catch (e) {
-                                    Swal.fire({
-                                        title: 'Error',
-                                        text: 'Respuesta inválida del servidor.',
-                                        icon: 'error',
-                                        confirmButtonText: 'Aceptar'
-                                    });
-                                }
-                            },
-                            error: function() {
-                                Swal.fire({
-                                    title: 'Error',
-                                    text : 'Hubo un problema al intentar eliminar la asignación.',
-                                    icon : 'error',
-                                    confirmButtonText: 'Aceptar'
-                                });
-                            }
-                        });
-                    }
-                });
-            },
         });
 
         calendar.render();
