@@ -18,7 +18,6 @@ function cargarDisponibilidadProfesor($pdo, $teacher_id) {
             WHERE teacher_id = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$teacher_id]);
-
     $disponibilidad = [];
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $dia = $row['day_of_week'];
@@ -63,6 +62,16 @@ function profesorEstaDisponible($teacherAvailability, $diaEsp, $start, $end) {
     return false;
 }
 
+function teacherLibreEnHorario($pdo, $teacher_id, $diaEsp, $start_time, $end_time) {
+    if (!$teacher_id) return true;
+    $sql = "SELECT COUNT(*) FROM schedule_assignments
+            WHERE teacher_id = ? AND schedule_day = ?
+              AND (start_time < ? AND end_time > ?)";
+    $st = $pdo->prepare($sql);
+    $st->execute([$teacher_id, $diaEsp, $end_time, $start_time]);
+    return ($st->fetchColumn() == 0);
+}
+
 function obtenerTurnoDelGrupo($pdo, $group_id) {
     $sql = "SELECT turn_id FROM `groups` WHERE group_id = ?";
     $stmt = $pdo->prepare($sql);
@@ -75,11 +84,7 @@ function obtenerTurnoDelGrupo($pdo, $group_id) {
     return isset($map[$turn_id]) ? $map[$turn_id] : 'MATUTINO';
 }
 
-/**
- * Intenta asignar un bloque de 1 hora. Devuelve true si se insertó, false si no.
- */
-function asignarBloqueHorario(
-    $pdo, $teacher_id, $subject_id, $group_id, $classroom_id,
+function asignarBloqueHorario($pdo, $teacher_id, $subject_id, $group_id, $classroom_id,
     $diaEsp, $start_ts, $end_ts, &$errores, $teacherAvailability
 ) {
     $start_time = date('H:i:s', $start_ts);
@@ -88,8 +93,6 @@ function asignarBloqueHorario(
     if (!profesorEstaDisponible($teacherAvailability, $diaEsp, $start_time, $end_time)) {
         return false;
     }
-
-    // Conflicto con el grupo
     $qGroup = $pdo->prepare("
         SELECT COUNT(*) FROM schedule_assignments
         WHERE group_id = :g
@@ -97,29 +100,18 @@ function asignarBloqueHorario(
           AND (start_time < :et AND end_time > :st)
     ");
     $qGroup->execute([
-        ':g'=>$group_id,':d'=>$diaEsp,':st'=>$start_time,':et'=>$end_time
+        ':g'=>$group_id, ':d'=>$diaEsp, ':st'=>$start_time, ':et'=>$end_time
     ]);
     if($qGroup->fetchColumn()>0){
         return false;
     }
 
-    // Conflicto con el profesor
     if($teacher_id){
-        $qTeach = $pdo->prepare("
-            SELECT COUNT(*) FROM schedule_assignments
-            WHERE teacher_id = :t
-              AND schedule_day = :d
-              AND (start_time < :et AND end_time > :st)
-        ");
-        $qTeach->execute([
-            ':t'=>$teacher_id,':d'=>$diaEsp,':st'=>$start_time,':et'=>$end_time
-        ]);
-        if($qTeach->fetchColumn()>0){
+        if(!teacherLibreEnHorario($pdo, $teacher_id, $diaEsp, $start_time, $end_time)){
             return false;
         }
     }
 
-    // Insertar
     $ins = $pdo->prepare("
         INSERT INTO schedule_assignments
             (subject_id, group_id, teacher_id, classroom_id, schedule_day,
@@ -135,11 +127,42 @@ function asignarBloqueHorario(
     return true;
 }
 
-/**
- * Intenta asignar todas las horas semanales (weekly_hours) de la materia
- * usando round-robin. Si lo logra, retorna true. Si falla (no hay disponibilidad total),
- * retorna false y agrega un mensaje a $errores.
- */
+function actualizarBloquesExistentes($pdo, $teacher_id, $subject_id, $group_id, $teacherAvailability, &$horasPendientes) {
+    $sql = "SELECT assignment_id, schedule_day, start_time, end_time
+            FROM schedule_assignments
+            WHERE subject_id=? AND group_id=?
+              AND (teacher_id=0 OR teacher_id IS NULL)
+              AND estado='activo'
+            ORDER BY schedule_day, start_time";
+    $st = $pdo->prepare($sql);
+    $st->execute([$subject_id, $group_id]);
+    $rows = $st->fetchAll(PDO::FETCH_ASSOC);
+
+    $actualizados = 0;
+    foreach ($rows as $r) {
+        if ($horasPendientes <= 0) break;
+        $dia = $r['schedule_day'];
+        $stt = $r['start_time'];
+        $ett = $r['end_time'];
+        $id  = $r['assignment_id'];
+        if (!profesorEstaDisponible($teacherAvailability, $dia, $stt, $ett)) {
+            continue;
+        }
+        if (!teacherLibreEnHorario($pdo, $teacher_id, $dia, $stt, $ett)) {
+            continue;
+        }
+        $upd = $pdo->prepare("
+            UPDATE schedule_assignments
+               SET teacher_id=?, fyh_actualizacion=NOW()
+             WHERE assignment_id=?
+        ");
+        $upd->execute([$teacher_id, $id]);
+        $actualizados++;
+        $horasPendientes--;
+    }
+    return $actualizados;
+}
+
 function asignarMateriaAHorarioRoundRobin(
     $pdo, $teacher_id, $subject_id, $group_id, $weekly_hours,
     &$errores, $horarios_disponibles, $dias_semana, $teacherAvailability
@@ -171,11 +194,14 @@ function asignarMateriaAHorarioRoundRobin(
         return false;
     }
 
-    $r = $weekly_hours;
+    $restan = $weekly_hours;
+    $usados = actualizarBloquesExistentes($pdo, $teacher_id, $subject_id, $group_id, $teacherAvailability, $restan);
+    if ($restan <= 0) return true; // si ya se cubrieron con bloques existentes
+
     $dc = count($dias_del_turno);
     $i=0; 
     $cs=0;
-    while($r>0){
+    while($restan>0){
         $dia = $dias_del_turno[$i];
         if(!isset($horarios_disponibles[$turno][$dia])){
             $i=($i+1)%$dc;
@@ -195,7 +221,7 @@ function asignarMateriaAHorarioRoundRobin(
                 $errores, $teacherAvailability
             );
             if($ok){
-                $r--;
+                $restan--;
                 $asignado=true;
                 break;
             }
@@ -211,12 +237,11 @@ function asignarMateriaAHorarioRoundRobin(
         } else {
             $cs=0;
         }
-
         $i=($i+1)%$dc;
     }
 
-    if($r>0){
-        $errores[]="No se pudo asignar $r horas (ROUND-ROBIN) a la materia $subject_id (Grupo $group_id).";
+    if($restan>0){
+        $errores[]="No se pudo asignar $restan horas (ROUND-ROBIN) a la materia $subject_id (Grupo $group_id).";
         return false;
     }
     return true;
@@ -254,7 +279,6 @@ try {
                 $errores[]="La materia $materia_id no tiene weekly_hours > 0.";
                 continue;
             }
-
             $asignada = asignarMateriaAHorarioRoundRobin(
                 $pdo, 
                 $teacher_id, 
@@ -266,20 +290,15 @@ try {
                 $dias_semana, 
                 $teacherAvailability
             );
-
-            // Si NO se pudo asignar la materia completa, no la insertamos en teacher_subjects
             if(!$asignada){
                 continue;
             }
-
-            // Si sí se pudo asignar, verificamos si ya existe
             $verif = $pdo->prepare("
                 SELECT COUNT(*) FROM teacher_subjects
                 WHERE teacher_id=? AND subject_id=? AND group_id=?
             ");
             $verif->execute([$teacher_id, $materia_id, $grupo_id]);
             $existe = $verif->fetchColumn();
-
             if(!$existe){
                 $ins = $pdo->prepare("
                     INSERT INTO teacher_subjects
@@ -291,12 +310,10 @@ try {
         }
     }
 
-    // Si hubo errores, forzamos que no se registre nada.
     if(!empty($errores)){
         throw new Exception(implode(" | ", $errores));
     }
 
-    // Actualizar las horas totales del profesor
     $sentencia_horas_totales = $pdo->prepare("
         SELECT SUM(s.weekly_hours) AS total_hours
         FROM teacher_subjects ts
@@ -318,7 +335,7 @@ try {
     $descripcion   = "Se asignaron materias al profesor con ID $teacher_id: ".implode(', ',$materia_ids);
     registrarEvento($pdo, $usuario_email, $accion, $descripcion);
 
-    $_SESSION['mensaje'] = "Se han asignado las materias y generado los horarios.";
+    $_SESSION['mensaje'] = "Se han asignado las materias y generado/actualizado los horarios.";
     $_SESSION['icono']   = "success";
     header('Location: '.APP_URL."/admin/profesores");
     exit;

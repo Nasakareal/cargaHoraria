@@ -63,6 +63,7 @@ if (!in_array(strtolower($schedule_day), $valid_days)) {
 try {
     $pdo->beginTransaction();
 
+    // Obtener el registro actual de schedule_assignments y bloquearlo
     $query_get_assignment = $pdo->prepare("
         SELECT * 
         FROM schedule_assignments 
@@ -80,6 +81,11 @@ try {
         exit;
     }
 
+    // Guardar los valores antiguos que usaremos como criterio para actualizar la tabla manual_schedule_assignments
+    $old_schedule_day = $current_assignment['schedule_day'];
+    $old_start_time   = $current_assignment['start_time'];
+    
+    // Datos del registro actual
     $subject_id   = intval($current_assignment['subject_id']);
     $group_id     = intval($current_assignment['group_id']);
     $tipo_espacio = strtolower($current_assignment['tipo_espacio']);
@@ -87,6 +93,7 @@ try {
     $aula_id      = intval($current_assignment['classroom_id']);
     $teacher_id   = intval($current_assignment['teacher_id']);
 
+    // Verificar conflictos de espacio (en laboratorio o aula)
     if ($tipo_espacio === 'laboratorio') {
         $query_verificar = $pdo->prepare("
             SELECT assignment_id 
@@ -98,7 +105,6 @@ try {
               AND estado = 'activo'
         ");
         $query_verificar->bindParam(':lab_id', $lab_id, PDO::PARAM_INT);
-
     } elseif ($tipo_espacio === 'aula') {
         $query_verificar = $pdo->prepare("
             SELECT assignment_id 
@@ -110,7 +116,6 @@ try {
               AND estado = 'activo'
         ");
         $query_verificar->bindParam(':aula_id', $aula_id, PDO::PARAM_INT);
-
     } else {
         error_log("Tipo de espacio inválido en update_assignment.php: " . $tipo_espacio);
         echo json_encode(['status' => 'error', 'message' => 'Tipo de espacio inválido.']);
@@ -162,23 +167,48 @@ try {
         }
     }
 
+    // Actualizar schedule_assignments usando el assignment_id
     $query_update = $pdo->prepare("
         UPDATE schedule_assignments 
-        SET schedule_day = :schedule_day,
-            start_time   = :start_time,
-            end_time     = :end_time,
+        SET schedule_day      = :new_schedule_day,
+            start_time        = :new_start_time,
+            end_time          = :new_end_time,
             fyh_actualizacion = :fyh_actualizacion
-        WHERE assignment_id = :assignment_id
+        WHERE assignment_id   = :assignment_id
     ");
 
     $current_datetime = date('Y-m-d H:i:s');
-    $query_update->bindParam(':schedule_day', $schedule_day, PDO::PARAM_STR);
-    $query_update->bindParam(':start_time', $start_time, PDO::PARAM_STR);
-    $query_update->bindParam(':end_time', $end_time, PDO::PARAM_STR);
+    $query_update->bindParam(':new_schedule_day', $schedule_day, PDO::PARAM_STR);
+    $query_update->bindParam(':new_start_time', $start_time, PDO::PARAM_STR);
+    $query_update->bindParam(':new_end_time', $end_time, PDO::PARAM_STR);
     $query_update->bindParam(':fyh_actualizacion', $current_datetime, PDO::PARAM_STR);
     $query_update->bindParam(':assignment_id', $assignment_id, PDO::PARAM_INT);
-
     $query_update->execute();
+
+    // *** NUEVO: Actualizar manual_schedule_assignments usando subject_id, group_id, y los valores antiguos de schedule_day y start_time ***
+    $query_update_manual = $pdo->prepare("
+        UPDATE manual_schedule_assignments
+        SET schedule_day      = :new_schedule_day,
+            start_time        = :new_start_time,
+            end_time          = :new_end_time,
+            fyh_actualizacion = :fyh_actualizacion
+        WHERE subject_id = :subject_id
+          AND group_id   = :group_id
+          AND schedule_day = :old_schedule_day
+          AND start_time   = :old_start_time
+          AND estado       = 'activo'
+        LIMIT 1
+    ");
+    $query_update_manual->bindParam(':new_schedule_day', $schedule_day, PDO::PARAM_STR);
+    $query_update_manual->bindParam(':new_start_time', $start_time, PDO::PARAM_STR);
+    $query_update_manual->bindParam(':new_end_time', $end_time, PDO::PARAM_STR);
+    $query_update_manual->bindParam(':fyh_actualizacion', $current_datetime, PDO::PARAM_STR);
+    $query_update_manual->bindParam(':subject_id', $subject_id, PDO::PARAM_INT);
+    $query_update_manual->bindParam(':group_id', $group_id, PDO::PARAM_INT);
+    $query_update_manual->bindParam(':old_schedule_day', $old_schedule_day, PDO::PARAM_STR);
+    $query_update_manual->bindParam(':old_start_time', $old_start_time, PDO::PARAM_STR);
+    $query_update_manual->execute();
+    // *** FIN NUEVO ***
 
     $usuario_email = $_SESSION['sesion_email'] ?? 'desconocido@dominio.com';
     $accion        = 'Actualización de asignación';
@@ -207,4 +237,3 @@ try {
     ]);
     exit;
 }
-?>
