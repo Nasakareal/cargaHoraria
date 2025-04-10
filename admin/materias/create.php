@@ -1,7 +1,7 @@
 <?php
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
-
+include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
 include('../../app/controllers/programas/listado_de_programas.php');
 ?>
 
@@ -38,7 +38,7 @@ include('../../app/controllers/programas/listado_de_programas.php');
                                     </div>
                                 </div>
                                 <!-- Programa -->
-                                    <div class="col-md-4">
+                                    <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="program_id">Programa</label>
                                             <select name="program_id" class="form-control" required>
@@ -50,6 +50,21 @@ include('../../app/controllers/programas/listado_de_programas.php');
                                             </select>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="row">
+                                <!-- Campo para el cuatrimestre (term_id) -->
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="term_id">Cuatrimestre</label>
+                                            <select name="term_id" class="form-control" required>
+                                                <option value="">Seleccione un cuatrimestre</option>
+                                                <?php foreach ($terms as $term): ?>
+                                                    <option value="<?= $term['term_id']; ?>"><?= htmlspecialchars($term['term_name'], ENT_QUOTES, 'UTF-8'); ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">

@@ -7,8 +7,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $subject_name = trim($_POST['subject_name']);
     $hours_consecutive = (int) $_POST['max_consecutive_class_hours'];
     $weekly_hours = (int) $_POST['weekly_hours'];
+    $program_id = (int) $_POST['program_id'];
+    $term_id = (int) $_POST['term_id']; // AÑADIDO
 
-    /* Verifica si la materia ya existe */
+    // Verifica si la materia ya existe
     $query = $pdo->prepare("SELECT COUNT(*) FROM subjects WHERE subject_name = :subject_name");
     $query->bindParam(':subject_name', $subject_name);
     $query->execute();
@@ -19,19 +21,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: ' . APP_URL . "/admin/materias");
         exit;
     } else {
-        /* Inserta la nueva materia */
-        $sentencia = $pdo->prepare('INSERT INTO subjects (subject_name, max_consecutive_class_hours, weekly_hours) VALUES (:subject_name, :max_consecutive_class_hours, :weekly_hours)');
+        // Inserta la nueva materia con el cuatrimestre (term_id)
+        $sentencia = $pdo->prepare('INSERT INTO subjects (
+            subject_name, 
+            max_consecutive_class_hours, 
+            weekly_hours, 
+            program_id, 
+            term_id
+        ) VALUES (
+            :subject_name, 
+            :max_consecutive_class_hours, 
+            :weekly_hours, 
+            :program_id, 
+            :term_id
+        )');
+
         $sentencia->bindParam(':subject_name', $subject_name);
         $sentencia->bindParam(':max_consecutive_class_hours', $hours_consecutive);
         $sentencia->bindParam(':weekly_hours', $weekly_hours);
+        $sentencia->bindParam(':program_id', $program_id);
+        $sentencia->bindParam(':term_id', $term_id);
 
         try {
             if ($sentencia->execute()) {
-                session_start();
-
                 $usuario_email = $_SESSION['sesion_email'] ?? 'desconocido@dominio.com';
                 $accion = 'Registro de materia';
-                $descripcion = "Se registró la materia '$subject_name' con $hours_consecutive horas consecutivas y $weekly_hours horas semanales. Especialización: " . ($is_specialization ? 'Sí' : 'No') . ".";
+                $descripcion = "Se registró la materia '$subject_name' con $hours_consecutive horas consecutivas y $weekly_hours horas semanales.";
 
                 registrarEvento($pdo, $usuario_email, $accion, $descripcion);
 
@@ -40,13 +55,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header('Location:' . APP_URL . "/admin/materias");
                 exit;
             } else {
-                session_start();
                 $_SESSION['mensaje'] = "Error: no se ha podido registrar la materia, comuníquese con el área de IT";
                 $_SESSION['icono'] = "error";
                 header('Location: ' . APP_URL . "/admin/materias");
             }
         } catch (Exception $exception) {
-            session_start();
             $_SESSION['mensaje'] = "Error al registrar: " . $exception->getMessage();
             $_SESSION['icono'] = "error";
             header('Location: ' . APP_URL . "/admin/materias");
