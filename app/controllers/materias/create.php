@@ -8,9 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hours_consecutive = (int) $_POST['max_consecutive_class_hours'];
     $weekly_hours = (int) $_POST['weekly_hours'];
     $program_id = (int) $_POST['program_id'];
-    $term_id = (int) $_POST['term_id']; // AÑADIDO
-
-    // Verifica si la materia ya existe
+    $term_id = (int) $_POST['term_id'];
     $query = $pdo->prepare("SELECT COUNT(*) FROM subjects WHERE subject_name = :subject_name");
     $query->bindParam(':subject_name', $subject_name);
     $query->execute();
@@ -21,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: ' . APP_URL . "/admin/materias");
         exit;
     } else {
-        // Inserta la nueva materia con el cuatrimestre (term_id)
         $sentencia = $pdo->prepare('INSERT INTO subjects (
             subject_name, 
             max_consecutive_class_hours, 

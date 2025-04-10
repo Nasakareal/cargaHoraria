@@ -23,6 +23,7 @@ try {
     $placeholders_materias = implode(',', array_fill(0, count($materia_ids), '?'));
     $placeholders_grupos   = implode(',', array_fill(0, count($grupo_ids), '?'));
 
+    // Eliminar las materias asignadas al profesor en teacher_subjects
     $sql_delete_teacher_subjects = "
         DELETE FROM teacher_subjects
         WHERE teacher_id = ?
@@ -36,35 +37,27 @@ try {
         throw new Exception("No se eliminaron filas en teacher_subjects. Verifica los datos enviados.");
     }
 
-    $sql_update_schedule = "
-        UPDATE schedule_assignments
-        SET teacher_id = NULL,
-            fyh_actualizacion = ?
+    // Eliminar las filas correspondientes de schedule_assignments
+    $sql_delete_schedule = "
+        DELETE FROM schedule_assignments
         WHERE teacher_id = ?
           AND subject_id IN ($placeholders_materias)
           AND group_id   IN ($placeholders_grupos)
     ";
-    $stmt_update_sa = $pdo->prepare($sql_update_schedule);
-    $actualizadas = $stmt_update_sa->execute(array_merge([$fechaHora, $teacher_id], $materia_ids, $grupo_ids));
+    $stmt_delete_schedule = $pdo->prepare($sql_delete_schedule);
+    $eliminadas_schedule = $stmt_delete_schedule->execute(array_merge([$teacher_id], $materia_ids, $grupo_ids));
 
-    if (!$actualizadas) {
-    }
-
-    $sql_update_manual = "
-        UPDATE manual_schedule_assignments
-        SET teacher_id = NULL,
-            fyh_actualizacion = ?
+    // Eliminar las filas correspondientes de manual_schedule_assignments
+    $sql_delete_manual = "
+        DELETE FROM manual_schedule_assignments
         WHERE teacher_id = ?
           AND subject_id IN ($placeholders_materias)
           AND group_id   IN ($placeholders_grupos)
     ";
-    $stmt_update_ma = $pdo->prepare($sql_update_manual);
-    $actualizadas_manual = $stmt_update_ma->execute(array_merge([$fechaHora, $teacher_id], $materia_ids, $grupo_ids));
+    $stmt_delete_manual = $pdo->prepare($sql_delete_manual);
+    $eliminadas_manual = $stmt_delete_manual->execute(array_merge([$teacher_id], $materia_ids, $grupo_ids));
 
-    if (!$actualizadas_manual) {
-
-    }
-
+    // Actualizar el total de horas asignadas al profesor basado en los registros actuales en teacher_subjects
     $sql_horas_actuales = "
         SELECT SUM(s.weekly_hours) AS total_hours
         FROM teacher_subjects ts
@@ -75,6 +68,7 @@ try {
     $stmt_horas->execute([$teacher_id]);
     $horas_actuales = (int) $stmt_horas->fetchColumn();
 
+    // Actualizar la tabla de teachers con el nuevo total de horas
     $sql_update_teacher = "
         UPDATE teachers
         SET hours = ?,
@@ -87,7 +81,7 @@ try {
     $pdo->commit();
 
     session_start();
-    $_SESSION['mensaje'] = "Las materias han sido eliminadas con éxito, y se actualizó Horarios Aumaticos y Manuales.";
+    $_SESSION['mensaje'] = "Las materias y los horarios asociados han sido eliminados con éxito.";
     $_SESSION['icono']   = "success";
     header('Location: ' . APP_URL . "/admin/configuraciones/eliminar_materias_profesor");
     exit;

@@ -115,13 +115,13 @@ foreach ($programs as $program) {
                                                             <tr>
                                                                 <td>
                                                                     <select name="day_of_week[]" class="form-control">
-                                                                        <option value="Monday" <?= ($horario['day_of_week'] == 'Monday') ? 'selected' : ''; ?>>Lunes</option>
-                                                                        <option value="Tuesday" <?= ($horario['day_of_week'] == 'Tuesday') ? 'selected' : ''; ?>>Martes</option>
-                                                                        <option value="Wednesday" <?= ($horario['day_of_week'] == 'Wednesday') ? 'selected' : ''; ?>>Miércoles</option>
-                                                                        <option value="Thursday" <?= ($horario['day_of_week'] == 'Thursday') ? 'selected' : ''; ?>>Jueves</option>
-                                                                        <option value="Friday" <?= ($horario['day_of_week'] == 'Friday') ? 'selected' : ''; ?>>Viernes</option>
-                                                                        <option value="Saturday" <?= ($horario['day_of_week'] == 'Saturday') ? 'selected' : ''; ?>>Sábado</option>
-                                                                        <option value="Sunday" <?= ($horario['day_of_week'] == 'Sunday') ? 'selected' : ''; ?>>Domingo</option>
+                                                                        <option value="Lunes" <?= ($horario['day_of_week'] == 'Lunes') ? 'selected' : ''; ?>>Lunes</option>
+                                                                        <option value="Martes" <?= ($horario['day_of_week'] == 'Martes') ? 'selected' : ''; ?>>Martes</option>
+                                                                        <option value="Miércoles" <?= ($horario['day_of_week'] == 'Miércoles') ? 'selected' : ''; ?>>Miércoles</option>
+                                                                        <option value="Jueves" <?= ($horario['day_of_week'] == 'Jueves') ? 'selected' : ''; ?>>Jueves</option>
+                                                                        <option value="Viernes" <?= ($horario['day_of_week'] == 'Viernes') ? 'selected' : ''; ?>>Viernes</option>
+                                                                        <option value="Sábado" <?= ($horario['day_of_week'] == 'Sábado') ? 'selected' : ''; ?>>Sábado</option>
+                                                                        <option value="Domingo" <?= ($horario['day_of_week'] == 'Domingo') ? 'selected' : ''; ?>>Domingo</option>
                                                                     </select>
                                                                 </td>
                                                                 <td>
@@ -201,13 +201,13 @@ document.addEventListener('DOMContentLoaded', function () {
         newRow.innerHTML = `
             <td>
                 <select name="day_of_week[]" class="form-control">
-                    <option value="Monday">Lunes</option>
-                    <option value="Tuesday">Martes</option>
-                    <option value="Wednesday">Miércoles</option>
-                    <option value="Thursday">Jueves</option>
-                    <option value="Friday">Viernes</option>
-                    <option value="Saturday">Sábado</option>
-                    <option value="Sunday">Domingo</option>
+                    <option value="Lunes">Lunes</option>
+                    <option value="Martes">Martes</option>
+                    <option value="Miércoles">Miércoles</option>
+                    <option value="Jueves">Jueves</option>
+                    <option value="Viernes">Viernes</option>
+                    <option value="Sábado">Sábado</option>
+                    <option value="Domingo">Domingo</option>
                 </select>
             </td>
             <td>${generateTimeSelect('start_time[]')}</td>
