@@ -13,13 +13,14 @@ $classroom_assigned = $_POST['classroom_id'];
 
 $group_name = mb_strtoupper($group_name, 'UTF-8');
 
-if (empty($group_name) || empty($program_id) || empty($term_id) || empty($turn_id) || empty($nivel_id) || empty($classroom_assigned)) {
+if (empty($group_name) || empty($program_id) || empty($term_id) || empty($turn_id) || empty($nivel_id)) {
     session_start();
     $_SESSION['mensaje'] = "Todos los campos son obligatorios.";
     $_SESSION['icono'] = "error";
     header('Location:' . APP_URL . "/admin/grupos/edit.php?id=" . $group_id);
     exit();
 }
+
 
 $sentencia = $pdo->prepare("UPDATE `groups` 
                             SET group_name = :group_name, 
