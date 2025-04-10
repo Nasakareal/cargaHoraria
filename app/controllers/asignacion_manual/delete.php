@@ -1,6 +1,6 @@
 <?php
 include_once($_SERVER['DOCUMENT_ROOT'] . '/cargaHoraria/app/config.php');
-require_once($_SERVER['DOCUMENT_ROOT'] . '/cargaHoraria/app/registro_eventos.php'); // Incluir la función de registro de eventos
+require_once($_SERVER['DOCUMENT_ROOT'] . '/cargaHoraria/app/registro_eventos.php');
 
 // Iniciar sesión para acceder al email del usuario
 if (session_status() == PHP_SESSION_NONE) {
@@ -24,52 +24,101 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     try {
         $pdo->beginTransaction();
 
-        // Verificar si la asignación existe
+        // Consultar la asignación en manual_schedule_assignments y obtener datos clave para la eliminación en schedule_assignments
         if ($lab_id) {
-            $check_exists = $pdo->prepare("
+            $consulta_existe = $pdo->prepare("
                 SELECT * FROM manual_schedule_assignments 
                 WHERE assignment_id = :assignment_id 
                   AND group_id = :group_id
                   AND (lab1_assigned = :lab_id OR lab2_assigned = :lab_id)
             ");
-            $check_exists->bindParam(':lab_id', $lab_id, PDO::PARAM_INT);
+            $consulta_existe->bindParam(':lab_id', $lab_id, PDO::PARAM_INT);
         } else {
-            $check_exists = $pdo->prepare("
+            $consulta_existe = $pdo->prepare("
                 SELECT * FROM manual_schedule_assignments 
                 WHERE assignment_id = :assignment_id 
                   AND group_id = :group_id
             ");
         }
+        $consulta_existe->bindParam(':assignment_id', $assignment_id, PDO::PARAM_INT);
+        $consulta_existe->bindParam(':group_id', $group_id, PDO::PARAM_INT);
+        $consulta_existe->execute();
 
-        $check_exists->bindParam(':assignment_id', $assignment_id, PDO::PARAM_INT);
-        $check_exists->bindParam(':group_id', $group_id, PDO::PARAM_INT);
-        $check_exists->execute();
-
-        if ($check_exists->rowCount() == 0) {
+        if ($consulta_existe->rowCount() == 0) {
             echo json_encode(['status' => 'error', 'message' => 'La asignación no existe o no está asociada al laboratorio especificado.']);
             $pdo->rollBack();
             exit;
         }
 
-        // Eliminar la asignación
-        $consulta_delete = $pdo->prepare("
-            DELETE FROM manual_schedule_assignments 
-            WHERE assignment_id = :assignment_id 
-              AND group_id = :group_id
-        ");
-        $consulta_delete->bindParam(':assignment_id', $assignment_id, PDO::PARAM_INT);
-        $consulta_delete->bindParam(':group_id', $group_id, PDO::PARAM_INT);
-        $consulta_delete->execute();
+        // Almacenamos los datos para la eliminación en schedule_assignments
+        $datos_manual = $consulta_existe->fetch(PDO::FETCH_ASSOC);
+        $subject_id   = $datos_manual['subject_id'];
+        $start_time   = $datos_manual['start_time'];
+        $end_time     = $datos_manual['end_time'];
+        $schedule_day = $datos_manual['schedule_day'];
 
-        if ($consulta_delete->rowCount() > 0) {
+        // Eliminar de manual_schedule_assignments
+        if ($lab_id) {
+            $consulta_delete_manual = $pdo->prepare("
+                DELETE FROM manual_schedule_assignments 
+                WHERE assignment_id = :assignment_id 
+                  AND group_id = :group_id
+                  AND (lab1_assigned = :lab_id OR lab2_assigned = :lab_id)
+            ");
+            $consulta_delete_manual->bindParam(':lab_id', $lab_id, PDO::PARAM_INT);
+        } else {
+            $consulta_delete_manual = $pdo->prepare("
+                DELETE FROM manual_schedule_assignments 
+                WHERE assignment_id = :assignment_id 
+                  AND group_id = :group_id
+            ");
+        }
+        $consulta_delete_manual->bindParam(':assignment_id', $assignment_id, PDO::PARAM_INT);
+        $consulta_delete_manual->bindParam(':group_id', $group_id, PDO::PARAM_INT);
+        $consulta_delete_manual->execute();
+
+        // Eliminar de schedule_assignments utilizando los datos obtenidos
+        if ($lab_id) {
+            $consulta_delete_schedule = $pdo->prepare("
+                DELETE FROM schedule_assignments 
+                WHERE group_id = :group_id 
+                  AND subject_id = :subject_id 
+                  AND start_time = :start_time 
+                  AND end_time = :end_time 
+                  AND schedule_day = :schedule_day
+                  AND lab_id = :lab_id
+            ");
+            $consulta_delete_schedule->bindParam(':lab_id', $lab_id, PDO::PARAM_INT);
+        } else {
+            $consulta_delete_schedule = $pdo->prepare("
+                DELETE FROM schedule_assignments 
+                WHERE group_id = :group_id 
+                  AND subject_id = :subject_id 
+                  AND start_time = :start_time 
+                  AND end_time = :end_time 
+                  AND schedule_day = :schedule_day
+            ");
+        }
+        $consulta_delete_schedule->bindParam(':group_id', $group_id, PDO::PARAM_INT);
+        $consulta_delete_schedule->bindParam(':subject_id', $subject_id, PDO::PARAM_INT);
+        $consulta_delete_schedule->bindParam(':start_time', $start_time, PDO::PARAM_STR);
+        $consulta_delete_schedule->bindParam(':end_time', $end_time, PDO::PARAM_STR);
+        $consulta_delete_schedule->bindParam(':schedule_day', $schedule_day, PDO::PARAM_STR);
+        $consulta_delete_schedule->execute();
+
+        // Verificar si se eliminó al menos un registro de alguna de las tablas
+        $deletedManual = $consulta_delete_manual->rowCount();
+        $deletedSchedule = $consulta_delete_schedule->rowCount();
+
+        if ($deletedManual > 0 || $deletedSchedule > 0) {
             $pdo->commit();
 
             // Registrar el evento de eliminación
-            $usuario_email = $_SESSION['sesion_email'] ?? 'desconocido@dominio.com'; // Email del usuario autenticado
+            $usuario_email = $_SESSION['sesion_email'] ?? 'mequihua@ut-morelia.edu.mx';
             $accion = 'Eliminación de asignación manual';
-            $descripcion = "Se eliminó la asignación con ID $assignment_id del grupo ID $group_id.";
+            $descripcion = "Se eliminó la asignación manual (ID $assignment_id, grupo $group_id) y la asignación de horario correspondiente (materia: $subject_id, día: $schedule_day, inicio: $start_time, fin: $end_time" . ($lab_id ? ", laboratorio: $lab_id" : "") . ").";
 
-            registrarEvento($pdo, $usuario_email, $accion, $descripcion); // Registro del evento
+            registrarEvento($pdo, $usuario_email, $accion, $descripcion);
 
             echo json_encode(['status' => 'success', 'message' => 'La asignación ha sido eliminada correctamente.']);
             exit;
@@ -85,3 +134,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
     }
 }
+?>
