@@ -168,7 +168,7 @@ include('../../../layout/mensajes.php');
                     data: { group_id: group_id, teacher_id: teacher_id },
                     success: function (response) {
                         console.log("Materias disponibles:", response);
-                        $('#materias_disponibles').html(response); // Cargar materias disponibles
+                        $('#materias_disponibles').html(response);
                     },
                     error: function () {
                         console.error('Error al cargar las materias.');

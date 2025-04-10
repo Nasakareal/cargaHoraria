@@ -14,7 +14,7 @@ include('../../app/controllers/programas/listado_de_programas.php');
                 <h1>Creación de una nueva materia</h1>
             </div>
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <div class="card card-outline card-primary">
                         <div class="card-header">
                             <h3 class="card-title">Llene los datos</h3>
@@ -22,23 +22,19 @@ include('../../app/controllers/programas/listado_de_programas.php');
                         <div class="card-body">
                             <form action="<?= APP_URL; ?>/app/controllers/materias/create.php" method="post">
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="">Nombre de la materia</label>
                                             <input type="text" name="subject_name" class="form-control" required>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="">Horas consecutivas</label>
                                             <input type="number" name="max_consecutive_class_hours" class="form-control" required>
                                         </div>
                                     </div>
-                                </div>
-                                <!-- Programa -->
-                                    <div class="col-md-12">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="program_id">Programa</label>
                                             <select name="program_id" class="form-control" required>
@@ -52,8 +48,7 @@ include('../../app/controllers/programas/listado_de_programas.php');
                                     </div>
                                 </div>
                                 <div class="row">
-                                <!-- Campo para el cuatrimestre (term_id) -->
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="term_id">Cuatrimestre</label>
                                             <select name="term_id" class="form-control" required>
@@ -64,9 +59,7 @@ include('../../app/controllers/programas/listado_de_programas.php');
                                             </select>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="">Horas semanales</label>
                                             <input type="number" name="weekly_hours" class="form-control" required>
