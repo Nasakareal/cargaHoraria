@@ -104,7 +104,7 @@ include('../layout/mensajes.php');
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
 
 <!-- Reproductor de audio para la celebración -->
-<audio id="audioCelebracion" src="../public/trompetas.m4a"></audio>
+<audio id="audioCelebracion" src="../public/grunt.mp3"></audio>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
