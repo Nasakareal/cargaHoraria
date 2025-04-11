@@ -19,11 +19,26 @@ if (empty($group_name) || empty($programa_id) || empty($term_id) || empty($volum
     exit();
 }
 
+// Obtener automáticamente el área desde el programa seleccionado
+$consultaArea = $pdo->prepare("SELECT area FROM programs WHERE program_id = :programa_id");
+$consultaArea->bindParam(':programa_id', $programa_id);
+$consultaArea->execute();
+$area = $consultaArea->fetchColumn();
+
+if (!$area) {
+    $_SESSION['mensaje'] = "No se pudo obtener el área correspondiente al programa seleccionado.";
+    $_SESSION['icono'] = "error";
+    header('Location:' . APP_URL . "/admin/grupos/create.php");
+    exit();
+}
+
 $sentencia = $pdo->prepare("INSERT INTO `groups`
-    (group_name, program_id, term_id, volume, turn_id, fyh_creacion, estado)
-VALUES  (:group_name, :programa_id, :term_id, :volume, :turn_id, :fyh_creacion, :estado)");
+    (group_name, area, program_id, term_id, volume, turn_id, fyh_creacion, estado)
+VALUES
+    (:group_name, :area, :programa_id, :term_id, :volume, :turn_id, :fyh_creacion, :estado)");
 
 $sentencia->bindParam(':group_name', $group_name);
+$sentencia->bindParam(':area', $area);
 $sentencia->bindParam(':programa_id', $programa_id);
 $sentencia->bindParam(':term_id', $term_id);
 $sentencia->bindParam(':volume', $volume);
@@ -35,7 +50,7 @@ try {
     if ($sentencia->execute()) {
         $usuario_email = $_SESSION['sesion_email'] ?? 'desconocido@dominio.com';
         $accion = 'Registro de grupo';
-        $descripcion = "Se registró el grupo '$group_name' en el programa ID $programa_id, periodo ID $term_id, volumen $volume, turno ID $turn_id.";
+        $descripcion = "Se registró el grupo '$group_name' en el programa ID $programa_id, cuatrimestre ID $term_id, volumen $volume, turno ID $turn_id, área '$area'.";
 
         registrarEvento($pdo, $usuario_email, $accion, $descripcion);
 

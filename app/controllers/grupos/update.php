@@ -13,6 +13,7 @@ $classroom_assigned = $_POST['classroom_id'];
 
 $group_name = mb_strtoupper($group_name, 'UTF-8');
 
+// Validación básica
 if (empty($group_name) || empty($program_id) || empty($term_id) || empty($turn_id) || empty($nivel_id)) {
     session_start();
     $_SESSION['mensaje'] = "Todos los campos son obligatorios.";
@@ -21,9 +22,23 @@ if (empty($group_name) || empty($program_id) || empty($term_id) || empty($turn_i
     exit();
 }
 
+// Obtener el área asociada al programa
+$consultaArea = $pdo->prepare("SELECT area FROM programs WHERE program_id = :program_id");
+$consultaArea->bindParam(':program_id', $program_id);
+$consultaArea->execute();
+$area = $consultaArea->fetchColumn();
+
+if (!$area) {
+    session_start();
+    $_SESSION['mensaje'] = "No se pudo obtener el área correspondiente al programa seleccionado.";
+    $_SESSION['icono'] = "error";
+    header('Location:' . APP_URL . "/admin/grupos/edit.php?id=" . $group_id);
+    exit();
+}
 
 $sentencia = $pdo->prepare("UPDATE `groups` 
                             SET group_name = :group_name, 
+                                area = :area,
                                 program_id = :program_id, 
                                 term_id = :term_id, 
                                 volume = :volume, 
@@ -33,6 +48,7 @@ $sentencia = $pdo->prepare("UPDATE `groups`
                             WHERE group_id = :group_id");
 
 $sentencia->bindParam(':group_name', $group_name);
+$sentencia->bindParam(':area', $area);
 $sentencia->bindParam(':program_id', $program_id);
 $sentencia->bindParam(':term_id', $term_id);
 $sentencia->bindParam(':volume', $volume);
@@ -47,6 +63,7 @@ try {
         throw new Exception("No se pudo actualizar la tabla `groups`.");
     }
 
+    // Manejo de nivel educativo
     $sentencia_verificar = $pdo->prepare("SELECT * FROM `educational_levels` WHERE group_id = :group_id");
     $sentencia_verificar->bindParam(':group_id', $group_id);
     $sentencia_verificar->execute();
@@ -75,9 +92,10 @@ try {
     }
 
     if (!$sentencia_nivel->execute()) {
-        throw new Exception("No se pudo actualizar o insertar el nivel educativo en la tabla `educational_levels`.");
+        throw new Exception("No se pudo actualizar o insertar el nivel educativo.");
     }
 
+    // Eliminar materias anteriores y registrar nuevas
     $stmt_delete_subjects = $pdo->prepare("DELETE FROM group_subjects WHERE group_id = :group_id");
     $stmt_delete_subjects->bindParam(':group_id', $group_id);
     $stmt_delete_subjects->execute();
@@ -92,26 +110,27 @@ try {
         $stmt_group_subject->execute([':group_id' => $group_id, ':subject_id' => $subject['subject_id']]);
     }
 
+    // Actualizar el aula en horarios
     $stmt_update_all_classrooms = $pdo->prepare("UPDATE schedule_assignments 
-                                             SET classroom_id = :classroom_id, fyh_actualizacion = NOW() 
-                                             WHERE group_id = :group_id AND tipo_espacio = 'Aula'");
-$stmt_update_all_classrooms->bindParam(':classroom_id', $classroom_assigned);
-$stmt_update_all_classrooms->bindParam(':group_id', $group_id);
-
+                                                 SET classroom_id = :classroom_id, fyh_actualizacion = NOW() 
+                                                 WHERE group_id = :group_id AND tipo_espacio = 'Aula'");
+    $stmt_update_all_classrooms->bindParam(':classroom_id', $classroom_assigned);
+    $stmt_update_all_classrooms->bindParam(':group_id', $group_id);
 
     if (!$stmt_update_all_classrooms->execute()) {
-        throw new Exception("No se pudo actualizar el salón en los registros de la tabla `schedule_assignments`.");
+        throw new Exception("No se pudo actualizar el salón en los horarios.");
     }
 
+    // Registrar evento
     $usuario_email = $_SESSION['sesion_email'] ?? 'desconocido@dominio.com';
     $accion = 'Actualización de grupo';
-    $descripcion = "Se actualizó el grupo '$group_name' con ID $group_id. Programa ID $program_id, Periodo ID $term_id, Turno ID $turn_id, Salón asignado: $classroom_assigned.";
+    $descripcion = "Se actualizó el grupo '$group_name' con ID $group_id. Área '$area', Programa ID $program_id, Cuatrimestre ID $term_id, Turno ID $turn_id, Salón asignado: $classroom_assigned.";
 
     registrarEvento($pdo, $usuario_email, $accion, $descripcion);
 
     $pdo->commit();
 
-    $_SESSION['mensaje'] = "El grupo ha sido actualizado correctamente, las materias se han actualizado y el salón ha sido asignado a todos los horarios.";
+    $_SESSION['mensaje'] = "El grupo ha sido actualizado correctamente.";
     $_SESSION['icono'] = "success";
     header('Location:' . APP_URL . "/admin/grupos");
     exit();
