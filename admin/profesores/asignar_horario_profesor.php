@@ -1,4 +1,11 @@
 <?php
+if (!isset($_GET['refreshed'])) {
+    $urlActual = $_SERVER['REQUEST_URI'];
+    $separador = strpos($urlActual, '?') !== false ? '&' : '?';
+    header("Location: " . $urlActual . $separador . "refreshed=1");
+    exit;
+}
+
 require_once '../../app/registro_eventos.php';
 include('../../app/config.php');
 include('../../app/middleware.php');
