@@ -4,6 +4,7 @@ include('../../admin/layout/parte1.php');
 include('../../app/controllers/horarios_grupos/grupos_disponibles.php');
 include('../../app/controllers/horarios_grupos/obtener_horario_grupo.php');
 include('../../app/controllers/horarios_grupos/procesar_horario_grupo.php');
+include('../../app/controllers/horarios_grupos/horarios_disponibles.php');
 
 $group_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
@@ -22,7 +23,6 @@ if ($group_id) {
     $horas          = $resultado['horas'];
     $dias           = $resultado['dias'];
 } else {
-
     $tabla_horarios = [];
     $turno          = null;
     $nombre_grupo   = null;
@@ -31,6 +31,27 @@ if ($group_id) {
 }
 
 $grupos = obtenerGrupos($pdo);
+
+function estaDentroDelHorario(string $turno, string $dia, string $hora, array $horarios): bool
+{
+    if (!isset($horarios[$turno][$dia])) {
+        return false;
+    }
+
+    $slot    = $horarios[$turno][$dia];
+    $rangos  = isset($slot['start']) ? [$slot] : $slot;
+
+    $horaCelda = DateTime::createFromFormat('H:i:s', $hora . ':00');
+
+    foreach ($rangos as $rango) {
+        $inicio = DateTime::createFromFormat('H:i:s', $rango['start']);
+        $fin    = DateTime::createFromFormat('H:i:s', $rango['end']);
+        if ($horaCelda >= $inicio && $horaCelda < $fin) {
+            return true;
+        }
+    }
+    return false;
+}
 ?>
 
 <div class="content-wrapper">
@@ -60,8 +81,8 @@ $grupos = obtenerGrupos($pdo);
 
             <div class="row">
                 <h1>
-                    Horarios Asignados al Grupo 
-                    <?= htmlspecialchars($nombre_grupo); ?> 
+                    Horarios Asignados al Grupo
+                    <?= htmlspecialchars($nombre_grupo); ?>
                     (Turno: <?= htmlspecialchars($turno); ?>)
                 </h1>
             </div>
@@ -87,16 +108,23 @@ $grupos = obtenerGrupos($pdo);
                                 </thead>
                                 <tbody>
                                     <?php foreach ($horas as $hora): ?>
+                                        <?php
+                                            // Puede ser "07:00" o "07:00 - 08:00"
+                                            $horaInicio = substr($hora, 0, 5);
+                                        ?>
                                         <tr>
                                             <td><?= htmlspecialchars($hora); ?></td>
                                             <?php foreach ($dias as $dia): ?>
                                                 <?php
-                                                $contenido = $tabla_horarios[$hora][$dia] ?? '';
-                                                $sin_profesor = (strpos($contenido, 'Sin profesor') !== false)
-                                                    ? 'table-warning'
-                                                    : '';
+                                                    $contenido        = $tabla_horarios[$hora][$dia] ?? '';
+                                                    $esSinProfesor    = strpos($contenido, 'Sin profesor') !== false;
+                                                    $claseAmarillo    = $esSinProfesor ? 'table-warning' : '';
+                                                    $contenidoVacio   = trim($contenido) === '';
+                                                    $estaDisponible   = estaDentroDelHorario($turno, $dia, $horaInicio, $horarios_disponibles);
+                                                    $claseRojo        = (!$estaDisponible && $contenidoVacio) ? 'table-danger' : '';
+                                                    $claseCelda       = trim("$claseAmarillo $claseRojo");
                                                 ?>
-                                                <td class="<?= $sin_profesor; ?>">
+                                                <td class="<?= $claseCelda; ?>">
                                                     <?= $contenido; ?>
                                                 </td>
                                             <?php endforeach; ?>
@@ -104,31 +132,31 @@ $grupos = obtenerGrupos($pdo);
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
-                        </div><!-- .card-body -->
-                    </div><!-- .card -->
-                </div><!-- .col -->
-            </div><!-- .row -->
-        </div><!-- .container -->
-    </div><!-- .content -->
-</div><!-- .content-wrapper -->
+                        </div><!-- /.card-body -->
+                    </div><!-- /.card -->
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container -->
+    </div><!-- /.content -->
+</div><!-- /.content-wrapper -->
 
 <?php
 include('../../admin/layout/parte2.php');
 include('../../layout/mensajes.php');
 ?>
 
-<!-- Scripts DataTables y Botones -->
+<!-- DataTables + botones -->
 <script>
 $(function () {
-    let groupName = "<?= addslashes($nombre_grupo) ?>"; 
-    let turno     = "<?= addslashes($turno) ?>";
+    const groupName = "<?= addslashes($nombre_grupo) ?>";
+    const turno     = "<?= addslashes($turno) ?>";
 
     $("#example1").DataTable({
-        "pageLength": 15,
-        "responsive": true,
-        "lengthChange": true,
-        "autoWidth": false,
-        "dom": 'Bfrtip',
+        pageLength: 15,
+        responsive: true,
+        lengthChange: true,
+        autoWidth: false,
+        dom: 'Bfrtip',
         buttons: [
             {
                 extend: 'collection',
@@ -139,9 +167,9 @@ $(function () {
                     {
                         text: 'PDF',
                         action: function () {
-                            let horarios = [];
+                            const horarios = [];
                             $("#example1 tbody tr").each(function () {
-                                let fila = [];
+                                const fila = [];
                                 $(this).find('td').each(function () {
                                     fila.push($(this).html().trim());
                                 });
@@ -154,8 +182,8 @@ $(function () {
                                 data: { horarios: horarios },
                                 xhrFields: { responseType: 'blob' },
                                 success: function (response) {
-                                    let blob = new Blob([response], { type: 'application/pdf' });
-                                    let link = document.createElement('a');
+                                    const blob = new Blob([response], { type: 'application/pdf' });
+                                    const link = document.createElement('a');
                                     link.href = window.URL.createObjectURL(blob);
                                     link.download = "Horario_Personalizado.pdf";
                                     link.click();
@@ -169,9 +197,9 @@ $(function () {
                     {
                         text: 'Imprimir',
                         action: function () {
-                            let horarios = [];
+                            const horarios = [];
                             $("#example1 tbody tr").each(function () {
-                                let fila = [];
+                                const fila = [];
                                 $(this).find('td').each(function () {
                                     fila.push($(this).html().trim());
                                 });
@@ -179,20 +207,21 @@ $(function () {
                             });
 
                             $.post('../../app/controllers/horarios_grupos/imprimir_horario.php',
-                            { horarios: horarios },
-                            function (data) {
-                                let w = window.open('');
-                                w.document.write(data);
-                                w.document.close();
-                            });
+                                { horarios: horarios },
+                                function (data) {
+                                    const w = window.open('');
+                                    w.document.write(data);
+                                    w.document.close();
+                                }
+                            );
                         }
                     },
                     {
                         text: 'Excel',
                         action: function () {
-                            let horarios = [];
+                            const horarios = [];
                             $("#example1 tbody tr").each(function () {
-                                let fila = [];
+                                const fila = [];
                                 $(this).find('td').each(function () {
                                     fila.push($(this).html().trim());
                                 });
@@ -209,10 +238,10 @@ $(function () {
                                 },
                                 xhrFields: { responseType: 'blob' },
                                 success: function (response) {
-                                    let blob = new Blob([response], {
+                                    const blob = new Blob([response], {
                                         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
                                     });
-                                    let link = document.createElement('a');
+                                    const link = document.createElement('a');
                                     link.href = window.URL.createObjectURL(blob);
                                     link.download = "Horario_Personalizado.xlsx";
                                     link.click();
