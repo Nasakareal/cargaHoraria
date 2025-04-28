@@ -790,6 +790,12 @@ ADD COLUMN quarter_name_en VARCHAR(100) NULL AFTER tipo_espacio;
 
 
 
+INSERT INTO permisos (nombre_permiso, descripcion, fyh_creacion, estado) VALUES
+('lab_block_manage', 'BLOQUEAR Y GESTIONAR LABORATORIOS', NOW(), 1),
+('classroom_edit', 'EDITAR INFORMACIÓN DE SALONES', NOW(), 1),
+('lab_edit', 'EDITAR INFORMACIÓN DE LABORATORIOS', NOW(), 1),
+('group_create', 'CREAR NUEVOS GRUPOS ESCOLARES', NOW(), 1),
+('program_edit', 'EDITAR INFORMACIÓN DE PROGRAMAS EDUCATIVOS', NOW(), 1);
 
 
 

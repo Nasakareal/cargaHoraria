@@ -2,6 +2,19 @@
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/programas/datos_del_programa.php');
+include_once('../../app/middleware.php');
+
+if (!verificarPermiso($_SESSION['sesion_id_usuario'], 'program_edit', $pdo)) {
+    $_SESSION['mensaje'] = "No tienes permiso para editar un Programa Educativo.";
+    $_SESSION['icono'] = "error";
+    ?>
+    <script>
+        history.back();
+    </script>
+    <?php
+    exit;
+}
+
 ?>
 
 <!-- Content Wrapper. Contains page content -->

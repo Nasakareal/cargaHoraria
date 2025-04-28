@@ -4,6 +4,18 @@ $classroom_id = $_GET['id'];
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/salones/datos_del_salon.php');
+include_once('../../app/middleware.php');
+
+if (!verificarPermiso($_SESSION['sesion_id_usuario'], 'classroom_edit', $pdo)) {
+    $_SESSION['mensaje'] = "No tienes permiso para editar un aula.";
+    $_SESSION['icono'] = "error";
+    ?>
+    <script>
+        history.back();
+    </script>
+    <?php
+    exit;
+}
 
 $classroom_name = isset($classroom_name) ? $classroom_name : "Salón no encontrado";
 $capacity = isset($capacity) ? $capacity : "Capacidad no encontrada";

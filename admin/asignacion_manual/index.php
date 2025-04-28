@@ -1,6 +1,18 @@
 <?php
 include('../../app/config.php');
 include('../../admin/layout/parte1.php');
+include_once('../../app/middleware.php');
+
+if (!verificarPermiso($_SESSION['sesion_id_usuario'], 'lab_block_manage', $pdo)) {
+    $_SESSION['mensaje'] = "No tienes permiso para hacer un bloqueo laboratorio/aula.";
+    $_SESSION['icono'] = "error";
+    ?>
+    <script>
+        history.back();
+    </script>
+    <?php
+    exit;
+}
 
 
 $sql_groups = "SELECT group_id, group_name FROM `groups` WHERE estado = '1'";

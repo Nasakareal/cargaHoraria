@@ -4,6 +4,19 @@ include('../../admin/layout/parte1.php');
 include('../../app/controllers/programas/listado_de_programas.php');
 include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
 include('../../app/controllers/turnos/listado_de_turnos.php');
+include_once('../../app/middleware.php');
+
+if (!verificarPermiso($_SESSION['sesion_id_usuario'], 'group_create', $pdo)) {
+    $_SESSION['mensaje'] = "No tienes permiso para crear un Grupo.";
+    $_SESSION['icono'] = "error";
+    ?>
+    <script>
+        history.back();
+    </script>
+    <?php
+    exit;
+}
+
 ?>
 
 <!-- Content Wrapper. Contains page content -->

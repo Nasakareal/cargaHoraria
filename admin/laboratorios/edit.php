@@ -11,8 +11,21 @@ include('../../app/config.php');
 include('../../admin/layout/parte1.php');
 include('../../app/controllers/laboratorios/datos_del_laboratorio.php');
 
+include_once('../../app/middleware.php');
+
+if (!verificarPermiso($_SESSION['sesion_id_usuario'], 'lab_edit', $pdo)) {
+    $_SESSION['mensaje'] = "No tienes permiso para editar un Laboratorio.";
+    $_SESSION['icono'] = "error";
+    ?>
+    <script>
+        history.back();
+    </script>
+    <?php
+    exit;
+}
+
 $sql_programs = "SELECT 
-                    DISTINCT p.area  -- Usamos DISTINCT para obtener solo áreas únicas
+                    DISTINCT p.area
                  FROM
                     programs p";
 

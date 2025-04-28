@@ -6,6 +6,19 @@ include('../../app/controllers/asignacion_manual/listado_de_laboratorios.php');
 include('../../app/controllers/asignacion_manual/obtener_laboratorio.php');
 include('../../app/controllers/asignacion_manual/obtener_aula.php');
 
+include_once('../../app/middleware.php');
+
+if (!verificarPermiso($_SESSION['sesion_id_usuario'], 'lab_block_manage', $pdo)) {
+    $_SESSION['mensaje'] = "No tienes permiso para hacer un bloqueo laboratorio/aula.";
+    $_SESSION['icono'] = "error";
+    ?>
+    <script>
+        history.back();
+    </script>
+    <?php
+    exit;
+}
+
 $materias = [];
 $group_id = isset($_GET['id']) ? $_GET['id'] : null;
 

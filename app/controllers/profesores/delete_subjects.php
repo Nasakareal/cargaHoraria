@@ -1,14 +1,12 @@
 <?php
 include('../../../app/config.php');
 
-// Recibimos el teacher_id, materias y grupos seleccionados
 $teacher_id    = $_POST['teacher_id'];
 $materia_ids   = isset($_POST['materias_eliminar']) ? $_POST['materias_eliminar'] : [];
 $grupo_ids     = isset($_POST['grupos_asignados']) ? array_filter($_POST['grupos_asignados']) : [];
 $fechaHora     = date('Y-m-d H:i:s');
 
 try {
-    // Iniciar una transacción si no se ha iniciado
     if (!$pdo->inTransaction()) {
         $pdo->beginTransaction();
     }
@@ -21,57 +19,49 @@ try {
         throw new Exception("Debe seleccionar al menos un grupo asociado a las materias para eliminar.");
     }
 
-    // Crear los placeholders para las consultas SQL usando IN
     $placeholders_materias = implode(',', array_fill(0, count($materia_ids), '?'));
     $placeholders_grupos   = implode(',', array_fill(0, count($grupo_ids), '?'));
 
     // ---------------------------------------------------------------------------------------------
-    // 1. Actualizar teacher_subjects: Se pasa a NULL el teacher_id cuando coincida con subject_id y group_id
+    // 1. Eliminar de teacher_subjects los registros que coincidan con teacher_id, subject_id y group_id
     // ---------------------------------------------------------------------------------------------
-    $sql_update_teacher_subjects = "
-        UPDATE teacher_subjects
-        SET teacher_id = NULL
+    $sql_delete_teacher_subjects = "
+        DELETE FROM teacher_subjects
         WHERE teacher_id = ?
           AND subject_id IN ($placeholders_materias)
-          AND group_id IN ($placeholders_grupos)
+          AND group_id   IN ($placeholders_grupos)
     ";
-    $stmt_update_ts = $pdo->prepare($sql_update_teacher_subjects);
-    $result_teacher_subjects = $stmt_update_ts->execute(array_merge([$teacher_id], $materia_ids, $grupo_ids));
+    $stmt_delete_ts = $pdo->prepare($sql_delete_teacher_subjects);
+    $stmt_delete_ts->execute(array_merge([$teacher_id], $materia_ids, $grupo_ids));
 
-    if (!$result_teacher_subjects) {
-        throw new Exception("No se actualizó teacher_subjects. Verifica los datos enviados.");
+    if ($stmt_delete_ts->rowCount() === 0) {
+        throw new Exception("No se eliminaron registros en teacher_subjects. Verifica los datos enviados.");
     }
 
     // ---------------------------------------------------------------------------------------------
     // 2. Poner en NULL el teacher_id de schedule_assignments Y manual_schedule_assignments
     //    cuando existan filas equivalentes (mismo subject_id, group_id, start_time, end_time, schedule_day).
-    //    Si en tu tabla manual_schedule_assignments efectivamente manejas un campo teacher_id,
-    //    entonces lo actualizas; de lo contrario, omite la parte del update a manual.
     // ---------------------------------------------------------------------------------------------
-    // Primero, programamos un UPDATE conjunto que afecte ambas tablas:
     $sql_update_both = "
         UPDATE schedule_assignments s
         JOIN manual_schedule_assignments m ON 
-             s.subject_id = m.subject_id
-             AND s.group_id = m.group_id
-             AND s.start_time = m.start_time
-             AND s.end_time   = m.end_time
-             AND s.schedule_day = m.schedule_day
+             s.subject_id    = m.subject_id
+         AND s.group_id      = m.group_id
+         AND s.start_time    = m.start_time
+         AND s.end_time      = m.end_time
+         AND s.schedule_day  = m.schedule_day
         SET 
             s.teacher_id = NULL,
-            m.teacher_id = NULL  -- <-- solo si manual_schedule_assignments también maneja teacher_id
+            m.teacher_id = NULL
         WHERE s.teacher_id = ?
           AND s.subject_id IN ($placeholders_materias)
-          AND s.group_id IN ($placeholders_grupos)
+          AND s.group_id   IN ($placeholders_grupos)
     ";
     $stmt_update_both = $pdo->prepare($sql_update_both);
-    $params_update_both = array_merge([$teacher_id], $materia_ids, $grupo_ids);
-    $stmt_update_both->execute($params_update_both);
+    $stmt_update_both->execute(array_merge([$teacher_id], $materia_ids, $grupo_ids));
 
     // ---------------------------------------------------------------------------------------------
-    // 3. Eliminar de schedule_assignments aquellas filas (teacher_id, subject_id, group_id, etc.)
-    //    que NO tienen equivalente en manual_schedule_assignments.
-    //    Es decir, si no se encontró la misma asignación en manual, se borra completamente.
+    // 3. Eliminar de schedule_assignments aquellas filas que NO tienen equivalente en manual_schedule_assignments.
     // ---------------------------------------------------------------------------------------------
     $sql_delete_solo_schedule = "
         DELETE s
@@ -79,28 +69,25 @@ try {
         WHERE s.teacher_id = ?
           AND s.subject_id IN ($placeholders_materias)
           AND s.group_id   IN ($placeholders_grupos)
-          -- si NO existe un registro en manual que coincida con las columnas relevantes,
-          -- entonces se elimina
           AND NOT EXISTS (
               SELECT 1 
               FROM manual_schedule_assignments m
               WHERE 
-                  m.subject_id = s.subject_id
-                  AND m.group_id = s.group_id
-                  AND m.start_time = s.start_time
-                  AND m.end_time   = s.end_time
-                  AND m.schedule_day = s.schedule_day
+                  m.subject_id   = s.subject_id
+              AND m.group_id     = s.group_id
+              AND m.start_time   = s.start_time
+              AND m.end_time     = s.end_time
+              AND m.schedule_day = s.schedule_day
           )
     ";
     $stmt_delete_solo_schedule = $pdo->prepare($sql_delete_solo_schedule);
-    $params_delete_solo_schedule = array_merge([$teacher_id], $materia_ids, $grupo_ids);
-    $stmt_delete_solo_schedule->execute($params_delete_solo_schedule);
+    $stmt_delete_solo_schedule->execute(array_merge([$teacher_id], $materia_ids, $grupo_ids));
 
     // ---------------------------------------------------------------------------------------------
-    // 4. Calcular las horas actuales
+    // 4. Calcular las horas actuales en teacher_subjects (ya actualizados tras el DELETE)
     // ---------------------------------------------------------------------------------------------
     $sql_horas_actuales = "
-        SELECT SUM(s.weekly_hours) AS total_hours
+        SELECT COALESCE(SUM(s.weekly_hours), 0) AS total_hours
         FROM teacher_subjects ts
         JOIN subjects s ON ts.subject_id = s.subject_id
         WHERE ts.teacher_id = ?
@@ -114,7 +101,7 @@ try {
     // ---------------------------------------------------------------------------------------------
     $sql_update_teacher = "
         UPDATE teachers
-        SET hours = ?,
+        SET hours            = ?,
             fyh_actualizacion = ?
         WHERE teacher_id = ?
     ";
