@@ -11,6 +11,19 @@ if (!$subject_id) {
 include('../../app/controllers/materias/datos_de_materias.php');
 include('../../app/controllers/programas/listado_de_programas.php');
 include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
+
+include_once('../../app/middleware.php');
+
+if (!verificarPermiso($_SESSION['sesion_id_usuario'], 'subject_edit', $pdo)) {
+    $_SESSION['mensaje'] = "No tienes permiso para editar un Grupo.";
+    $_SESSION['icono'] = "error";
+    ?>
+    <script>
+        history.back();
+    </script>
+    <?php
+    exit;
+}
 ?>
 
 <!-- Content Wrapper. Contains page content -->

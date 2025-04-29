@@ -13,6 +13,18 @@ include('../../app/controllers/cuatrimestres/listado_de_cuatrimestres.php');
 include('../../app/controllers/turnos/listado_de_turnos.php');
 include('../../app/controllers/niveles/listado_de_niveles.php');
 include('../../app/controllers/salones/listado_de_salones.php');
+include_once('../../app/middleware.php');
+
+if (!verificarPermiso($_SESSION['sesion_id_usuario'], 'group_edit', $pdo)) {
+    $_SESSION['mensaje'] = "No tienes permiso para editar un Grupo.";
+    $_SESSION['icono'] = "error";
+    ?>
+    <script>
+        history.back();
+    </script>
+    <?php
+    exit;
+}
 
 $group_name = isset($group_name) ? $group_name : "Grupo no encontrado";
 $program_id = isset($program_id) ? $program_id : null;
