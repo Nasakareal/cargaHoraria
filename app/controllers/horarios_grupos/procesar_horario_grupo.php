@@ -19,11 +19,11 @@ function procesarHorarioGrupo($group_id, $pdo)
     switch ($turno) {
         case 'MATUTINO':
             $horas = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'];
-            $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+            $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
             break;
         case 'VESPERTINO':
             $horas = ['11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
-            $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+            $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
             break;
         case 'MIXTO':
         case 'ZINAPÉCUARO':
@@ -32,15 +32,15 @@ function procesarHorarioGrupo($group_id, $pdo)
             break;
         case 'ENFERMERIA':
             $horas = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
-            $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+            $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
             break;
         case 'MATUTINO AVANZADO':
             $horas = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00'];
-            $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+            $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
             break;
         case 'VESPERTINO AVANZADO':
             $horas = ['11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
-            $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+            $dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
             break;
 
         default:
