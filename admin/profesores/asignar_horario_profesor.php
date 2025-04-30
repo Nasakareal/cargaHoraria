@@ -14,15 +14,12 @@ if (!verificarPermiso($_SESSION['sesion_id_usuario'], 'teacher_assign', $pdo)) {
     $_SESSION['mensaje'] = "No tienes permiso para asignar profesores a materias y grupos.";
     $_SESSION['icono'] = "error";
     ?>
-    <script>
-        history.back();
-    </script>
+    <script>history.back();</script>
     <?php
     exit;
 }
 
 $teacher_id = filter_input(INPUT_GET, 'teacher_id', FILTER_VALIDATE_INT);
-
 if (!$teacher_id) {
     echo "ID de profesor inválido.";
     exit;
@@ -47,10 +44,10 @@ include('../../app/controllers/profesores/datos_del_profesor_en_subjects.php');
                             <h3 class="card-title">Llene los datos</h3>
                         </div>
                         <div class="card-body">
-                            <!-- Formulario con método POST y acción que apunta a `update_subjects.php` -->
                             <form action="<?= APP_URL; ?>/app/controllers/profesores/update_subjects.php" method="post">
                                 <input type="hidden" name="teacher_id" value="<?= htmlspecialchars($teacher_id); ?>">
-                                <input type="hidden" id="grupos_asignados" name="grupos_asignados[]" value="">
+                                <!-- Contenedor donde el JS añade los inputs ocultos de grupos -->
+                                <div id="hidden_group_inputs"></div>
 
                                 <!-- Total de horas asignadas -->
                                 <div class="row" style="margin-top: 20px;">
@@ -61,11 +58,11 @@ include('../../app/controllers/profesores/datos_del_profesor_en_subjects.php');
                                         </div>
                                     </div>
 
-                                    <!-- Grupos disponibles -->
+                                    <!-- Grupos disponibles (ya no enviamos name aquí) -->
                                     <div class="col-md-5">
                                         <label for="grupos_disponibles">Grupos disponibles</label>
                                         <div class="input-group">
-                                            <select id="grupos_disponibles" name="grupos_disponibles" class="form-control">
+                                            <select id="grupos_disponibles" class="form-control">
                                                 <?php include('../../app/controllers/relacion_profesor_grupos/grupos_disponibles.php'); ?>
                                             </select>
                                             <button id="confirm_group" class="btn btn-primary" type="button">Seleccionar Grupo</button>
@@ -79,7 +76,8 @@ include('../../app/controllers/profesores/datos_del_profesor_en_subjects.php');
                                         <label for="materias_disponibles">Materias disponibles</label>
                                         <select id="materias_disponibles" class="form-control" multiple style="height:200px;">
                                             <?php foreach ($materias_disponibles as $materia): ?>
-                                                <option value="<?= htmlspecialchars($materia['subject_id']); ?>" data-hours="<?= htmlspecialchars($materia['weekly_hours']); ?>">
+                                                <option value="<?= htmlspecialchars($materia['subject_id']); ?>"
+                                                        data-hours="<?= htmlspecialchars($materia['weekly_hours']); ?>">
                                                     <?= htmlspecialchars($materia['subject_name']); ?>
                                                 </option>
                                             <?php endforeach; ?>
@@ -95,7 +93,8 @@ include('../../app/controllers/profesores/datos_del_profesor_en_subjects.php');
                                         <label for="materias_asignadas">Materias asignadas</label>
                                         <select id="materias_asignadas" name="materias_asignadas[]" class="form-control" multiple style="height:200px;">
                                             <?php foreach ($materias_asignadas as $materia): ?>
-                                                <option value="<?= htmlspecialchars($materia['subject_id']); ?>" data-hours="<?= htmlspecialchars($materia['weekly_hours']); ?>">
+                                                <option value="<?= htmlspecialchars($materia['subject_id']); ?>"
+                                                        data-hours="<?= htmlspecialchars($materia['weekly_hours']); ?>">
                                                     <?= htmlspecialchars($materia['subject_name']); ?>
                                                 </option>
                                             <?php endforeach; ?>
@@ -129,13 +128,13 @@ include('../../layout/mensajes.php');
 $(document).ready(function () {
     var teacher_id = $('input[name="teacher_id"]').val();
 
+    // Cargo horas iniciales
     $.ajax({
         url: '../../app/controllers/relacion_profesor_materias/obtener_horas.php',
         type: 'POST',
         data: { teacher_id: teacher_id },
         success: function (response) {
-            var initialHours = parseInt(response) || 0;
-            $('#total_hours').val(initialHours);
+            $('#total_hours').val(parseInt(response) || 0);
         },
         error: function () {
             $('#total_hours').val(0);
@@ -144,55 +143,49 @@ $(document).ready(function () {
 
     $('#confirm_group').click(function () {
         var group_id = $('#grupos_disponibles').val();
+        if (!group_id) return;
 
-        if (group_id) {
-            if ($('#materias_asignadas option').length > 0) {
-                Swal.fire({
-                    title: '¿Eliminar materias asignadas?',
-                    text: "Ya tienes materias asignadas. ¿Quieres eliminarlas antes de seleccionar otro grupo?",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Sí, eliminar',
-                    cancelButtonText: 'No, cancelar',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $('#materias_asignadas').empty();
-                        $('#total_hours').val(0);
-
-                        var gruposAsignados = $('#grupos_asignados').val().split(',').filter(Boolean);
-                        if (!gruposAsignados.includes(group_id)) {
-                            gruposAsignados.push(group_id);
-                            $('#grupos_asignados').val(gruposAsignados.join(','));
-                        }
-
-                        $.ajax({
-                            url: '../../app/controllers/relacion_profesor_materias/obtener_materias.php',
-                            type: 'POST',
-                            data: { group_id: group_id },
-                            success: function (response) {
-                                $('#materias_disponibles').html(response);
-                            }
-                        });
-                    }
-                });
-            } else {
-                var gruposAsignados = $('#grupos_asignados').val().split(',').filter(Boolean);
-                if (!gruposAsignados.includes(group_id)) {
-                    gruposAsignados.push(group_id);
-                    $('#grupos_asignados').val(gruposAsignados.join(','));
-                }
-
-                $.ajax({
-                    url: '../../app/controllers/relacion_profesor_materias/obtener_materias.php',
-                    type: 'POST',
-                    data: { group_id: group_id },
-                    success: function (response) {
-                        $('#materias_disponibles').html(response);
-                    }
-                });
+        // Si ya había materias asignadas, pregunto si limpiar
+        if ($('#materias_asignadas option').length > 0) {
+            Swal.fire({
+                title: '¿Eliminar materias asignadas?',
+                text: "Ya tienes materias asignadas. ¿Quieres eliminarlas antes de seleccionar otro grupo?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'No, cancelar',
+            }).then((result) => {
+                if (!result.isConfirmed) return;
+                $('#materias_asignadas').empty();
+                $('#total_hours').val(0);
+                // limpio grupos previos y agrego el nuevo
+                $('#hidden_group_inputs').empty();
+                $('#hidden_group_inputs').append(
+                    '<input type="hidden" name="grupos_asignados[]" value="' + group_id + '">'
+                );
+                cargarMaterias(group_id);
+            });
+        } else {
+            // Si no había materias, solo agrego el grupo si no existe
+            if ($('#hidden_group_inputs input[value="' + group_id + '"]').length === 0) {
+                $('#hidden_group_inputs').append(
+                    '<input type="hidden" name="grupos_asignados[]" value="' + group_id + '">'
+                );
             }
+            cargarMaterias(group_id);
         }
     });
+
+    function cargarMaterias(group_id) {
+        $.ajax({
+            url: '../../app/controllers/relacion_profesor_materias/obtener_materias.php',
+            type: 'POST',
+            data: { group_id: group_id },
+            success: function (response) {
+                $('#materias_disponibles').html(response);
+            }
+        });
+    }
 
     function calcularTotalHoras() {
         var totalHoras = 0;
@@ -203,20 +196,17 @@ $(document).ready(function () {
     }
 
     $('#add_subject').click(function () {
-        $('#materias_disponibles option:selected').each(function () {
-            $(this).appendTo('#materias_asignadas');
-        });
+        $('#materias_disponibles option:selected').appendTo('#materias_asignadas');
         calcularTotalHoras();
     });
 
     $('#remove_subject').click(function () {
-        $('#materias_asignadas option:selected').each(function () {
-            $(this).appendTo('#materias_disponibles');
-        });
+        $('#materias_asignadas option:selected').appendTo('#materias_disponibles');
         calcularTotalHoras();
     });
 
     $('form').submit(function () {
+        // Aseguro que todas las opciones queden marcadas
         $('#materias_asignadas option').prop('selected', true);
     });
 });

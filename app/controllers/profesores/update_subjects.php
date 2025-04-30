@@ -387,7 +387,13 @@ function asignarMateriaConBloquesYAparteSiSobra(
 /*--------------------------------------------------------------
   ↘ PROCESO PRINCIPAL
 ----------------------------------------------------------------*/
-$teacher_id = isset($_POST['teacher_id']) ? intval($_POST['teacher_id']) : 0;
+if (!isset($_POST['teacher_id']) || !is_numeric($_POST['teacher_id']) || intval($_POST['teacher_id']) <= 0) {
+    $_SESSION['mensaje'] = "Error: ID de profesor inválido.";
+    $_SESSION['icono'] = "error";
+    header('Location: ' . APP_URL . "/admin/profesores");
+    exit;
+}
+$teacher_id = intval($_POST['teacher_id']);
 $materia_ids = isset($_POST['materias_asignadas']) ? $_POST['materias_asignadas'] : [];
 $grupo_ids = isset($_POST['grupos_asignados']) ? array_filter($_POST['grupos_asignados'], 'is_numeric') : [];
 $fechaHora = date('Y-m-d H:i:s');
