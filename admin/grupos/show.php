@@ -90,23 +90,23 @@ include('../../app/controllers/horarios_grupos/grupos_disponibles.php');
                                 <div class="col-md-12">
                                     <h3>Materias del Grupo</h3>
                                     <ul>
-    <?php if (!empty($materias)): ?>
-        <?php foreach (explode(', ', $materias) as $materia): ?>
-            <?php
-            // Separamos la información de la materia en "Materia" y sus horas
-            $parts = explode('Lab:', $materia);
-            $materiaPrincipal = trim($parts[0]); // Nombre y horas totales
-            $labInfo = isset($parts[1]) ? 'Lab:' . trim($parts[1]) : ''; // Información del laboratorio
-            ?>
-            <li>
-                <?= htmlspecialchars($materiaPrincipal); ?>
-                <?= $labInfo ? ' - ' . htmlspecialchars($labInfo) : ''; ?>
-            </li>
-        <?php endforeach; ?>
-    <?php else: ?>
-        <li>No hay materias asignadas a este grupo.</li>
-    <?php endif; ?>
-</ul>
+                                        <?php if (!empty($materias)): ?>
+                                            <?php foreach (explode(', ', $materias) as $materia): ?>
+                                                <?php
+                                                // Separamos la información de la materia en "Materia" y sus horas
+                                                $parts = explode('Lab:', $materia);
+                                                $materiaPrincipal = trim($parts[0]); // Nombre y horas totales
+                                                $labInfo = isset($parts[1]) ? 'Lab:' . trim($parts[1]) : ''; // Información del laboratorio
+                                                ?>
+                                                <li>
+                                                    <?= htmlspecialchars($materiaPrincipal); ?>
+                                                    <?= $labInfo ? ' - ' . htmlspecialchars($labInfo) : ''; ?>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <li>No hay materias asignadas a este grupo.</li>
+                                        <?php endif; ?>
+                                    </ul>
 
                                 </div>
                             </div>

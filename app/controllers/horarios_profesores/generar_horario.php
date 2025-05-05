@@ -26,7 +26,7 @@ $horarios = $_POST['horarios'];
 $teacher_id = intval($_POST['teacher_id']);
 
 /* Conectar a la base de datos */
-include('../../app/config.php'); // Asegúrate de que esta ruta es correcta y contiene la conexión $pdo
+include('../../app/config.php');
 
 /* Obtener teacher_name y hours desde la tabla teachers */
 $sql_teacher = "SELECT teacher_name, hours FROM teachers WHERE teacher_id = :teacher_id LIMIT 1";
@@ -52,7 +52,7 @@ $sheet->getStyle('D3')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
 /* Insertar el total de horas en la celda G4 */
 $sheet->setCellValue('G4', $hours);
-$sheet->getStyle('G4')->getNumberFormat()->setFormatCode('0'); // Formato de número entero
+$sheet->getStyle('G4')->getNumberFormat()->setFormatCode('0');
 $sheet->getStyle('G4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
 $sheet->getStyle('G4')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
@@ -63,19 +63,19 @@ foreach ($horarios as $fila) {
 
     /* Determinar la fila correspondiente en la plantilla */
     $horaFila = [
-        '07:00' => 7,
-        '08:00' => 10,
-        '09:00' => 13,
-        '10:00' => 16,
-        '11:00' => 19,
-        '12:00' => 22,
-        '13:00' => 25,
-        '14:00' => 28,
-        '15:00' => 31,
-        '16:00' => 34,
-        '17:00' => 37,
-        '18:00' => 40,
-        '19:00' => 43
+        '07:00' => 6,
+        '08:00' => 7,
+        '09:00' => 8,
+        '10:00' => 9,
+        '11:00' => 10,
+        '12:00' => 11,
+        '13:00' => 12,
+        '14:00' => 13,
+        '15:00' => 14,
+        '16:00' => 15,
+        '17:00' => 16,
+        '18:00' => 17,
+        '19:00' => 18
     ];
 
     if (!isset($horaFila[$hora])) {
@@ -89,7 +89,6 @@ foreach ($horarios as $fila) {
     foreach ($dias as $index => $contenido) {
         $columna = chr(ord($columnaInicial) + $index);
         $sheet->setCellValue($columna . $filaPlantilla, strip_tags($contenido));
-        // Opcional: Aplicar estilos si es necesario
         $sheet->getStyle($columna . $filaPlantilla)->getAlignment()->setWrapText(true);
         $sheet->getStyle($columna . $filaPlantilla)->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
     }

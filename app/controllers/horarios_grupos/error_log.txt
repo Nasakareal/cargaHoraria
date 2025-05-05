@@ -169,3 +169,33 @@
 )
 
 [22-Jan-2025 19:14:09 UTC] Archivo Excel generado y enviado correctamente: Horario_AFC-2A.xlsx
+[05-May-2025 22:50:41 UTC] Plantilla cargada correctamente.
+[05-May-2025 22:50:41 UTC] Nombre del profesor establecido en C3: JESUS EDUARDO RODRÍGUEZ GUTIÉRREZ
+[05-May-2025 22:50:41 UTC] Horas del profesor establecidas en G4: 18
+[05-May-2025 22:50:41 UTC] Hora no reconocida: 20:00
+[05-May-2025 22:50:43 UTC] Archivo Excel generado y enviado correctamente: Horario_JESUS_EDUARDO_RODR__GUEZ_GUTI__RREZ.xlsx
+[05-May-2025 23:06:04 UTC] Plantilla cargada correctamente.
+[05-May-2025 23:06:04 UTC] Nombre del profesor establecido en C3: JESUS EDUARDO RODRÍGUEZ GUTIÉRREZ
+[05-May-2025 23:06:04 UTC] Horas del profesor establecidas en G4: 18
+[05-May-2025 23:06:04 UTC] Hora no reconocida: 20:00
+[05-May-2025 23:06:05 UTC] Archivo Excel generado y enviado correctamente: Horario_JESUS_EDUARDO_RODR__GUEZ_GUTI__RREZ.xlsx
+[05-May-2025 23:16:13 UTC] Plantilla cargada correctamente.
+[05-May-2025 23:16:13 UTC] Nombre del profesor establecido en C3: INGLES II
+[05-May-2025 23:16:13 UTC] Horas del profesor establecidas en G4: 23
+[05-May-2025 23:16:13 UTC] Hora no reconocida: 20:00
+[05-May-2025 23:16:13 UTC] Archivo Excel generado y enviado correctamente: Horario_INGLES_II.xlsx
+[05-May-2025 23:17:42 UTC] Plantilla cargada correctamente.
+[05-May-2025 23:17:42 UTC] Nombre del profesor establecido en C3: INGLES II
+[05-May-2025 23:17:42 UTC] Horas del profesor establecidas en G4: 23
+[05-May-2025 23:17:42 UTC] Hora no reconocida: 20:00
+[05-May-2025 23:17:42 UTC] Archivo Excel generado y enviado correctamente: Horario_INGLES_II.xlsx
+[05-May-2025 23:18:16 UTC] Plantilla cargada correctamente.
+[05-May-2025 23:18:16 UTC] Nombre del profesor establecido en C3: INGLES II
+[05-May-2025 23:18:16 UTC] Horas del profesor establecidas en G4: 23
+[05-May-2025 23:18:16 UTC] Hora no reconocida: 20:00
+[05-May-2025 23:18:16 UTC] Archivo Excel generado y enviado correctamente: Horario_INGLES_II.xlsx
+[05-May-2025 23:22:12 UTC] Plantilla cargada correctamente.
+[05-May-2025 23:22:12 UTC] Nombre del profesor establecido en C3: INGLES II
+[05-May-2025 23:22:12 UTC] Horas del profesor establecidas en G4: 23
+[05-May-2025 23:22:12 UTC] Hora no reconocida: 20:00
+[05-May-2025 23:22:12 UTC] Archivo Excel generado y enviado correctamente: Horario_INGLES_II.xlsx
