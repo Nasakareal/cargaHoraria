@@ -4,88 +4,88 @@ include('../admin/layout/parte1.php');
 include('../app/controllers/materias/obtener_materias.php');
 include('../app/controllers/materias/programas_no_asignados.php');
 
-$grupos_materias_faltantes = isset($grupos_materias_faltantes) ? $grupos_materias_faltantes : [];
-$total_grupos = count($grupos_materias_faltantes);
+$grupos_all                    = $grupos_all ?? [];
+$grupos_con_materias_faltantes = $grupos_con_materias_faltantes ?? [];
+$materias_cubiertas    = array_sum(array_column($grupos_all, 'materias_asignadas'));
+$materias_no_cubiertas = array_sum(array_column($grupos_all, 'materias_no_cubiertas'));
 
-$materias_cubiertas = 0;
-$materias_no_cubiertas = 0;
-
-foreach ($grupos_materias_faltantes as $grupo) {
-    $materias_cubiertas += $grupo['materias_asignadas'];
-    $materias_no_cubiertas += $grupo['materias_no_cubiertas'];
-}
-
-$total_materias = $materias_cubiertas + $materias_no_cubiertas;
-$porcentaje_cubiertas = $total_materias > 0 ? round(($materias_cubiertas / $total_materias) * 100, 2) : 0;
+$total_materias        = $materias_cubiertas + $materias_no_cubiertas;
+$porcentaje_cubiertas  = $total_materias
+    ? round(($materias_cubiertas / $total_materias) * 100, 2)
+    : 0;
 $porcentaje_no_cubiertas = 100 - $porcentaje_cubiertas;
 ?>
 
-<!-- Content Wrapper -->
-<div class="content-wrapper">
-    <br>
-    <div class="container">
-        <div class="row justify-content-center">
-            <h1 class="text-center"><?= APP_NAME; ?></h1>
-        </div>
-        <br>
-        <div class="row justify-content-center">
-            <!-- Gráfico de Pastel -->
-            <div class="col-md-5">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title text-center">Materias Cubiertas</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex justify-content-center">
-                            <canvas id="materiasChart"></canvas>
-                        </div>
-                        <p class="mt-3 text-center">
-                            <strong>Porcentaje de Materias Cubiertas:</strong> <?php echo $porcentaje_cubiertas; ?>%<br>
-                            <strong>Porcentaje de Materias No Cubiertas:</strong> <?php echo $porcentaje_no_cubiertas; ?>%
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <!-- Listado de Grupos con Materias No Asignadas -->
-            <div class="col-md-7">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title text-center">Grupos con Materias Sin Profesor</h3>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-center"><strong>Total de Materias Faltantes:</strong> <?php echo $materias_no_cubiertas; ?></p>
+<div class="content-wrapper"><br>
+  <div class="container">
+    <div class="row justify-content-center">
+      <h1 class="text-center"><?= APP_NAME; ?></h1>
+    </div><br>
 
-                        <?php
-                        $grupos_con_materias_faltantes = array_filter($grupos_materias_faltantes, function ($grupo) {
-                            return isset($grupo['materias_faltantes']) && $grupo['materias_faltantes'] > 0;
-                        });
-                        ?>
-
-                        <?php if (!empty($grupos_con_materias_faltantes)): ?>
-                            <table id="listadoMaterias" class="table table-striped table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Grupo</th>
-                                        <th>Materias Sin Profesor</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($grupos_con_materias_faltantes as $grupo): ?>
-                                        <tr>
-                                            <td><?php echo htmlspecialchars($grupo['grupo']); ?></td>
-                                            <td><?php echo htmlspecialchars($grupo['materias_faltantes']); ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        <?php else: ?>
-                            <p class="text-center">Todos los grupos tienen sus materias asignadas a profesores.</p>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
+    <div class="row justify-content-center">
+      <!-- Gráfico -->
+      <div class="col-md-5">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title text-center">Materias Cubiertas</h3>
+          </div>
+          <div class="card-body">
+            <canvas id="materiasChart"></canvas>
+            <p class="mt-3 text-center">
+              <strong>% Cubiertas:</strong> <?= $porcentaje_cubiertas; ?>%<br>
+              <strong>% No Cubiertas:</strong> <?= $porcentaje_no_cubiertas; ?>%
+            </p>
+          </div>
         </div>
+      </div>
+
+      <!-- Tabla de faltantes -->
+      <div class="col-md-7">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title text-center">Grupos con Materias Sin Profesor</h3>
+          </div>
+          <div class="card-body">
+            <p class="text-center">
+              <strong>Total de Materias Faltantes:</strong> <?= $materias_no_cubiertas; ?>
+            </p>
+
+            <?php if (!empty($grupos_con_materias_faltantes)): ?>
+              <table id="listadoMaterias" class="table table-striped table-bordered">
+                <thead>
+                  <tr>
+                    <th>Grupo</th>
+                    <th>Materias Sin Profesor</th>
+                    <th># Faltantes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php foreach ($grupos_con_materias_faltantes as $g): ?>
+                    <tr>
+                      <td>
+                        <?= htmlspecialchars($g['grupo'] ?? '–', ENT_QUOTES, 'UTF-8') ?>
+                      </td>
+                      <td>
+                        <?= htmlspecialchars($g['materias_faltantes'] ?? '–', ENT_QUOTES, 'UTF-8') ?>
+                      </td>
+                      <td>
+                        <?= (int) $g['materias_no_cubiertas'] ?>
+                      </td>
+                    </tr>
+                  <?php endforeach; ?>
+                </tbody>
+              </table>
+            <?php else: ?>
+              <p class="text-center">
+                Todos los grupos tienen sus materias asignadas a profesores.
+              </p>
+            <?php endif; ?>
+
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <?php
