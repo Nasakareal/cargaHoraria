@@ -17,7 +17,8 @@ $sql_horarios = "SELECT
                     g.group_name, 
                     COALESCE(r.classroom_name, 'Sin aula') AS classroom_name, 
                     t.teacher_name, 
-                    t.hours
+                    t.hours,
+                    t.clasificacion
                  FROM 
                     schedule_assignments sa
                  JOIN 
@@ -44,6 +45,7 @@ if (!$horarios) {
 /* Captura del nombre del profesor y horas */
 $teacher_name = $horarios[0]['teacher_name'];
 $teacher_hours = $horarios[0]['hours'];
+$teacher_clasificacion = $horarios[0]['clasificacion'] ?? 'Sin clasificar';
 
 /* Definir los horarios y días */
 $horas = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
@@ -123,6 +125,7 @@ foreach ($horarios as $horario) {
                                     </table>
                                 </div>
                             </div>
+                            <input type="hidden" id="teacher_clasificacion" value="<?= htmlspecialchars($teacher_clasificacion, ENT_QUOTES, 'UTF-8') ?>">
                             <hr>
                             <div class="row">
                                 <div class="col-md-12">
@@ -233,7 +236,7 @@ include('../../layout/mensajes.php');
 
                                 let teacher_name = "<?= addslashes($teacher_name) ?>";
                                 let teacher_hours = "<?= addslashes($teacher_hours) ?>";
-
+                                let teacher_clasificacion = "<?= addslashes($teacher_clasificacion) ?>";
                                 
                                 $.ajax({
                                     url: '../../app/controllers/horarios_grupos/generar_horario.php',
@@ -241,7 +244,8 @@ include('../../layout/mensajes.php');
                                     data: { 
                                         horarios: horarios, 
                                         teacher_name: teacher_name, 
-                                        hours: teacher_hours 
+                                        hours: teacher_hours,
+                                        clasificacion: teacher_clasificacion
                                     },
                                     xhrFields: {
                                         responseType: 'blob'

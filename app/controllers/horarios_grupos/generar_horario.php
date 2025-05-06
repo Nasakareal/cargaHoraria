@@ -46,6 +46,7 @@ $horarios = $_POST['horarios'];
 
 $teacher_name = isset($_POST['teacher_name']) ? htmlspecialchars(trim($_POST['teacher_name']), ENT_QUOTES, 'UTF-8') : '';
 $teacher_hours = isset($_POST['hours']) ? htmlspecialchars(trim($_POST['hours']), ENT_QUOTES, 'UTF-8') : '';
+$clasificacion = isset($_POST['clasificacion']) ? htmlspecialchars(trim($_POST['clasificacion']), ENT_QUOTES, 'UTF-8') : 'Sin clasificar';
 
 if (empty($teacher_name) || empty($teacher_hours)) {
     error_log('Error: Faltan datos del profesor.');
@@ -57,6 +58,12 @@ error_log('Nombre del profesor establecido en C3: ' . strtoupper($teacher_name))
 
 $sheet->setCellValue('G4', $teacher_hours);
 error_log('Horas del profesor establecidas en G4: ' . $teacher_hours);
+
+$sheet->setCellValue('F25', $clasificacion);
+$sheet->setCellValue('A3', 'Nombre del ' . $clasificacion . ':');
+$sheet->getStyle('F25')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+$sheet->getStyle('F25')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+
 
 $horaFila = [
     '07:00' => 6,

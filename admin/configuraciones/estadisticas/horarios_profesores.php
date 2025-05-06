@@ -55,7 +55,8 @@ function obtenerTodosLosProfesoresConHorarios($pdo)
 {
     $sql = "SELECT DISTINCT 
                 t.teacher_id,
-                t.teacher_name
+                t.teacher_name,
+                t.clasificacion
             FROM 
                 schedule_assignments sa
             JOIN 
@@ -129,6 +130,7 @@ $filaInicial = [
 foreach ($profesores as $profesor) {
     $teacher_id = $profesor['teacher_id'];
     $teacher_name = $profesor['teacher_name'];
+    $clasificacion = $profesor['clasificacion'] ?? 'Sin clasificar';
 
     $horarios = obtenerHorariosPorProfesor($pdo, $teacher_id);
 
@@ -156,6 +158,11 @@ foreach ($profesores as $profesor) {
     }
 
     $sheet->setCellValue('C3', $teacher_name);
+    $sheet->setCellValue('F25', $clasificacion);
+    $sheet->setCellValue('A3', 'Nombre del ' . $clasificacion . ':');
+    $sheet->getStyle('F25')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+    $sheet->getStyle('F25')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+
     $sheet->getStyle('C3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
     $sheet->getStyle('C3')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 
