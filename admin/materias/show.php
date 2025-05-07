@@ -38,7 +38,7 @@ include('../../app/controllers/materias/datos_de_materias.php');
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="">Horas Consecutivas en Aula</label>
-                                        <p><?= $hours_consecutive; ?></p> 
+                                        <p><?= $max_consecutive_class_hours; ?></p> 
                                     </div>
                                 </div>
                                 <div class="col-md-4">
