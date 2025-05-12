@@ -8,6 +8,7 @@ $sql_materias = "SELECT
                     s.fyh_creacion,
                     s.fyh_actualizacion,
                     s.estado,
+                    s.unidades,
                     p.program_id,
                     p.program_name, 
                     t.term_id,
@@ -33,6 +34,7 @@ if (!$materia) {
 $subject_name = $materia['subject_name'];
 $max_consecutive_class_hours = $materia['max_consecutive_class_hours'];
 $weekly_hours = $materia['weekly_hours'];
+$unidades = $materia['unidades'];
 $program_id = $materia['program_id'];
 $program_name = $materia['program_name'] ?? 'No asignado';
 $term_id = $materia['term_id'];

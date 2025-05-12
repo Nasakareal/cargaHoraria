@@ -801,3 +801,5 @@ INSERT INTO permisos (nombre_permiso, descripcion, fyh_creacion, estado) VALUES
 
 
 
+ALTER TABLE subjects
+ADD COLUMN unidades INT DEFAULT 0 AFTER term_id;

@@ -98,6 +98,13 @@ if (!verificarPermiso($_SESSION['sesion_id_usuario'], 'subject_edit', $pdo)) {
                                         </div>
                                     </div>
 
+                                    <!-- Unidades -->
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="">Unidades</label>
+                                            <input type="number" name="unidades" value="<?= htmlspecialchars($unidades); ?>" class="form-control" required>
+                                        </div>
+                                    </div>
 
                                 </div>
 

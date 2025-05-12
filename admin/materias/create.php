@@ -21,6 +21,8 @@ include('../../app/controllers/programas/listado_de_programas.php');
                         </div>
                         <div class="card-body">
                             <form action="<?= APP_URL; ?>/app/controllers/materias/create.php" method="post">
+
+                            <!-- Nombre de Materia, Horas consecutivas, Programa -->
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group">
@@ -47,8 +49,10 @@ include('../../app/controllers/programas/listado_de_programas.php');
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Cuatrimestre, Horas Semanales, Unidades -->
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="term_id">Cuatrimestre</label>
                                             <select name="term_id" class="form-control" required>
@@ -59,14 +63,23 @@ include('../../app/controllers/programas/listado_de_programas.php');
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="">Horas semanales</label>
                                             <input type="number" name="weekly_hours" class="form-control" required>
                                         </div>
                                     </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="">Unidades</label>
+                                            <input type="number" name="unidades" class="form-control" required>
+                                        </div>
+                                    </div>
                                 </div>
+                                
+
                                 <hr>
+
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">

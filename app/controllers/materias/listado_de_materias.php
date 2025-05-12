@@ -6,7 +6,8 @@ $sql_subjects = "SELECT
     s.weekly_hours,
     s.max_consecutive_class_hours AS hours_consecutive,
     s.program_id,
-    s.term_id
+    s.term_id,
+    s.unidades
 FROM
     subjects s";
 

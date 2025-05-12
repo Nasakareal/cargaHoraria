@@ -6,12 +6,12 @@ session_start();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Captura y limpia los datos
     $subject_name = trim($_POST['subject_name']);
-    $subject_name_clean = preg_replace('/\s+/', ' ', $subject_name); // Elimina espacios dobles
-
+    $subject_name_clean = preg_replace('/\s+/', ' ', $subject_name);
     $hours_consecutive = (int) $_POST['max_consecutive_class_hours'];
     $weekly_hours = (int) $_POST['weekly_hours'];
     $program_id = (int) $_POST['program_id'];
     $term_id = (int) $_POST['term_id'];
+    $unidades = (int) $_POST['unidades'];
 
     // Validación: ¿Ya existe la materia?
     $query = $pdo->prepare("SELECT COUNT(*) FROM subjects WHERE subject_name = :subject_name");
@@ -31,13 +31,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         max_consecutive_class_hours, 
         weekly_hours, 
         program_id, 
-        term_id
+        term_id,
+        unidades
     ) VALUES (
         :subject_name, 
         :max_consecutive_class_hours, 
         :weekly_hours, 
         :program_id, 
-        :term_id
+        :term_id,
+        :unidades
     )');
 
     $sentencia->bindParam(':subject_name', $subject_name_clean);
@@ -45,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sentencia->bindParam(':weekly_hours', $weekly_hours);
     $sentencia->bindParam(':program_id', $program_id);
     $sentencia->bindParam(':term_id', $term_id);
+    $sentencia->bindParam(':unidades', $unidades);
 
     try {
         if ($sentencia->execute()) {
