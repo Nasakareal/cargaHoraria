@@ -136,7 +136,8 @@ function obtenerLaboratoriosAsignados($pdo, $subject_id)
                                         <td style="text-align: center">
                                             <div class="btn-group" role="group">
                                                 <a href="show.php?id=<?= $subject['subject_id']; ?>" class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>
-                                                <a href="edit.php?id=<?= $subject['subject_id']; ?>" class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></a>
+                                                <a href="edit.php?id=<?= $subject['subject_id']; ?>&redirect=<?= urlencode($_SERVER['REQUEST_URI']) ?>"class="btn btn-info btn-sm"><i class="bi bi-eye"></i></a>
+
                                                 <form action="<?= APP_URL; ?>/app/controllers/materias/delete.php" onclick="preguntar<?= $subject['subject_id']; ?>(event)" method="post" id="miFormulario<?= $subject['subject_id']; ?>">
                                                     <input type="hidden" name="subject_id" value="<?= $subject['subject_id']; ?>">
                                                     <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
@@ -187,7 +188,8 @@ include('../../layout/mensajes.php');
 <script>
     $(function () {
         $("#example1").DataTable({
-            "pageLength": 5,
+            "stateSave": true,
+            "pageLength": 10,
             "language": {
                 "emptyTable": "No hay información",
                 "info": "Mostrando _START_ a _END_ de _TOTAL_ Materias",

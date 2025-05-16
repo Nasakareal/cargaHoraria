@@ -43,6 +43,8 @@ if (!verificarPermiso($_SESSION['sesion_id_usuario'], 'subject_edit', $pdo)) {
                         <div class="card-body">
                             <form action="<?= APP_URL; ?>/app/controllers/materias/update.php" method="post">
                                 <input type="hidden" name="subject_id" value="<?= htmlspecialchars($subject_id); ?>">
+                                <input type="hidden" name="redirect" value="<?= htmlspecialchars($_GET['redirect'] ?? '') ?>">
+
 
                                 <div class="row">
                                     <!-- Nombre de la materia -->

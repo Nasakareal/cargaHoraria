@@ -14,6 +14,9 @@ $program_id = filter_input(INPUT_POST, 'program_id', FILTER_VALIDATE_INT);
 $term_id = filter_input(INPUT_POST, 'term_id', FILTER_VALIDATE_INT);
 $unidades = filter_input(INPUT_POST, 'unidades', FILTER_VALIDATE_INT);
 
+/** 👇 Aquí capturamos el redirect directo del POST, sin session ni respaldo */
+$redirect = $_POST['redirect'] ?? (APP_URL . "/admin/materias");
+
 if (
     !$subject_id || 
     !$subject_name || 
@@ -25,7 +28,7 @@ if (
 ) {
     $_SESSION['mensaje'] = "Error: Datos inválidos.";
     $_SESSION['icono'] = "error";
-    header('Location: ' . APP_URL . "/admin/materias");
+    header('Location: ' . $redirect);
     exit;
 }
 
@@ -46,7 +49,6 @@ try {
     $old_weekly_hours = $old_subject['weekly_hours'];
     $difference = $weekly_hours - $old_weekly_hours;
 
-    // ✅ Se añade el campo 'unidades' al UPDATE
     $sentencia_actualizar = $pdo->prepare("UPDATE subjects
         SET subject_name = :subject_name,
             weekly_hours = :weekly_hours,
@@ -63,7 +65,7 @@ try {
     $sentencia_actualizar->bindParam(':fyh_actualizacion', $fechaHora);
     $sentencia_actualizar->bindParam(':program_id', $program_id, PDO::PARAM_INT);
     $sentencia_actualizar->bindParam(':term_id', $term_id, PDO::PARAM_INT);
-    $sentencia_actualizar->bindParam(':unidades', $unidades, PDO::PARAM_INT); // <- esta línea es nueva
+    $sentencia_actualizar->bindParam(':unidades', $unidades, PDO::PARAM_INT);
     $sentencia_actualizar->bindParam(':subject_id', $subject_id, PDO::PARAM_INT);
 
     $sentencia_actualizar->execute();
@@ -74,7 +76,6 @@ try {
     $sentencia_relacion->bindParam(':program_id', $program_id, PDO::PARAM_INT);
     $sentencia_relacion->bindParam(':term_id', $term_id, PDO::PARAM_INT);
     $sentencia_relacion->bindParam(':subject_id', $subject_id, PDO::PARAM_INT);
-
     $sentencia_relacion->execute();
 
     if ($difference != 0) {
@@ -91,7 +92,6 @@ try {
 
             $update_teacher_hours->bindParam(':difference', $difference, PDO::PARAM_INT);
             $update_teacher_hours->bindParam(':teacher_id', $teacher_id, PDO::PARAM_INT);
-
             $update_teacher_hours->execute();
         }
     }
@@ -106,12 +106,13 @@ try {
 
     $_SESSION['mensaje'] = "Materia actualizada correctamente.";
     $_SESSION['icono'] = "success";
-    header('Location: ' . APP_URL . "/admin/materias");
+    header('Location: ' . $redirect);
     exit;
+
 } catch (Exception $exception) {
     $pdo->rollBack();
     $_SESSION['mensaje'] = "Ocurrió un error: " . $exception->getMessage();
     $_SESSION['icono'] = "error";
-    header('Location: ' . APP_URL . "/admin/materias");
+    header('Location: ' . $redirect);
     exit;
 }
